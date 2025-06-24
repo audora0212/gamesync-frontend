@@ -1,12 +1,19 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectGroup,
+  SelectLabel,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { timetableService } from "@/lib/timetable-service"
@@ -32,15 +39,17 @@ interface TimetableViewProps {
 }
 
 export function TimetableView({ serverId }: TimetableViewProps) {
+  const today = new Date().toISOString().split("T")[0]
+
   const [entries, setEntries] = useState<TimetableEntry[]>([])
   const [defaultGames, setDefaultGames] = useState<Game[]>([])
   const [customGames, setCustomGames] = useState<Game[]>([])
-  const [selectedDate, setSelectedDate] = useState("")
-  const [selectedTime, setSelectedTime] = useState("")
-  const [selectedGame, setSelectedGame] = useState("")
-  const [gameFilter, setGameFilter] = useState("")
-  const [sortByGame, setSortByGame] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [selectedDate, setSelectedDate] = useState<string>(today)
+  const [selectedTime, setSelectedTime] = useState<string>("")
+  const [selectedGame, setSelectedGame] = useState<string>("")
+  const [gameFilter, setGameFilter] = useState<string>("")
+  const [sortByGame, setSortByGame] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     loadData()
@@ -59,10 +68,8 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       setDefaultGames(defaultData.defaultGames)
       setCustomGames(customData.customGames)
       await loadTimetable()
-    } catch (error) {
-      toast.error("데이터 로드 실패", {
-        description: "데이터를 불러오는데 실패했습니다.",
-      })
+    } catch {
+      toast.error("데이터 로드 실패", { description: "데이터를 불러오는데 실패했습니다." })
     } finally {
       setIsLoading(false)
     }
@@ -72,19 +79,15 @@ export function TimetableView({ serverId }: TimetableViewProps) {
     try {
       const data = await timetableService.getTimetable(serverId, gameFilter, sortByGame)
       setEntries(data)
-    } catch (error) {
-      toast.error("타임테이블 로드 실패", {
-        description: "타임테이블을 불러오는데 실패했습니다.",
-      })
+    } catch {
+      toast.error("타임테이블 로드 실패", { description: "타임테이블을 불러오는데 실패했습니다." })
     }
   }
 
   const handleAddEntry = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedDate || !selectedTime || !selectedGame) {
-      toast.error("입력 오류", {
-        description: "모든 필드를 입력해주세요.",
-      })
+      toast.error("입력 오류", { description: "모든 필드를 입력해주세요." })
       return
     }
 
@@ -92,7 +95,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
     const [gameType, gameId] = selectedGame.split("-")
 
     try {
-      const entry = await timetableService.addEntry({
+      await timetableService.addEntry({
         serverId,
         slot,
         defaultGameId: gameType === "default" ? Number(gameId) : undefined,
@@ -100,17 +103,13 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       })
 
       await loadTimetable()
-      setSelectedDate("")
+      setSelectedDate(today)
       setSelectedTime("")
       setSelectedGame("")
 
-      toast.success("예약 완료", {
-        description: "게임이 예약되었습니다.",
-      })
-    } catch (error) {
-      toast.error("예약 실패", {
-        description: "게임 예약 중 오류가 발생했습니다.",
-      })
+      toast.success("예약 완료", { description: "게임이 예약되었습니다." })
+    } catch {
+      toast.error("예약 실패", { description: "게임 예약 중 오류가 발생했습니다." })
     }
   }
 
@@ -168,25 +167,27 @@ export function TimetableView({ serverId }: TimetableViewProps) {
               required
             />
           </div>
-          <Select value={selectedGame} onValueChange={setSelectedGame} required>
+          <Select value={selectedGame} onValueChange={setSelectedGame} defaultValue="">
             <SelectTrigger className="glass border-white/30 text-black">
               <SelectValue placeholder="게임 선택" />
             </SelectTrigger>
             <SelectContent className="glass border-white/20 text-black">
-              <optgroup label="기본 게임">
+              <SelectGroup>
+                <SelectLabel>기본 게임</SelectLabel>
                 {defaultGames.map((game) => (
                   <SelectItem key={`default-${game.id}`} value={`default-${game.id}`}>
-                    {game.name}
+                    {`${game.name} (기본)`}
                   </SelectItem>
                 ))}
-              </optgroup>
-              <optgroup label="커스텀 게임">
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>커스텀 게임</SelectLabel>
                 {customGames.map((game) => (
                   <SelectItem key={`custom-${game.id}`} value={`custom-${game.id}`}>
-                    {game.name}
+                    {`${game.name} (커스텀)`}
                   </SelectItem>
                 ))}
-              </optgroup>
+              </SelectGroup>
             </SelectContent>
           </Select>
           <Button type="submit" className="w-full glass-button text-white">
@@ -196,14 +197,12 @@ export function TimetableView({ serverId }: TimetableViewProps) {
 
         {/* 필터 및 정렬 */}
         <div className="flex gap-3">
-          <div className="flex-1">
-            <Input
-              placeholder="게임 이름으로 필터"
-              value={gameFilter}
-              onChange={(e) => setGameFilter(e.target.value)}
-              className="glass border-white/30 text-black placeholder:text-black/50"
-            />
-          </div>
+          <Input
+            placeholder="게임 이름으로 필터"
+            value={gameFilter}
+            onChange={(e) => setGameFilter(e.target.value)}
+            className="glass border-white/30 text-black placeholder:text-black/50"
+          />
           <Button
             onClick={() => setSortByGame(!sortByGame)}
             variant="outline"
@@ -223,7 +222,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                   <Clock className="h-4 w-4 text-black/60" />
                   <span className="text-black font-medium">{formatDateTime(entry.slot)}</span>
                 </div>
-                <Badge variant={entry.custom ? "secondary" : "default"} className="glass text-black">
+                <Badge variant={entry.custom ? "secondary" : "default"} className="glass text-white">
                   {entry.custom ? "커스텀" : "기본"}
                 </Badge>
               </div>
