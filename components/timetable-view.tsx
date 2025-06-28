@@ -126,13 +126,13 @@ export function TimetableView({ serverId }: TimetableViewProps) {
     return (
       <Card className="glass border-white/20 h-full">
         <CardHeader>
-          <CardTitle className="text-black flex items-center">
-            <Calendar className="mr-2 h-5 w-5 text-black" />
+          <CardTitle className="text-white flex items-center">
+            <Calendar className="mr-2 h-5 w-5 text-white" />
             타임테이블
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-black/70">로딩 중...</div>
+          <div className="text-white/70">로딩 중...</div>
         </CardContent>
       </Card>
     )

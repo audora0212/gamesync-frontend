@@ -19,16 +19,16 @@ interface CustomGameRequest {
   name: string
 }
 
+interface ScheduledUserListResponse {
+  users: { username: string }[]
+}
+
 class GameService {
   async getDefaultGames(): Promise<DefaultGameListResponse> {
     const response = await fetch(`${API_BASE}/games/default`, {
       headers: authService.getAuthHeaders(),
     })
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch default games")
-    }
-
+    if (!response.ok) throw new Error("Failed to fetch default games")
     return response.json()
   }
 
@@ -36,11 +36,7 @@ class GameService {
     const response = await fetch(`${API_BASE}/servers/${serverId}/custom-games`, {
       headers: authService.getAuthHeaders(),
     })
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch custom games")
-    }
-
+    if (!response.ok) throw new Error("Failed to fetch custom games")
     return response.json()
   }
 
@@ -53,23 +49,28 @@ class GameService {
       },
       body: JSON.stringify(data),
     })
+    if (!response.ok) throw new Error("Failed to add custom game")
+    return response.json()
+  }
 
-    if (!response.ok) {
-      throw new Error("Failed to add custom game")
-    }
-
+  async getScheduledUsers(serverId: number, gameId: number): Promise<ScheduledUserListResponse> {
+    const response = await fetch(
+      `${API_BASE}/servers/${serverId}/custom-games/${gameId}/scheduled-users`,
+      { headers: authService.getAuthHeaders() }
+    )
+    if (!response.ok) throw new Error("Failed to fetch scheduled users")
     return response.json()
   }
 
   async deleteCustomGame(serverId: number, gameId: number): Promise<void> {
-    const response = await fetch(`${API_BASE}/servers/${serverId}/custom-games/${gameId}`, {
-      method: "DELETE",
-      headers: authService.getAuthHeaders(),
-    })
-
-    if (!response.ok) {
-      throw new Error("Failed to delete custom game")
-    }
+    const response = await fetch(
+      `${API_BASE}/servers/${serverId}/custom-games/${gameId}`,
+      {
+        method: "DELETE",
+        headers: authService.getAuthHeaders(),
+      }
+    )
+    if (!response.ok) throw new Error("Failed to delete custom game")
   }
 }
 
