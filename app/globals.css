@@ -45,3 +45,11 @@
   @apply ring-2 ring-blue-400 ring-opacity-50;
 }
 
+/* ────────────── Glassmorphism Utilities ────────────── */
+.glass {
+  @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl;
+}
+
+.glass-button {
+  @apply bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-2xl;
+}
