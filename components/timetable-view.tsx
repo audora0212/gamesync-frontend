@@ -141,37 +141,37 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   return (
     <Card className="glass border-white/20 h-full">
       <CardHeader>
-        <CardTitle className="text-black flex items-center">
-          <Calendar className="mr-2 h-5 w-5 text-black" />
+        <CardTitle className="text-white flex items-center">
+          <Calendar className="mr-2 h-5 w-5 text-white" />
           타임테이블
         </CardTitle>
-        <CardDescription className="text-black/70">게임 세션을 예약하고 관리하세요</CardDescription>
+        <CardDescription className="text-white/70">게임 세션을 예약하고 관리하세요</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* 예약 추가 폼 */}
         <form onSubmit={handleAddEntry} className="space-y-4 p-4 glass rounded-lg">
-          <h3 className="text-black font-medium">새 예약 추가</h3>
+          <h3 className="text-white font-medium">새 예약 추가</h3>
           <div className="grid grid-cols-2 gap-3">
             <Input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="glass border-white/30 text-black"
+              className="glass border-white/30 text-white"
               required
             />
             <Input
               type="time"
               value={selectedTime}
               onChange={(e) => setSelectedTime(e.target.value)}
-              className="glass border-white/30 text-black"
+              className="glass border-white/30 text-white"
               required
             />
           </div>
           <Select value={selectedGame} onValueChange={setSelectedGame} defaultValue="">
-            <SelectTrigger className="glass border-white/30 text-black">
+            <SelectTrigger className="glass border-white/30 text-white">
               <SelectValue placeholder="게임 선택" />
             </SelectTrigger>
-            <SelectContent className="glass border-white/20 text-black">
+            <SelectContent className="glass border-white/20 text-white">
               <SelectGroup>
                 <SelectLabel>기본 게임</SelectLabel>
                 {defaultGames.map((game) => (
@@ -201,14 +201,14 @@ export function TimetableView({ serverId }: TimetableViewProps) {
             placeholder="게임 이름으로 필터"
             value={gameFilter}
             onChange={(e) => setGameFilter(e.target.value)}
-            className="glass border-white/30 text-black placeholder:text-black/50"
+            className="glass border-white/30 text-white placeholder:text-white/50"
           />
           <Button
             onClick={() => setSortByGame(!sortByGame)}
             variant="outline"
-            className={`glass border-white/30 text-black ${sortByGame ? "bg-black/10" : ""}`}
+            className={`glass border-white/30 text-white ${sortByGame ? "bg-white/10" : ""}`}
           >
-            <Filter className="mr-2 h-4 w-4 text-black" />
+            <Filter className="mr-2 h-4 w-4 text-white" />
             게임순
           </Button>
         </div>
@@ -219,21 +219,21 @@ export function TimetableView({ serverId }: TimetableViewProps) {
             <div key={entry.id} className="p-3 glass rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4 text-black/60" />
-                  <span className="text-black font-medium">{formatDateTime(entry.slot)}</span>
+                  <Clock className="h-4 w-4 text-white/60" />
+                  <span className="text-white font-medium">{formatDateTime(entry.slot)}</span>
                 </div>
                 <Badge variant={entry.custom ? "secondary" : "default"} className="glass text-white">
                   {entry.custom ? "커스텀" : "기본"}
                 </Badge>
               </div>
-              <div className="text-black/80 text-sm">
+              <div className="text-white/80 text-sm">
                 <div>게임: {entry.gameName}</div>
                 <div>플레이어: {entry.user}</div>
               </div>
             </div>
           ))}
           {entries.length === 0 && (
-            <div className="text-center py-8 text-black/60">예약된 게임이 없습니다.</div>
+            <div className="text-center py-8 text-white/60">예약된 게임이 없습니다.</div>
           )}
         </div>
       </CardContent>

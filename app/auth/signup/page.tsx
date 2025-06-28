@@ -58,15 +58,15 @@ export default function SignupPage() {
           <p className="text-white/70">새 계정을 만들어보세요</p>
         </div>
 
-        <Card className="glass border-black/20">
+        <Card className="glass border-white/20">
           <CardHeader>
-            <CardTitle className="text-black">회원가입</CardTitle>
-            <CardDescription className="text-black/70">새 계정 정보를 입력해주세요</CardDescription>
+            <CardTitle className="text-white">회원가입</CardTitle>
+            <CardDescription className="text-white/70">새 계정 정보를 입력해주세요</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-black">
+                <Label htmlFor="username" className="text-white">
                   사용자명
                 </Label>
                 <Input
@@ -74,13 +74,13 @@ export default function SignupPage() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="glass border-black/30 text-black placeholder:text-black/50"
+                  className="glass border-white/30 text-white placeholder:text-white/50"
                   placeholder="사용자명을 입력하세요"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-black">
+                <Label htmlFor="password" className="text-white">
                   비밀번호
                 </Label>
                 <Input
@@ -88,13 +88,13 @@ export default function SignupPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="glass border-black/30 text-black placeholder:text-black/50"
+                  className="glass border-white/30 text-white placeholder:text-white/50"
                   placeholder="비밀번호를 입력하세요"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-black">
+                <Label htmlFor="confirmPassword" className="text-white">
                   비밀번호 확인
                 </Label>
                 <Input
@@ -102,7 +102,7 @@ export default function SignupPage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="glass border-black/30 text-black placeholder:text-black/50"
+                  className="glass border-white/30 text-white placeholder:text-white/50"
                   placeholder="비밀번호를 다시 입력하세요"
                   required
                 />
@@ -119,7 +119,7 @@ export default function SignupPage() {
               </Button>
             </form>
             <div className="mt-6 text-center">
-              <p className="text-black/70">
+              <p className="text-white/70">
                 이미 계정이 있으신가요?{" "}
                 <Link href="/auth/login" className="text-blue-300 hover:text-blue-200 underline">
                   로그인

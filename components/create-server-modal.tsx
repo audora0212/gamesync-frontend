@@ -47,25 +47,25 @@ export function CreateServerModal({ open, onClose, onServerCreated }: CreateServ
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="glass border-white/20">
         <DialogHeader>
-          <DialogTitle className="text-black">새 서버 생성</DialogTitle>
-          <DialogDescription className="text-black/70">새로운 게임 서버를 생성합니다.</DialogDescription>
+          <DialogTitle className="text-white">새 서버 생성</DialogTitle>
+          <DialogDescription className="text-white/70">새로운 게임 서버를 생성합니다.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-black">
+            <Label htmlFor="name" className="text-white">
               서버 이름
             </Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="glass border-white/30 text-black placeholder:text-black/50"
+              className="glass border-white/30 text-white placeholder:text-white/50"
               placeholder="서버 이름을 입력하세요"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="resetTime" className="text-black">
+            <Label htmlFor="resetTime" className="text-white">
               초기화 시간
             </Label>
             <Input
@@ -73,7 +73,7 @@ export function CreateServerModal({ open, onClose, onServerCreated }: CreateServ
               type="time"
               value={resetTime}
               onChange={(e) => setResetTime(e.target.value)}
-              className="glass border-white/30 text-black"
+              className="glass border-white/30 text-white"
               required
             />
           </div>
@@ -82,7 +82,7 @@ export function CreateServerModal({ open, onClose, onServerCreated }: CreateServ
               type="button"
               variant="outline"
               onClick={onClose}
-              className="glass border-white/30 text-black hover:bg-black/10"
+              className="glass border-white/30 text-white hover:bg-white/10"
             >
               취소
             </Button>

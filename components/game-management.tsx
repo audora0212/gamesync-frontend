@@ -89,7 +89,7 @@ export function GameManagement({ serverId }: GameManagementProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-black/70">로딩 중...</div>
+          <div className="text-white/70">로딩 중...</div>
         </CardContent>
       </Card>
     )
@@ -98,21 +98,21 @@ export function GameManagement({ serverId }: GameManagementProps) {
   return (
     <Card className="glass border-white/20 h-full">
       <CardHeader>
-        <CardTitle className="text-black flex items-center">
+        <CardTitle className="text-white flex items-center">
           <Gamepad2 className="mr-2 h-5 w-5" />
           게임 관리
         </CardTitle>
-        <CardDescription className="text-black/70">기본 게임과 커스텀 게임을 관리하세요</CardDescription>
+        <CardDescription className="text-white/70">기본 게임과 커스텀 게임을 관리하세요</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* 기본 게임 */}
         <div>
-          <h3 className="text-black font-medium mb-3">기본 게임</h3>
+          <h3 className="text-white font-medium mb-3">기본 게임</h3>
           <div className="space-y-2">
             {defaultGames.map((game) => (
               <div key={game.id} className="flex items-center justify-between p-2 glass rounded-lg">
-                <span className="text-black text-sm">{game.name}</span>
-                <Badge variant="secondary" className="glass text-black text-xs">
+                <span className="text-white text-sm">{game.name}</span>
+                <Badge variant="secondary" className="glass text-white text-xs">
                   기본
                 </Badge>
               </div>
@@ -122,13 +122,13 @@ export function GameManagement({ serverId }: GameManagementProps) {
 
         {/* 커스텀 게임 */}
         <div>
-          <h3 className="text-black font-medium mb-3">커스텀 게임</h3>
+          <h3 className="text-white font-medium mb-3">커스텀 게임</h3>
           <form onSubmit={handleAddCustomGame} className="flex gap-2 mb-3">
             <Input
               value={newGameName}
               onChange={(e) => setNewGameName(e.target.value)}
               placeholder="게임 이름"
-              className="glass border-white/30 text-black placeholder:text-black/50 text-sm"
+              className="glass border-white/30 text-white placeholder:text-white/50 text-sm"
             />
             <Button type="submit" size="sm" className="glass-button">
               <Plus className="h-4 w-4" />
@@ -137,7 +137,7 @@ export function GameManagement({ serverId }: GameManagementProps) {
           <div className="space-y-2">
             {customGames.map((game) => (
               <div key={game.id} className="flex items-center justify-between p-2 glass rounded-lg">
-                <span className="text-black text-sm">{game.name}</span>
+                <span className="text-white text-sm">{game.name}</span>
                 <Button
                   onClick={() => handleDeleteCustomGame(game.id)}
                   size="sm"

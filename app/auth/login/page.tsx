@@ -51,13 +51,13 @@ export default function LoginPage() {
 
         <Card className="glass border-white/20">
           <CardHeader>
-            <CardTitle className="text-black">로그인</CardTitle>
-            <CardDescription className="text-black/70">계정 정보를 입력해주세요</CardDescription>
+            <CardTitle className="text-white">로그인</CardTitle>
+            <CardDescription className="text-white/70">계정 정보를 입력해주세요</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-black">
+                <Label htmlFor="username" className="text-white">
                   사용자명
                 </Label>
                 <Input
@@ -65,13 +65,13 @@ export default function LoginPage() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="glass border-black/30 text-black placeholder:text-black/50"
+                  className="glass border-white/30 text-white placeholder:text-white/50"
                   placeholder="사용자명을 입력하세요"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-black">
+                <Label htmlFor="password" className="text-white">
                   비밀번호
                 </Label>
                 <Input
@@ -79,7 +79,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="glass border-black/30 text-black placeholder:text-black/50"
+                  className="glass border-white/30 text-white placeholder:text-white/50"
                   placeholder="비밀번호를 입력하세요"
                   required
                 />
@@ -96,7 +96,7 @@ export default function LoginPage() {
               </Button>
             </form>
             <div className="mt-6 text-center">
-              <p className="text-black/70">
+              <p className="text-white/70">
                 계정이 없으신가요?{" "}
                 <Link href="/auth/signup" className="text-blue-300 hover:text-blue-200 underline">
                   회원가입

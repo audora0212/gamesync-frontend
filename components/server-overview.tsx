@@ -51,40 +51,40 @@ export function ServerOverview({ server, onServerUpdate }: ServerOverviewProps) 
   return (
     <Card className="glass border-white/20 h-full">
       <CardHeader>
-        <CardTitle className="text-black flex items-center">
-          <Users className="mr-2 h-5 w-5 text-black" />
+        <CardTitle className="text-white flex items-center">
+          <Users className="mr-2 h-5 w-5 text-white" />
           서버 개요
         </CardTitle>
-        <CardDescription className="text-black/70">서버 정보와 멤버를 관리하세요</CardDescription>
+        <CardDescription className="text-white/70">서버 정보와 멤버를 관리하세요</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* 서버 정보 */}
         <div className="space-y-3">
-          <h3 className="text-black font-medium">서버 정보</h3>
+          <h3 className="text-white font-medium">서버 정보</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-black/70">서버 이름:</span>
-              <span className="text-black">{server.name}</span>
+              <span className="text-white/70">서버 이름:</span>
+              <span className="text-white">{server.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-black/70">초기화 시간:</span>
-              <span className="text-black">{server.resetTime}</span>
+              <span className="text-white/70">초기화 시간:</span>
+              <span className="text-white">{server.resetTime}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-black/70">총 멤버:</span>
-              <span className="text-black">{server.members.length}명</span>
+              <span className="text-white/70">총 멤버:</span>
+              <span className="text-white">{server.members.length}명</span>
             </div>
           </div>
         </div>
 
         {/* 멤버 목록 */}
         <div className="space-y-3">
-          <h3 className="text-black font-medium">멤버 목록</h3>
+          <h3 className="text-white font-medium">멤버 목록</h3>
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {server.members.map((member) => (
               <div key={member} className="flex items-center justify-between p-2 glass rounded-lg">
                 <div className="flex items-center space-x-2">
-                  <span className="text-black text-sm">{member}</span>
+                  <span className="text-white text-sm">{member}</span>
                   {server.owner === member && <Crown className="h-4 w-4 text-yellow-400" />}
                   {server.admins.includes(member) && server.owner !== member && (
                     <Shield className="h-4 w-4 text-blue-400" />
@@ -115,8 +115,8 @@ export function ServerOverview({ server, onServerUpdate }: ServerOverviewProps) 
             </Button>
           </Link>
           {(isOwner || isAdmin) && (
-            <Button variant="outline" className="w-full glass border-white/30 text-black hover:bg-black/10">
-              <Settings className="mr-2 h-4 w-4 text-black" />
+            <Button variant="outline" className="w-full glass border-white/30 text-white hover:bg-black/10">
+              <Settings className="mr-2 h-4 w-4 text-white" />
               서버 설정
             </Button>
           )}
@@ -126,18 +126,18 @@ export function ServerOverview({ server, onServerUpdate }: ServerOverviewProps) 
         <div className="pt-4 border-t border-white/20">
           <div className="flex flex-wrap gap-2">
             {isOwner && (
-              <Badge variant="secondary" className="glass text-black">
-                <Crown className="mr-1 h-3 w-3 text-black" />
+              <Badge variant="secondary" className="glass text-white">
+                <Crown className="mr-1 h-3 w-3 text-white" />
                 소유자
               </Badge>
             )}
             {isAdmin && !isOwner && (
-              <Badge variant="secondary" className="glass text-black">
-                <Shield className="mr-1 h-3 w-3 text-black" />
+              <Badge variant="secondary" className="glass text-white">
+                <Shield className="mr-1 h-3 w-3 text-white" />
                 관리자
               </Badge>
             )}
-            <Badge variant="outline" className="glass border-white/30 text-black">
+            <Badge variant="outline" className="glass border-white/30 text-white">
               멤버
             </Badge>
           </div>

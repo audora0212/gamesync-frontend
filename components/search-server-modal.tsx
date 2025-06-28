@@ -69,25 +69,25 @@ export function SearchServerModal({ open, onClose, onJoinSuccess }: Props) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="glass border-white/20">
         <DialogHeader>
-          <DialogTitle className="text-black">서버 찾기</DialogTitle>
+          <DialogTitle className="text-white">서버 찾기</DialogTitle>
         </DialogHeader>
         <div className="p-4">
           <Input
             placeholder="서버 이름으로 검색"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="glass border-white/30 text-black mb-4"
+            className="glass border-white/30 text-white mb-4"
           />
           <div ref={containerRef} onScroll={onScroll} className="max-h-64 overflow-y-auto space-y-2">
             {list.map(s => (
               <div key={s.id} className="flex items-center justify-between p-2 glass rounded-lg">
-                <span className="text-black">{s.name}</span>
+                <span className="text-white">{s.name}</span>
                 <Button size="sm" onClick={() => handleJoin(s.id)} className="glass-button">
                   참가
                 </Button>
               </div>
             ))}
-            {list.length === 0 && <div className="text-center text-black/60">검색 결과가 없습니다.</div>}
+            {list.length === 0 && <div className="text-center text-white/60">검색 결과가 없습니다.</div>}
           </div>
         </div>
       </DialogContent>

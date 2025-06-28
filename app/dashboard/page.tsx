@@ -84,10 +84,16 @@ export default function DashboardPage() {
             <p className="text-white/70">내가 참여한 서버를 관리하고 스케줄을 확인하세요</p>
           </div>
           <div className="flex">
-            <Button onClick={() => setShowSearchModal(true)} className="mr-2 glass-button">
+            <Button
+              onClick={() => setShowSearchModal(true)}
+              className="mr-2 glass-button hover:bg-white/20 h-12 px-6"
+            >
               서버 찾기
             </Button>
-            <Button onClick={() => setShowCreateModal(true)} className="glass-button">
+            <Button
+              onClick={() => setShowCreateModal(true)}
+              className="glass-button hover:bg-white/20 h-12 px-6"
+            >
               <Plus className="mr-2 h-4 w-4" />서버 생성
             </Button>
           </div>
@@ -95,7 +101,10 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {servers.map(server => (
-            <Card key={server.id} className="glass bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 lg:p-8">
+            <Card
+              key={server.id}
+              className="glass bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 lg:p-8"
+            >
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-white">{server.name}</CardTitle>
@@ -111,25 +120,35 @@ export default function DashboardPage() {
                     <Users className="mr-2 h-4 w-4" />
                     <span>{server.members.length}명 참여</span>
                   </div>
-                  <div className="flex items-center text-white/80">
-                    <Clock className="mr-2 h-4 w-4" />
-                    <span>초기화: {server.resetTime}</span>
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <Button onClick={() => router.push(`/server/${server.id}`)} className="flex-1 glass-button" size="sm">
+
+                  {/* resetTime row: left=time, right=입장 버튼 */}
+                  <div className="flex items-center justify-between text-white/80">
+                    <div className="flex items-center">
+                      <Clock className="mr-2 h-4 w-4" />
+                      <span>초기화: {server.resetTime}</span>
+                    </div>
+                    <Button
+                      onClick={() => router.push(`/server/${server.id}`)}
+                      className="glass-button hover:bg-white/20 h-15 px-8"
+                      size="sm"
+                    >
                       입장
                     </Button>
-                    {server.owner !== authService.getCurrentUser() && (
+                  </div>
+
+                  {/* 참가 버튼 (소유자가 아닐 때만) */}
+                  {server.owner !== authService.getCurrentUser() && (
+                    <div className="text-right">
                       <Button
                         onClick={() => handleJoinServer(server.id)}
                         variant="outline"
-                        className="glass border-white/30 text-white hover:bg-white/20"
+                        className="glass border-white/30 text-white hover:bg-red/20 h-10 px-4"
                         size="sm"
                       >
                         참가
                       </Button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -138,13 +157,19 @@ export default function DashboardPage() {
 
         {servers.length === 0 && (
           <div className="text-center py-12">
-            <div className="glass-card max-w-md mx-auto">
+            <div className="glass max-w-md mx-auto p-8">
               <h3 className="text-xl font-semibold text-white mb-2">서버가 없습니다</h3>
               <p className="text-white/70 mb-4">서버를 찾거나 생성해보세요.</p>
-              <Button onClick={() => setShowSearchModal(true)} className="glass-button mr-2">
+              <Button
+                onClick={() => setShowSearchModal(true)}
+                className="glass-button hover:bg-white/20 h-12 px-6 mr-2"
+              >
                 서버 찾기
               </Button>
-              <Button onClick={() => setShowCreateModal(true)} className="glass-button">
+              <Button
+                onClick={() => setShowCreateModal(true)}
+                className="glass-button hover:bg-white/20 h-12 px-6"
+              >
                 서버 생성
               </Button>
             </div>
@@ -152,8 +177,16 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <CreateServerModal open={showCreateModal} onClose={() => setShowCreateModal(false)} onServerCreated={handleServerCreated} />
-      <SearchServerModal open={showSearchModal} onClose={() => setShowSearchModal(false)} onJoinSuccess={loadServers} />
+      <CreateServerModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onServerCreated={handleServerCreated}
+      />
+      <SearchServerModal
+        open={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        onJoinSuccess={loadServers}
+      />
     </div>
   )
 }
