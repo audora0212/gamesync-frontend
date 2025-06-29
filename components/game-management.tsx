@@ -126,7 +126,6 @@ export function GameManagement({ serverId }: GameManagementProps) {
           <CardDescription className="text-white/70">기본 게임과 커스텀 게임을 관리하세요</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* ... existing default games and custom games UI ... */}
           <div>
             <h3 className="text-white font-medium mb-3">커스텀 게임</h3>
             <form onSubmit={handleAddCustomGame} className="flex gap-2 mb-3">
@@ -136,13 +135,13 @@ export function GameManagement({ serverId }: GameManagementProps) {
                 placeholder="게임 이름"
                 className="glass border-white/30 text-white placeholder:text-white/50 text-sm"
               />
-              <Button type="submit" size="sm" className="glass-button">
+              <Button type="submit" size="sm" className="glass-button hover:bg-black/10">
                 <Plus className="h-4 w-4" />
               </Button>
             </form>
             <div className="space-y-2">
               {customGames.map(game => (
-                <div key={game.id} className="flex items-center justify-between p-2 glass rounded-lg">
+                <div key={game.id} className="flex items-center justify-between p-2 glass rounded-lg hover:bg-black/10">
                   <span className="text-white text-sm">{game.name}</span>
                   <Button
                     onClick={() => requestDeleteCustomGame(game.id, game.name)}

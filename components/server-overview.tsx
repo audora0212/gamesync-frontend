@@ -34,8 +34,6 @@ export function ServerOverview({ server, onServerUpdate }: ServerOverviewProps) 
 
     setIsLoading(true)
     try {
-      // Note: This would need the user ID, not username
-      // In a real implementation, you'd need to get the user ID first
       toast.error("기능 준비 중", {
         description: "멤버 강퇴 기능은 준비 중입니다.",
       })
@@ -82,7 +80,10 @@ export function ServerOverview({ server, onServerUpdate }: ServerOverviewProps) 
           <h3 className="text-white font-medium">멤버 목록</h3>
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {server.members.map((member) => (
-              <div key={member} className="flex items-center justify-between p-2 glass rounded-lg">
+              <div
+                key={member}
+                className="flex items-center justify-between pl-4 p-2 glass rounded-lg hover:bg-black/10"
+              >
                 <div className="flex items-center space-x-2">
                   <span className="text-white text-sm">{member}</span>
                   {server.owner === member && <Crown className="h-4 w-4 text-yellow-400" />}
@@ -109,13 +110,19 @@ export function ServerOverview({ server, onServerUpdate }: ServerOverviewProps) 
         {/* 액션 버튼 */}
         <div className="space-y-2">
           <Link href={`/stats/${server.id}`}>
-            <Button className="w-full glass-button text-white">
+            <Button
+              variant="outline"
+              className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+            >
               <BarChart3 className="mr-2 h-4 w-4 text-white" />
               통계 보기
             </Button>
           </Link>
           {(isOwner || isAdmin) && (
-            <Button variant="outline" className="w-full glass border-white/30 text-white hover:bg-black/10">
+            <Button
+              variant="outline"
+              className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+            >
               <Settings className="mr-2 h-4 w-4 text-white" />
               서버 설정
             </Button>
@@ -126,18 +133,18 @@ export function ServerOverview({ server, onServerUpdate }: ServerOverviewProps) 
         <div className="pt-4 border-t border-white/20">
           <div className="flex flex-wrap gap-2">
             {isOwner && (
-              <Badge variant="secondary" className="glass text-white">
+              <Badge variant="secondary" className="glass text-white hover:bg-black/10">
                 <Crown className="mr-1 h-3 w-3 text-white" />
                 소유자
               </Badge>
             )}
             {isAdmin && !isOwner && (
-              <Badge variant="secondary" className="glass text-white">
+              <Badge variant="secondary" className="glass text-white hover:bg-black/10">
                 <Shield className="mr-1 h-3 w-3 text-white" />
                 관리자
               </Badge>
             )}
-            <Badge variant="outline" className="glass border-white/30 text-white">
+            <Badge variant="outline" className="glass border-white/30 text-white hover:bg-black/10">
               멤버
             </Badge>
           </div>

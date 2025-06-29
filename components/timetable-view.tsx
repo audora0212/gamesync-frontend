@@ -190,7 +190,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Button type="submit" className="w-full glass-button text-white">
+          <Button type="submit" className="w-full glass-button text-white hover:bg-black/10">
             예약 추가
           </Button>
         </form>
@@ -206,9 +206,9 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           <Button
             onClick={() => setSortByGame(!sortByGame)}
             variant="outline"
-            className={`glass border-white/30 text-white ${sortByGame ? "bg-white/10" : ""}`}
+            className={`glass border-white/30 text-white hover:bg-black/10 ${sortByGame ? "bg-white/10" : ""}`}
           >
-            <Filter className="mr-2 h-4 w-4 text-white" />
+            <Filter className="mr-2 h-4 w-4 text-white " />
             게임순
           </Button>
         </div>
@@ -222,7 +222,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                   <Clock className="h-4 w-4 text-white/60" />
                   <span className="text-white font-medium">{formatDateTime(entry.slot)}</span>
                 </div>
-                <Badge variant={entry.custom ? "secondary" : "default"} className="glass text-white">
+                <Badge variant={entry.custom ? "secondary" : "default"} className="glass text-white hover:bg-black/10">
                   {entry.custom ? "커스텀" : "기본"}
                 </Badge>
               </div>
