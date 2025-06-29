@@ -47,7 +47,7 @@ interface UserSchedule {
 }
 
 export function TimetableView({ serverId }: TimetableViewProps) {
-  const today = new Date().toISOString().split("T")[0]
+const today = new Date().toLocaleDateString("en-CA");
   const [entries, setEntries] = useState<TimetableEntry[]>([])
   const [defaultGames, setDefaultGames] = useState<Game[]>([])
   const [customGames, setCustomGames] = useState<Game[]>([])
@@ -308,7 +308,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
               className="glass border-white/30 text-white"
-              required
+              disabled
             />
             <Input
               type="time"
