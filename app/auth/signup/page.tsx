@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner"
 import { authService } from "@/lib/auth-service"
 import { Loader2, GamepadIcon } from "lucide-react"
+import { useEffect } from "react"
 
 export default function SignupPage() {
   const [username, setUsername] = useState("")
@@ -19,6 +20,12 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+    useEffect(() => {
+    // 이미 토큰이 있으면 대시보드로 강제 이동
+    if (authService.isAuthenticated()) {
+      router.replace("/dashboard")
+    }
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

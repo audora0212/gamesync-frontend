@@ -12,6 +12,7 @@ import { CreateServerModal } from "@/components/create-server-modal"
 import { SearchServerModal } from "@/components/search-server-modal"
 import { Navbar } from "@/components/navbar"
 import { Plus, Users, Clock } from "lucide-react"
+import { useProtectedRoute } from "../hooks/useProtectedRoute"
 
 interface Server {
   id: number
@@ -23,6 +24,8 @@ interface Server {
 }
 
 export default function DashboardPage() {
+  useProtectedRoute()
+  
   const [servers, setServers] = useState<Server[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -135,20 +138,6 @@ export default function DashboardPage() {
                       입장
                     </Button>
                   </div>
-
-                  {/* 참가 버튼 (소유자가 아닐 때만) */}
-                  {server.owner !== authService.getCurrentUser() && (
-                    <div className="text-right">
-                      <Button
-                        onClick={() => handleJoinServer(server.id)}
-                        variant="outline"
-                        className="glass border-white/30 text-white hover:bg-red/20 h-10 px-4"
-                        size="sm"
-                      >
-                        참가
-                      </Button>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>

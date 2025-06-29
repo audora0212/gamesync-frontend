@@ -1,4 +1,5 @@
 import { authService } from "./auth-service"
+import { fetchWithAuth } from "./fetch-with-auth"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
 
@@ -41,7 +42,7 @@ class ServerService {
   }
   
   async getMyServers(): Promise<Server[]> {
-    const res = await fetch(`${API_BASE}/servers/mine`, { headers: authService.getAuthHeaders() })
+    const res = await fetchWithAuth(`${API_BASE}/servers/mine`)
     if (!res.ok) throw new Error("Failed to fetch my servers")
     return res.json()
   }
@@ -64,8 +65,6 @@ class ServerService {
     if (!res.ok) throw new Error("Failed to join server")
     return res.json()
   }
-
-  // ... other methods remain unchanged
 }
 
 export const serverService = new ServerService()

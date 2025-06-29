@@ -9,6 +9,7 @@ import { ServerOverview } from "@/components/server-overview"
 import { toast } from "sonner"
 import { serverService } from "@/lib/server-service"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { useProtectedRoute } from "@/app/hooks/useProtectedRoute"
 
 interface Server {
   id: number
@@ -20,6 +21,8 @@ interface Server {
 }
 
 export default function ServerDetailPage() {
+  
+  useProtectedRoute()
   const params = useParams()
   const serverId = Number.parseInt(params.id as string)
   const [server, setServer] = useState<Server | null>(null)

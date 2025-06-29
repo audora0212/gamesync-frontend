@@ -7,6 +7,7 @@ import { Navbar } from "@/components/navbar"
 import { toast } from "sonner"
 import { timetableService } from "@/lib/timetable-service"
 import { Trophy, Clock, TrendingUp, Users } from "lucide-react"
+import { useProtectedRoute } from "@/app/hooks/useProtectedRoute"
 
 interface Stats {
   topGame: string
@@ -16,6 +17,7 @@ interface Stats {
 }
 
 export default function StatsPage() {
+  useProtectedRoute()
   const params = useParams()
   const serverId = Number.parseInt(params.id as string)
   const [stats, setStats] = useState<Stats | null>(null)
