@@ -200,10 +200,10 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       <CardHeader>
         <CardTitle className="text-white flex items-center">
           <Calendar className="mr-2 h-5 w-5 text-white" />
-          디스코드 합류 시간표
+          합류 시간표
         </CardTitle>
         <CardDescription className="text-white/70">
-          친구들이 언제 디스코드에 합류하는지 확인하고 새로운 예약을 추가하세요
+          친구들이 언제 합류하는지 확인하고 새로운 예약을 추가하세요
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -284,10 +284,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
               {/* 범례 */}
               <div className="mt-6 pt-4 border-t border-white/20">
                 <div className="flex items-center gap-6 text-xs text-white/60">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-white rounded-full border border-blue-400" />
-                    <span>합류 시점</span>
-                  </div>
+
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-3 bg-gradient-to-r from-blue-500/60 to-blue-600/40 rounded" />
                     <span>온라인 시간</span>
