@@ -18,23 +18,31 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-          <AuthProvider>{children}</AuthProvider>
-          <Toaster
-            theme="dark"
-            position="top-right"
-            toastOptions={{
-              style: {
-                background: "rgba(255, 255, 255, 0.1)",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                color: "white",
-              },
-            }}
-          />
-        </div>
+    <html lang="ko" className="h-full">
+      <body
+        className={`
+          ${inter.className}
+          h-full
+          bg-gradient-to-br
+          from-purple-900
+          via-blue-900
+          to-indigo-900
+          bg-fixed
+        `}
+      >
+        <AuthProvider>{children}</AuthProvider>
+        <Toaster
+          theme="dark"
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: "rgba(255, 255, 255, 0.1)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              color: "white",
+            },
+          }}
+        />
       </body>
     </html>
   )

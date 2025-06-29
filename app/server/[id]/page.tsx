@@ -21,10 +21,9 @@ interface Server {
 }
 
 export default function ServerDetailPage() {
-  
   useProtectedRoute()
   const params = useParams()
-  const serverId = Number.parseInt(params.id as string)
+  const serverId = Number(params.id)
   const [server, setServer] = useState<Server | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -64,12 +63,8 @@ export default function ServerDetailPage() {
         <Navbar />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-white mb-2">
-              서버를 찾을 수 없습니다
-            </h2>
-            <p className="text-white/70">
-              요청한 서버가 존재하지 않거나 접근 권한이 없습니다.
-            </p>
+            <h2 className="text-2xl font-bold text-white mb-2">서버를 찾을 수 없습니다</h2>
+            <p className="text-white/70">요청한 서버가 존재하지 않거나 접근 권한이 없습니다.</p>
           </div>
         </div>
       </div>
@@ -80,32 +75,25 @@ export default function ServerDetailPage() {
     <div className="min-h-screen">
       <Navbar />
       <div className="container mx-auto px-4 py-6">
-        {/* ─── Server Header with Glass effect ─── */}
+        {/* 서버 헤더 */}
         <Card className="glass border-white/20 mb-6">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold text-white">
-              {server.name}
-            </CardTitle>
-            <CardDescription className="text-white/70">
-              서버장: {server.owner}
-            </CardDescription>
+            <CardTitle className="text-3xl font-bold text-white">{server.name}</CardTitle>
+            <CardDescription className="text-white/70">서버장: {server.owner}</CardDescription>
           </CardHeader>
         </Card>
 
+        {/* 레이아웃: 타임테이블 (왼쪽 9), 서버 개요+게임 관리 (오른쪽 3) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[calc(100vh-200px)]">
-          {/* 게임 관리 (왼쪽) */}
-          <div className="lg:col-span-3">
-            <GameManagement serverId={serverId} />
-          </div>
-
-          {/* 타임테이블 (중앙) */}
-          <div className="lg:col-span-6">
+          {/* 타임테이블 섹션 */}
+          <div className="lg:col-span-9">
             <TimetableView serverId={serverId} />
           </div>
 
-          {/* 서버 개요 (오른쪽) */}
-          <div className="lg:col-span-3">
+          {/* 우측: 서버 개요 + 게임 관리 */}
+          <div className="lg:col-span-3 flex flex-col gap-6">
             <ServerOverview server={server} onServerUpdate={setServer} />
+            <GameManagement serverId={serverId} />
           </div>
         </div>
       </div>
