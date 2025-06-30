@@ -8,8 +8,8 @@ import { Toaster } from "sonner"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Game Scheduler",
-  description: "Modern game scheduling platform with glassmorphism design",
+  title: "GameSlots",
+  description: "GameSlots platform for scheduling games",
 }
 
 export default function RootLayout({

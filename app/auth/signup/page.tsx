@@ -61,7 +61,7 @@ export default function SignupPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 glass rounded-2xl mb-4">
             <GamepadIcon className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Game Scheduler</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">GameSlots</h1>
           <p className="text-white/70">새 계정을 만들어보세요</p>
         </div>
 
