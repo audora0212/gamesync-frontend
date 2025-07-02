@@ -23,6 +23,14 @@ class AuthService {
   private tokenKey = "auth-token"
   private userKey = "current-user"
 
+
+    setToken(token: string) {
+    localStorage.setItem(this.tokenKey, token);
+  }
+    setCurrentUser(username: string) {
+    localStorage.setItem(this.userKey, username);
+  }
+
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const response = await fetch(`${API_BASE}/auth/login`, {
       method: "POST",
@@ -43,7 +51,10 @@ class AuthService {
     localStorage.setItem(this.userKey, credentials.username)
 
     return data
+
+
   }
+
 
   async signup(credentials: SignupRequest): Promise<SignupResponse> {
     const response = await fetch(`${API_BASE}/auth/signup`, {

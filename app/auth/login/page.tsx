@@ -102,6 +102,15 @@ export default function LoginPage() {
                 )}
               </Button>
             </form>
+<Button asChild>
+  <a
+    href="http://localhost:8080/oauth2/authorization/discord"
+    className="w-full glass-button"
+  >
+    Discord로 로그인
+  </a>
+</Button>
+
             <div className="mt-6 text-center">
               <p className="text-white/70">
                 계정이 없으신가요?{" "}
