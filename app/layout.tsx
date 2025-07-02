@@ -1,9 +1,11 @@
+// app/layout.tsx
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/components/auth-provider"
 import { Toaster } from "sonner"
+import { Footer } from "@/components/Footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,7 +27,7 @@ export default function RootLayout({
       <body
         className={`
           ${inter.className}
-          h-full
+          flex flex-col h-full
           bg-gradient-to-br
           from-purple-900
           via-blue-900
@@ -33,19 +35,22 @@ export default function RootLayout({
           bg-fixed
         `}
       >
-        <AuthProvider>{children}</AuthProvider>
-        <Toaster
-          theme="dark"
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: "rgba(255, 255, 255, 0.1)",
-              backdropFilter: "blur(12px)",
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-              color: "white",
-            },
-          }}
-        />
+        <AuthProvider>
+          {children}
+          <Toaster
+            theme="dark"
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: "rgba(255, 255, 255, 0.1)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                color: "white",
+              },
+            }}
+          />
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   )
