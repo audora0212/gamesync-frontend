@@ -8,23 +8,15 @@ import { TimetableView } from "@/components/timetable-view"
 import { ServerOverview } from "@/components/server-overview"
 import { toast } from "sonner"
 import { serverService } from "@/lib/server-service"
+import type { Server as IServer } from "@/lib/server-service"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute"
-
-interface Server {
-  id: number
-  name: string
-  owner: string
-  members: string[]
-  admins: string[]
-  resetTime: string
-}
 
 export default function ServerDetailPage() {
   useProtectedRoute()
   const params = useParams()
   const serverId = Number(params.id)
-  const [server, setServer] = useState<Server | null>(null)
+  const [server, setServer] = useState<IServer | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -83,14 +75,11 @@ export default function ServerDetailPage() {
           </CardHeader>
         </Card>
 
-        {/* 레이아웃: 타임테이블 (왼쪽 9), 서버 개요+게임 관리 (오른쪽 3) */}
+        {/* 레이아웃: 타임테이블(왼쪽) + 개요/게임 관리(오른쪽) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[calc(100vh-200px)]">
-          {/* 타임테이블 섹션 */}
           <div className="lg:col-span-9">
             <TimetableView serverId={serverId} />
           </div>
-
-          {/* 우측: 서버 개요 + 게임 관리 */}
           <div className="lg:col-span-3 flex flex-col gap-6">
             <ServerOverview server={server} onServerUpdate={setServer} />
             <GameManagement serverId={serverId} />
