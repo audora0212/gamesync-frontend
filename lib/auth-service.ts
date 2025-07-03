@@ -7,6 +7,7 @@ interface LoginRequest {
 
 interface SignupRequest {
   username: string
+  nickname: string
   password: string
 }
 
@@ -27,9 +28,10 @@ class AuthService {
     setToken(token: string) {
     localStorage.setItem(this.tokenKey, token);
   }
-    setCurrentUser(username: string) {
-    localStorage.setItem(this.userKey, username);
-  }
+setCurrentUser(user: { id: number; nickname: string }) {
+  localStorage.setItem("current-user-id", String(user.id));
+  localStorage.setItem("current-user-nickname", user.nickname);
+}
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const response = await fetch(`${API_BASE}/auth/login`, {
@@ -100,6 +102,13 @@ class AuthService {
     if (typeof window === "undefined") return null
     return localStorage.getItem(this.userKey)
   }
+  getCurrentUserId(): number | null {
+  const v = localStorage.getItem("current-user-id");
+  return v ? Number(v) : null;
+}
+getCurrentUserNickname(): string | null {
+  return localStorage.getItem("current-user-nickname");
+}
 
   isAuthenticated(): boolean {
     return !!this.getToken()

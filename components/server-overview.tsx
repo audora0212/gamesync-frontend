@@ -51,7 +51,7 @@ export function ServerOverview({
 
   // 멤버 강퇴 핸들러
   async function handleKickMember(member: MemberInfo) {
-    if (!confirm(`${member.username}을(를) 강퇴하시겠습니까?`)) return
+    if (!confirm(`${member.nickname}을(를) 강퇴하시겠습니까?`)) return
     setIsLoading(true)
     try {
       await serverService.kickMember(server.id, member.id)
@@ -67,7 +67,7 @@ export function ServerOverview({
 
   // 관리자 임명 핸들러
   async function handleGrantAdmin(member: MemberInfo) {
-    if (!confirm(`${member.username}을(를) 관리자로 임명하시겠습니까?`)) return
+    if (!confirm(`${member.nickname}을(를) 관리자로 임명하시겠습니까?`)) return
     setIsLoading(true)
     try {
       await serverService.updateAdmin(server.id, member.id, true)
@@ -83,7 +83,7 @@ export function ServerOverview({
 
   // 관리자 해임 핸들러
   async function handleRevokeAdmin(member: MemberInfo) {
-    if (!confirm(`${member.username} 관리자를 해임하시겠습니까?`)) return
+    if (!confirm(`${member.nickname} 관리자를 해임하시겠습니까?`)) return
     setIsLoading(true)
     try {
       await serverService.updateAdmin(server.id, member.id, false)
@@ -174,19 +174,19 @@ export function ServerOverview({
               >
                 <div className="flex items-center space-x-2 truncate">
                   <span className="text-white text-sm truncate w-32">
-                    {member.username}
+                    {member.nickname}
                   </span>
-                  {member.username === server.owner && (
+                  {member.nickname === server.owner && (
                     <Crown className="h-4 w-4 text-yellow-400" />
                   )}
                   {server.admins.some((a) => a.id === member.id) &&
-                    member.username !== server.owner && (
+                    member.nickname !== server.owner && (
                       <Crown className="h-4 w-4 text-blue-400" />
                     )}
                 </div>
                 <div className="flex space-x-2">
                   {(isOwner || isAdmin) &&
-                    member.username !== server.owner && (
+                    member.nickname !== server.owner && (
                       <>
                         {!server.admins.some((a) => a.id === member.id) &&
                           isOwner && (

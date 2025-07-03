@@ -15,6 +15,7 @@ import { DiscordIcon } from "@/components/icons/discord-icon"
 
 export default function SignupPage() {
   const [username, setUsername] = useState("")
+  const [nickname, setNickname] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -35,7 +36,7 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      await authService.signup({ username, password })
+      await authService.signup({ username, password, nickname })
       toast.success("회원가입 성공", {
         description: "계정이 생성되었습니다. 로그인해주세요.",
       })
@@ -106,13 +107,28 @@ export default function SignupPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-white">
-                  사용자명
+                  로그인 아이디
                 </Label>
                 <Input
                   id="username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
+                  placeholder="로그인 아이디를 입력하세요"
+                  required
+                  disabled={isDiscordLoading}
+                />
+              </div>
+                            <div className="space-y-2">
+                <Label htmlFor="nickname" className="text-white">
+                  사용자명
+                </Label>
+                <Input
+                  id="nickname"
+                  type="text"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
                   className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
                   placeholder="사용자명을 입력하세요"
                   required

@@ -5,13 +5,14 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 export interface MemberInfo {
   id: number;
+  nickname: string;
   username: string;
 }
 
 export interface Server {
   id: number;
   name: string;
-  owner: string;
+  owner: string; // 백엔드에서 nickname으로 받는중
   members: MemberInfo[];
   admins: MemberInfo[];
   resetTime: string;
