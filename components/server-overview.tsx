@@ -170,12 +170,15 @@ export function ServerOverview({
             {server.members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between pl-4 p-2 glass rounded-lg hover:bg-black/10"
+                className="flex items-center justify-between px-3 py-2 glass rounded-lg hover:bg-black/10"
               >
-                <div className="flex items-center space-x-2 truncate">
-                  <span className="text-white text-sm truncate w-32">
-                    {member.nickname}
-                  </span>
+                {/* 닉네임 왼쪽 */}
+                <span className="text-white text-sm truncate w-32">
+                  {member.nickname}
+                </span>
+
+                {/* 왕관 및 액션 버튼 우측 */}
+                <div className="flex items-center space-x-2">
                   {member.nickname === server.owner && (
                     <Crown className="h-4 w-4 text-yellow-400" />
                   )}
@@ -183,46 +186,41 @@ export function ServerOverview({
                     member.nickname !== server.owner && (
                       <Crown className="h-4 w-4 text-blue-400" />
                     )}
-                </div>
-                <div className="flex space-x-2">
-                  {(isOwner || isAdmin) &&
-                    member.nickname !== server.owner && (
-                      <>
-                        {!server.admins.some((a) => a.id === member.id) &&
-                          isOwner && (
-                            <Button
-                              onClick={() => handleGrantAdmin(member)}
-                              size="sm"
-                              variant="ghost"
-                              className="text-blue-400 truncate hover:text-blue-300 hover:bg-blue-500/20"
-                              disabled={isLoading}
-                            >
-                              임명
-                            </Button>
-                          )}
-                        {server.admins.some((a) => a.id === member.id) &&
-                          isOwner && (
-                            <Button
-                              onClick={() => handleRevokeAdmin(member)}
-                              size="sm"
-                              variant="ghost"
-                              className="text-gray-400 truncate hover:text-gray-300 hover:bg-gray-500/20"
-                              disabled={isLoading}
-                            >
-                              해임
-                            </Button>
-                          )}
+                  {(isOwner || isAdmin) && member.username !== server.owner && (
+                    <>                            
+                      {!server.admins.some((a) => a.id === member.id) && isOwner && (
                         <Button
-                          onClick={() => handleKickMember(member)}
+                          onClick={() => handleGrantAdmin(member)}
                           size="sm"
                           variant="ghost"
-                          className="text-red-400 truncate hover:text-red-300 hover:bg-red-500/20"
+                          className="text-blue-400 truncate hover:text-blue-300 hover:bg-blue-500/20"
                           disabled={isLoading}
                         >
-                          강퇴
+                          임명
                         </Button>
-                      </>
-                    )}
+                      )}
+                      {server.admins.some((a) => a.id === member.id) && isOwner && (
+                        <Button
+                          onClick={() => handleRevokeAdmin(member)}
+                          size="sm"
+                          variant="ghost"
+                          className="text-gray-400 truncate hover:text-gray-300 hover:bg-gray-500/20"
+                          disabled={isLoading}
+                        >
+                          해임
+                        </Button>
+                      )}
+                      <Button
+                        onClick={() => handleKickMember(member)}
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-400 truncate hover:text-red-300 hover:bg-red-500/20"
+                        disabled={isLoading}
+                      >
+                        강퇴
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -279,7 +277,7 @@ export function ServerOverview({
                   <DialogClose asChild>
                     <Button
                       variant="outline"
-                      className="glass border-white/30 text-white hover:bg-black/10"
+                      className="glass border-white/30 hover:bg-black/10"
                     >
                       취소
                     </Button>
