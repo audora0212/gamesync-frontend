@@ -47,7 +47,7 @@ interface UserSchedule {
 }
 
 export function TimetableView({ serverId }: TimetableViewProps) {
-const today = new Date().toLocaleDateString("en-CA");
+  const today = new Date().toLocaleDateString("en-CA");
   const [entries, setEntries] = useState<TimetableEntry[]>([])
   const [defaultGames, setDefaultGames] = useState<Game[]>([])
   const [customGames, setCustomGames] = useState<Game[]>([])
@@ -154,7 +154,7 @@ const today = new Date().toLocaleDateString("en-CA");
     return hour >= schedule.joinTime
   }
 
-  // 사용자별 색상 생성
+  // 사용자별 색상 생성 (랜덤)
   const getUserColor = (user: string, custom: boolean) => {
     const colors = [
       "from-blue-500/60 to-blue-600/40 border-blue-400/60",
@@ -166,10 +166,6 @@ const today = new Date().toLocaleDateString("en-CA");
       "from-red-500/60 to-red-600/40 border-red-400/60",
       "from-indigo-500/60 to-indigo-600/40 border-indigo-400/60",
     ]
-
-    if (custom) {
-      return "from-yellow-500/60 to-yellow-600/40 border-yellow-400/60"
-    }
 
     const hash = user.split("").reduce((a, b) => {
       a = (a << 5) - a + b.charCodeAt(0)
