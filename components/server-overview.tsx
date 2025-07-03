@@ -40,9 +40,9 @@ export function ServerOverview({
   onServerUpdate,
 }: ServerOverviewProps) {
   const router = useRouter()
-  const currentUser = authService.getCurrentUser()
-  const isOwner = server.owner === currentUser
-  const isAdmin = server.admins.some((a) => a.username === currentUser)
+  const currentUserId = authService.getCurrentUserId()
+  const isOwner = server.ownerId === currentUserId
+  const isAdmin = server.admins.some((a) => a.id === currentUserId)
 
   const [isLoading, setIsLoading] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
@@ -179,11 +179,11 @@ export function ServerOverview({
 
                 {/* 왕관 및 액션 버튼 우측 */}
                 <div className="flex items-center space-x-2">
-                  {member.nickname === server.owner && (
+                  {member.id === server.ownerId && (
                     <Crown className="h-4 w-4 text-yellow-400" />
                   )}
                   {server.admins.some((a) => a.id === member.id) &&
-                    member.nickname !== server.owner && (
+                    member.id !== server.ownerId && (
                       <Crown className="h-4 w-4 text-blue-400" />
                     )}
                   {(isOwner || isAdmin) && member.username !== server.owner && (

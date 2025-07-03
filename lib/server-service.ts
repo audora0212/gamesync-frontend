@@ -12,6 +12,7 @@ export interface MemberInfo {
 export interface Server {
   id: number;
   name: string;
+  ownerId: number
   owner: string; // 백엔드에서 nickname으로 받는중
   members: MemberInfo[];
   admins: MemberInfo[];
