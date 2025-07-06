@@ -236,7 +236,7 @@ export function ServerOverview({
         <div className="space-y-2 p-4">
           <Button
             variant="outline"
-            className="w-full glass border-white/30 text-white hover:bg-black/10"
+             className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white"
             onClick={() => router.push(`/stats/${server.id}`)}
           >
             <BarChart3 className="mr-2 h-4 w-4 text-white" /> 통계 보기
@@ -244,7 +244,7 @@ export function ServerOverview({
           {(isOwner || isAdmin) && (
             <Dialog open={showSettings} onOpenChange={setShowSettings}>
               <DialogTrigger asChild>
-                <Button className="w-full glass border-white/30 text-white hover:bg-black/10">
+                <Button  className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white">
                   <SettingsIcon className="mr-2 h-4 w-4 text-white" /> 서버 설정
                 </Button>
               </DialogTrigger>

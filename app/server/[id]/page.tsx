@@ -91,7 +91,7 @@ export default function ServerDetailPage() {
                 </CardDescription>
                 <Button
                   variant="outline"
-                  className="w-full glass-button text-white hover:bg-black/10"
+                  className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white"
                   onClick={() => {
                     navigator.clipboard.writeText(server.inviteCode)
                       .then(() => toast.success("초대 코드가 복사되었습니다"))

@@ -39,13 +39,13 @@ export function Navbar() {
             {user && <span className="text-white font-medium">{user}</span>}
             {/* 닉네임 변경 모달 트리거 */}
             {/* 알림 아이콘 */}
-            <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/20">
+            <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/20 hover:text-white">
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
             </Button>
             <ChangeNicknameModal />
             {/* 로그아웃 */}
-            <Button onClick={handleLogout} variant="ghost" className="text-white hover:bg-white/20">
+            <Button onClick={handleLogout} variant="ghost" className="text-white hover:bg-white/20 hover:text-white">
               <LogOut className="mr-2 h-4 w-4" />
               로그아웃
             </Button>

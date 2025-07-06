@@ -110,7 +110,7 @@ export default function DashboardPage() {
                     <CardTitle className="text-white">
                       {server.name}
                     </CardTitle>
-                    <Badge variant="secondary" className="glass text-white">
+                    <Badge variant="secondary" className="glass text-yellow-300">
                       {isOwner ? "소유자" : "멤버"}
                     </Badge>
                   </div>
