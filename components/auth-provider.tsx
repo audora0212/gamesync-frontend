@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (token && currentUser) {
       setUser(currentUser)
     } else if (!pathname.startsWith("/auth")) {
-      router.push("/auth/login")
+      // router.push("/auth/login")
     }
 
     setIsLoading(false)
