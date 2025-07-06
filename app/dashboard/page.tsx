@@ -1,59 +1,59 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
-import { serverService, Server as IServer } from "@/lib/server-service"
-import { authService } from "@/lib/auth-service"
-import { CreateServerModal } from "@/components/create-server-modal"
-import { SearchServerModal } from "@/components/search-server-modal"
-import { Navbar } from "@/components/navbar"
-import { Plus, Users, Clock } from "lucide-react"
-import { useProtectedRoute } from "../hooks/useProtectedRoute"
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { serverService, Server as IServer } from "@/lib/server-service";
+import { authService } from "@/lib/auth-service";
+import { CreateServerModal } from "@/components/create-server-modal";
+import { JoinByCodeModal } from "@/components/join-by-code-modal";
+import { Navbar } from "@/components/navbar";
+import { Plus, Users, Clock } from "lucide-react";
+import { useProtectedRoute } from "@/app/hooks/useProtectedRoute";  // <-- 절대 경로
 
 export default function DashboardPage() {
-  useProtectedRoute()
+  useProtectedRoute();
 
-  const [servers, setServers] = useState<IServer[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showSearchModal, setShowSearchModal] = useState(false)
-  const router = useRouter()
+  const [servers, setServers] = useState<IServer[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    loadServers()
-  }, [])
+    loadServers();
+  }, []);
 
   const loadServers = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const data = await serverService.getMyServers()
-      setServers(data)
+      const data = await serverService.getMyServers();
+      setServers(data);
     } catch {
       toast.error("서버 로드 실패", {
         description: "내 서버 정보를 불러오는데 실패했습니다.",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleServerCreated = (newServer: IServer) => {
-    setServers((prev) => [...prev, newServer])
-    setShowCreateModal(false)
+    setServers((prev) => [...prev, newServer]);
+    setShowCreateModal(false);
     toast.success("서버 생성 완료", {
       description: `${newServer.name} 서버가 생성되었습니다.`,
-    })
-  }
+    });
+  };
 
   if (isLoading) {
     return (
@@ -65,11 +65,10 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  // 현재 로그인한 유저의 ID
-  const currentUserId = authService.getCurrentUserId()
+  const currentUserId = authService.getCurrentUserId();
 
   return (
     <div className="min-h-screen">
@@ -84,10 +83,10 @@ export default function DashboardPage() {
           </div>
           <div className="flex">
             <Button
-              onClick={() => setShowSearchModal(true)}
+              onClick={() => setShowJoinModal(true)}
               className="mr-2 glass-button hover:bg-white/20 h-12 px-6"
             >
-              서버 찾기
+              초대 코드로 참가
             </Button>
             <Button
               onClick={() => setShowCreateModal(true)}
@@ -100,8 +99,7 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {servers.map((server) => {
-            const isOwner = server.ownerId === currentUserId
-
+            const isOwner = server.ownerId === currentUserId;
             return (
               <Card
                 key={server.id}
@@ -109,7 +107,9 @@ export default function DashboardPage() {
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-white">{server.name}</CardTitle>
+                    <CardTitle className="text-white">
+                      {server.name}
+                    </CardTitle>
                     <Badge variant="secondary" className="glass text-white">
                       {isOwner ? "소유자" : "멤버"}
                     </Badge>
@@ -124,7 +124,6 @@ export default function DashboardPage() {
                       <Users className="mr-2 h-4 w-4" />
                       <span>{server.members.length}명 참여</span>
                     </div>
-
                     <div className="flex items-center justify-between text-white/80">
                       <div className="flex items-center">
                         <Clock className="mr-2 h-4 w-4" />
@@ -141,7 +140,7 @@ export default function DashboardPage() {
                   </div>
                 </CardContent>
               </Card>
-            )
+            );
           })}
         </div>
 
@@ -152,13 +151,13 @@ export default function DashboardPage() {
                 서버가 없습니다
               </h3>
               <p className="text-white/70 mb-4">
-                서버를 찾거나 생성해보세요.
+                초대 코드를 입력하거나 새 서버를 생성하세요.
               </p>
               <Button
-                onClick={() => setShowSearchModal(true)}
+                onClick={() => setShowJoinModal(true)}
                 className="glass-button hover:bg-white/20 h-12 px-6 mr-2"
               >
-                서버 찾기
+                초대 코드로 참가
               </Button>
               <Button
                 onClick={() => setShowCreateModal(true)}
@@ -176,11 +175,11 @@ export default function DashboardPage() {
         onClose={() => setShowCreateModal(false)}
         onServerCreated={handleServerCreated}
       />
-      <SearchServerModal
-        open={showSearchModal}
-        onClose={() => setShowSearchModal(false)}
+      <JoinByCodeModal
+        open={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
         onJoinSuccess={loadServers}
       />
     </div>
-  )
+  );
 }

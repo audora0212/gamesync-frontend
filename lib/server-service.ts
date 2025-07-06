@@ -15,6 +15,7 @@ export interface Server {
   ownerId: number
   owner: string; // 백엔드에서 nickname으로 받는중
   members: MemberInfo[];
+  inviteCode: string;
   admins: MemberInfo[];
   resetTime: string;
 }
@@ -53,6 +54,15 @@ class ServerService {
     if (!res.ok) throw new Error("Failed to fetch my servers");
     return res.json();
   }
+
+  async joinByCode(code: string): Promise<Server> {
+  const res = await fetch(`${API_BASE}/servers/join?code=${code}`, {
+    method: "POST",
+    headers: authService.getAuthHeaders(),
+  })
+  if (!res.ok) throw new Error("Invalid code")
+  return res.json()
+}
 
   async searchServers(params: SearchParams): Promise<Server[]> {
     const qs = new URLSearchParams();

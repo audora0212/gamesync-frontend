@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { TimetableView } from "@/components/timetable-view"
 import { ServerOverview } from "@/components/server-overview"
+import { GameManagement } from "@/components/game-management"
 import { toast } from "sonner"
 import { serverService, Server as IServer } from "@/lib/server-service"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -27,6 +28,7 @@ export default function ServerDetailPage() {
   async function loadServer() {
     try {
       const data = await serverService.getServer(serverId)
+      console.log("서버 정보:", data)
       setServer(data)
     } catch {
       toast.error("서버 정보 로드 실패", {
@@ -71,7 +73,6 @@ export default function ServerDetailPage() {
   const currentUser = localStorage.getItem("current-user")
   const isOwner = server.owner === currentUser
 
-
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -81,9 +82,27 @@ export default function ServerDetailPage() {
             <CardTitle className="text-3xl font-bold text-white">
               {server.name}
             </CardTitle>
-            <CardDescription className="text-white/70">
-              서버장: {server.owner}
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <CardDescription className="text-white/70">
+                서버장: {server.owner}
+              </CardDescription>
+              <div className="flex items-center">
+                <CardDescription className="text-white/70">
+                  초대코드 {server.inviteCode}
+                </CardDescription>
+                <Button
+                  variant="outline"
+                  className="w-full glass-button text-white hover:bg-black/10"
+                  onClick={() => {
+                    navigator.clipboard.writeText(server.inviteCode)
+                      .then(() => toast.success("초대 코드가 복사되었습니다"))
+                      .catch(() => toast.error("초대 코드 복사 실패"))
+                  }}
+                >
+                  복사
+                </Button>
+              </div>
+            </div>
           </CardHeader>
         </Card>
 
@@ -96,6 +115,7 @@ export default function ServerDetailPage() {
               server={server}
               onServerUpdate={(s) => setServer(s)}
             />
+            <GameManagement serverId={serverId} />
             {!isOwner && (
               <Button
                 variant="destructive"
@@ -114,7 +134,6 @@ export default function ServerDetailPage() {
                 서버 떠나기
               </Button>
             )}
-
           </div>
         </div>
       </div>
