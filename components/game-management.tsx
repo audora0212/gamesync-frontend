@@ -1,4 +1,3 @@
-// components/game-management.tsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -88,10 +87,22 @@ export function GameManagement({ serverId }: GameManagementProps) {
   const requestDeleteCustomGame = async (gameId: number, gameName: string) => {
     try {
       const data = await gameService.getScheduledUsers(serverId, gameId)
-      setScheduledUsers(data.users.map((u) => u.username))
-      setDeletingGameId(gameId)
-      setDeletingGameName(gameName)
-      setShowDeleteModal(true)
+      const users = data.users.map((u) => u.username)
+
+      if (users.length > 0) {
+        // 예약된 사용자가 있을 때만 모달 표시
+        setScheduledUsers(users)
+        setDeletingGameId(gameId)
+        setDeletingGameName(gameName)
+        setShowDeleteModal(true)
+      } else {
+        // 예약된 사용자가 없으면 바로 삭제
+        await gameService.deleteCustomGame(serverId, gameId)
+        setCustomGames((prev) => prev.filter((g) => g.id !== gameId))
+        toast.success("게임 삭제 완료", {
+          description: `${gameName}이 삭제되었습니다.`,
+        })
+      }
     } catch {
       toast.error("예약자 조회 실패", {
         description: "예약된 사용자를 불러오는데 실패했습니다.",

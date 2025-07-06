@@ -185,9 +185,10 @@ export function ServerOverview({
                       <Crown className="h-4 w-4 text-blue-400" />
                     )}
 
-                  {/* 소유자는 액션 버튼 제외 */}
+                  {/* 소유자 또는 관리자만 액션 */}
                   {(isOwner || isAdmin) && member.id !== server.ownerId && (
-                    <>                            
+                    <>
+                      {/* 임명/해임 (소유자만) */}
                       {!server.admins.some((a) => a.id === member.id) && isOwner && (
                         <Button
                           onClick={() => handleGrantAdmin(member)}
@@ -210,15 +211,19 @@ export function ServerOverview({
                           해임
                         </Button>
                       )}
-                      <Button
-                        onClick={() => handleKickMember(member)}
-                        size="sm"
-                        variant="ghost"
-                        className="text-red-400 truncate hover:text-red-300 hover:bg-red-500/20"
-                        disabled={isLoading}
-                      >
-                        강퇴
-                      </Button>
+
+                      {/* 강퇴: 관리자에게는 표시하지 않음 */}
+                      {!server.admins.some((a) => a.id === member.id) && (
+                        <Button
+                          onClick={() => handleKickMember(member)}
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-400 truncate hover:text-red-300 hover:bg-red-500/20"
+                          disabled={isLoading}
+                        >
+                          강퇴
+                        </Button>
+                      )}
                     </>
                   )}
                 </div>

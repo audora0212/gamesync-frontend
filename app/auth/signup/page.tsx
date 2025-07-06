@@ -16,7 +16,6 @@ import { DiscordIcon } from "@/components/icons/discord-icon"
 export default function SignupPage() {
   const [username, setUsername] = useState("")
   const [nickname, setNickname] = useState("")
-  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -26,8 +25,38 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // 아이디 유효성 검사
+    if (username.length < 3 || username.length > 20) {
+      toast.error("아이디 길이 오류", {
+        description: "아이디는 3자 이상 20자 이하로 입력해주세요.",
+      })
+      return
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      toast.error("아이디 형식 오류", {
+        description: "아이디는 영문, 숫자, 밑줄(_)만 사용할 수 있습니다.",
+      })
+      return
+    }
+
+    // 사용자명 유효성 검사
+    if (nickname.length < 2 || nickname.length > 30) {
+      toast.error("사용자명 길이 오류", {
+        description: "사용자명은 2자 이상 30자 이하로 입력해주세요.",
+      })
+      return
+    }
+
+    // 비밀번호 유효성 검사
+    if (password.length < 8) {
+      toast.error("비밀번호 길이 오류", {
+        description: "비밀번호는 최소 8자 이상이어야 합니다.",
+      })
+      return
+    }
+
     if (password !== confirmPassword) {
-      toast.error("비밀번호 확인", {
+      toast.error("비밀번호 확인 오류", {
         description: "비밀번호가 일치하지 않습니다.",
       })
       return
@@ -56,9 +85,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-900
-          via-blue-900
-          to-indigo-900">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 glass rounded-2xl mb-4">
@@ -107,64 +134,61 @@ export default function SignupPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-white">
-                  로그인 아이디
+                  로그인 아이디 (3~20자, 영문,숫자)
                 </Label>
                 <Input
                   id="username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  minLength={3}
+                  maxLength={20}
+                  pattern="^[a-zA-Z0-9_]+$"
+                  title="3~20자 영문, 숫자, 밑줄(_)만 가능"
                   className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
                   placeholder="로그인 아이디를 입력하세요"
                   required
                   disabled={isDiscordLoading}
                 />
               </div>
-                            <div className="space-y-2">
+
+              <div className="space-y-2">
                 <Label htmlFor="nickname" className="text-white">
-                  사용자명
+                  사용자명 (2~30자)
                 </Label>
                 <Input
                   id="nickname"
                   type="text"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
+                  minLength={2}
+                  maxLength={30}
+                  title="2~30자 사이로 입력해주세요"
                   className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
                   placeholder="사용자명을 입력하세요"
                   required
                   disabled={isDiscordLoading}
                 />
               </div>
-              {/* <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">
-                  이메일
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
-                  placeholder="이메일을 입력하세요"
-                  required
-                  disabled={isDiscordLoading}
-                />
-              </div> */}
+
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-white">
-                  비밀번호
-                </Label>
+ 비밀번호 (최소 8자)
+</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  minLength={8}
+                  title="비밀번호는 최소 8자 이상이어야 합니다."
                   className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
                   placeholder="비밀번호를 입력하세요"
                   required
                   disabled={isDiscordLoading}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-white">
                   비밀번호 확인
@@ -174,12 +198,15 @@ export default function SignupPage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  minLength={8}
+                  title="비밀번호를 다시 입력하세요"
                   className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
                   placeholder="비밀번호를 다시 입력하세요"
                   required
                   disabled={isDiscordLoading}
                 />
               </div>
+
               <Button
                 type="submit"
                 className="w-full glass-button font-medium py-3"
@@ -198,7 +225,7 @@ export default function SignupPage() {
 
             <div className="text-center">
               <p className="text-white/70 text-sm">
-                이미 계정이 있으신가요?{" "}
+                이미 계정이 있으신가요? {" "}
                 <Link
                   href="/auth/login"
                   className="text-blue-300 hover:text-blue-200 underline font-medium transition-colors"
