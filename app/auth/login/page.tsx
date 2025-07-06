@@ -48,7 +48,7 @@ export default function LoginPage() {
   const handleDiscordLogin = () => {
     setIsDiscordLoading(true)
     // Discord 로그인 페이지로 리다이렉트하기 전에 로딩 상태 표시
-    window.location.href = "http://localhost:8080/oauth2/authorization/discord"
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/discord`
   }
 
   return (

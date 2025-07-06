@@ -28,7 +28,6 @@ export default function ServerDetailPage() {
   async function loadServer() {
     try {
       const data = await serverService.getServer(serverId)
-      console.log("서버 정보:", data)
       setServer(data)
     } catch {
       toast.error("서버 정보 로드 실패", {

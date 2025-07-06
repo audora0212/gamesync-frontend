@@ -1,26 +1,27 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { authService } from "@/lib/auth-service"
-import { toast } from "sonner"
-import { GamepadIcon, LogOut, Home } from "lucide-react"
+import { GamepadIcon, Home, LogOut, Bell } from "lucide-react"
+import { ChangeNicknameModal } from "@/components/ChangeNicknameModal"
 
 export function Navbar() {
-  const router = useRouter()
+  const [user, setUser] = useState<string | null>(null)
+
+  useEffect(() => {
+    // 클라이언트에서만 실행
+    const nickname = authService.getCurrentUser()
+    setUser(nickname)
+  }, [])
 
   const handleLogout = async () => {
     try {
       await authService.logout()
-      toast.success("로그아웃 완료", {
-        description: "성공적으로 로그아웃되었습니다.",
-      })
-      router.push("/auth/login")
-    } catch (error) {
-      toast.error("로그아웃 실패", {
-        description: "로그아웃 중 오류가 발생했습니다.",
-      })
+      window.location.href = "/auth/login"
+    } catch {
+      console.error("Logout failed")
     }
   }
 
@@ -34,12 +35,23 @@ export function Navbar() {
           </Link>
 
           <div className="flex items-center space-x-4">
+            {/* 대시보드 버튼 */}
             <Link href="/dashboard">
               <Button variant="ghost" className="text-white hover:bg-white/20">
                 <Home className="mr-2 h-4 w-4" />
                 대시보드
               </Button>
             </Link>
+            {/* 알림 아이콘 */}
+            <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/20">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
+            </Button>
+            {/* 닉네임 표시: 클라이언트 마운트 후 렌더링 */}
+            {user && <span className="text-white font-medium">{user}</span>}
+            {/* 닉네임 변경 모달 트리거 */}
+            <ChangeNicknameModal />
+            {/* 로그아웃 */}
             <Button onClick={handleLogout} variant="ghost" className="text-white hover:bg-white/20">
               <LogOut className="mr-2 h-4 w-4" />
               로그아웃

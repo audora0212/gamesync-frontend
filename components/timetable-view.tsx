@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { timetableService } from "@/lib/timetable-service"
 import { gameService } from "@/lib/game-service"
+import { serverService } from "@/lib/server-service"
 import { Calendar, Clock, Filter, Users, GamepadIcon } from "lucide-react"
 
 interface TimetableEntry {
@@ -58,6 +59,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   const [sortByGame, setSortByGame] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [hoveredUser, setHoveredUser] = useState<string | null>(null)
+  const [resetHour, setResetHour] = useState<number | null>(null)
 
   // 사용자별 스케줄 데이터 처리
   const userSchedules = useMemo(() => {
@@ -96,6 +98,11 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       ])
       setDefaultGames(defaultData.defaultGames)
       setCustomGames(customData.customGames)
+
+      const serverInfo = await serverService.getServer(serverId)
+      const hourPart = serverInfo.resetTime.split(":")[0]
+      setResetHour(Number(hourPart))
+
       await loadTimetable()
     } catch {
       toast.error("데이터 로드 실패", { description: "데이터를 불러오는데 실패했습니다." })
@@ -203,7 +210,6 @@ export function TimetableView({ serverId }: TimetableViewProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* 디스코드 합류 시간표 시각화 */}
         {userSchedules.length > 0 && (
           <div className="glass rounded-lg p-6">
             <h3 className="text-white font-medium mb-6 flex items-center">
@@ -212,7 +218,6 @@ export function TimetableView({ serverId }: TimetableViewProps) {
             </h3>
 
             <div className="space-y-4">
-              {/* 시간 헤더 */}
               <div className="flex items-center border-b border-white/20 pb-3">
                 <div className="w-48 text-sm text-white/80 font-medium">사용자 / 게임</div>
                 <div className="flex-1 flex">
@@ -224,16 +229,14 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                 </div>
               </div>
 
-              {/* 사용자별 스케줄 */}
               <div className="space-y-3">
-                {userSchedules.map((schedule, index) => (
+                {userSchedules.map((schedule) => (
                   <div
                     key={`${schedule.user}-${schedule.entry.id}`}
                     className="flex items-center group"
                     onMouseEnter={() => setHoveredUser(schedule.user)}
                     onMouseLeave={() => setHoveredUser(null)}
                   >
-                    {/* 사용자 정보 */}
                     <div className="w-48 pr-4">
                       <div className="text-white font-medium text-sm mb-1">{schedule.user}</div>
                       <div className="flex items-center gap-2">
@@ -248,7 +251,6 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                       </div>
                     </div>
 
-                    {/* 시간 바 */}
                     <div className="flex-1 flex h-10 gap-px">
                       {hours.map((hour) => (
                         <div
@@ -268,6 +270,9 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                           }`}
                         >
                           {hour === new Date().getHours() && (
+                            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-green-400 opacity-80" />
+                          )}
+                          {resetHour !== null && hour === resetHour && (
                             <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-red-400 opacity-80" />
                           )}
                         </div>
@@ -277,7 +282,6 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                 ))}
               </div>
 
-              {/* 범례 */}
               <div className="mt-6 pt-4 border-t border-white/20">
                 <div className="flex items-center gap-6 text-xs text-white/60">
 
@@ -286,8 +290,12 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                     <span>온라인 시간</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-0.5 h-4 bg-red-400" />
+                    <div className="w-0.5 h-4 bg-green-400" />
                     <span>현재 시간</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-0.5 h-4 bg-red-400" />
+                    <span>초기화 시간</span>
                   </div>
                 </div>
               </div>
@@ -295,7 +303,6 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           </div>
         )}
 
-        {/* 예약 추가 폼 */}
         <form onSubmit={handleAddEntry} className="space-y-4 p-4 glass rounded-lg">
           <h3 className="text-white font-medium">새 합류 시간 예약</h3>
           <div className="grid grid-cols-2 gap-3">
@@ -342,7 +349,6 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           </Button>
         </form>
 
-        {/* 필터 및 정렬 */}
         <div className="flex gap-3">
           <Input
             placeholder="게임 이름으로 필터"
@@ -360,7 +366,6 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           </Button>
         </div>
 
-        {/* 타임테이블 엔트리 */}
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {entries.map((entry) => (
             <div key={entry.id} className="p-3 glass rounded-lg">

@@ -81,7 +81,7 @@ export default function SignupPage() {
 
   const handleDiscordSignup = () => {
     setIsDiscordLoading(true)
-    window.location.href = "http://localhost:8080/oauth2/authorization/discord"
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/discord`
   }
 
   return (

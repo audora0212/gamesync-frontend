@@ -82,7 +82,7 @@ export function CreateServerModal({ open, onClose, onServerCreated }: CreateServ
               type="button"
               variant="outline"
               onClick={onClose}
-              className="glass border-white/30 text-white hover:bg-white/10"
+              className="glass-button"
             >
               취소
             </Button>
