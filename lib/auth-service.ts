@@ -29,6 +29,7 @@ class AuthService {
     localStorage.setItem(this.tokenKey, token);
   }
 setCurrentUser(user: { id: number; nickname: string }) {
+  localStorage.setItem(this.userKey, user.nickname); 
   localStorage.setItem("current-user-id", String(user.id));
   localStorage.setItem("current-user-nickname", user.nickname);
 }

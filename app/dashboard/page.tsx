@@ -96,48 +96,56 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {servers.map((server) => (
-            <Card
-              key={server.id}
-              className="glass bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 lg:p-8"
-            >
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-white">{server.name}</CardTitle>
-                  <Badge variant="secondary" className="glass text-white">
-                    {server.owner === authService.getCurrentUser()
-                      ? "소유자"
-                      : "멤버"}
-                  </Badge>
-                </div>
-                <CardDescription className="text-white/70">
-                  서버장: {server.owner}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center text-white/80">
-                    <Users className="mr-2 h-4 w-4" />
-                    <span>{server.members.length}명 참여</span>
+          {servers.map((server) => {
+            // Debug: log owner vs current user
+            console.log(
+              "DashboardPage - server:", server.name,
+              "owner:", server.owner,
+              "currentUser:", authService.getCurrentUser()
+            )
+            return (
+              <Card
+                key={server.id}
+                className="glass bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 lg:p-8"
+              >
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-white">{server.name}</CardTitle>
+                    <Badge variant="secondary" className="glass text-white">
+                      {server.owner === authService.getCurrentUser()
+                        ? "소유자"
+                        : "멤버"}
+                    </Badge>
                   </div>
-
-                  <div className="flex items-center justify-between text-white/80">
-                    <div className="flex items-center">
-                      <Clock className="mr-2 h-4 w-4" />
-                      <span>초기화: {server.resetTime}</span>
+                  <CardDescription className="text-white/70">
+                    서버장: {server.owner}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center text-white/80">
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>{server.members.length}명 참여</span>
                     </div>
-                    <Button
-                      onClick={() => router.push(`/server/${server.id}`)}
-                      className="glass-button hover:bg-white/20 h-15 px-8"
-                      size="sm"
-                    >
-                      입장
-                    </Button>
+
+                    <div className="flex items-center justify-between text-white/80">
+                      <div className="flex items-center">
+                        <Clock className="mr-2 h-4 w-4" />
+                        <span>초기화: {server.resetTime}</span>
+                      </div>
+                      <Button
+                        onClick={() => router.push(`/server/${server.id}`)}
+                        className="glass-button hover:bg-white/20 h-15 px-8"
+                        size="sm"
+                      >
+                        입장
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
 
         {servers.length === 0 && (
