@@ -1,5 +1,3 @@
-// frontend/components/server-overview.tsx
-
 "use client"
 
 import React, { useState } from "react"
@@ -83,7 +81,7 @@ export function ServerOverview({
 
   // 관리자 해임 핸들러
   async function handleRevokeAdmin(member: MemberInfo) {
-    if (!confirm(`${member.nickname} 관리자를 해임하시겠습니까?`)) return
+    if (!confirm(`${member.nickname} 관리자 권한을 해임하시겠습니까?`)) return
     setIsLoading(true)
     try {
       await serverService.updateAdmin(server.id, member.id, false)
@@ -186,7 +184,9 @@ export function ServerOverview({
                     member.id !== server.ownerId && (
                       <Crown className="h-4 w-4 text-blue-400" />
                     )}
-                  {(isOwner || isAdmin) && member.username !== server.owner && (
+
+                  {/* 소유자는 액션 버튼 제외 */}
+                  {(isOwner || isAdmin) && member.id !== server.ownerId && (
                     <>                            
                       {!server.admins.some((a) => a.id === member.id) && isOwner && (
                         <Button
@@ -232,7 +232,6 @@ export function ServerOverview({
           <Button
             variant="outline"
             className="w-full glass border-white/30 text-white hover:bg-black/10"
-            disabled={!isAdmin && !isOwner}
             onClick={() => router.push(`/stats/${server.id}`)}
           >
             <BarChart3 className="mr-2 h-4 w-4 text-white" /> 통계 보기

@@ -1,62 +1,39 @@
-"use client";
+"use client"
 
-import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Navbar } from "@/components/navbar";
-import { GameManagement } from "@/components/game-management";
-import { ServerOverview } from "@/components/server-overview";
-import { TimetableView } from "@/components/timetable-view";
-import { toast } from "sonner";
-import { serverService, Server as IServer } from "@/lib/server-service";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useProtectedRoute } from "@/app/hooks/useProtectedRoute";
+import React, { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
+import { Navbar } from "@/components/navbar"
+import { TimetableView } from "@/components/timetable-view"
+import { ServerOverview } from "@/components/server-overview"
+import { toast } from "sonner"
+import { serverService, Server as IServer } from "@/lib/server-service"
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { useProtectedRoute } from "@/app/hooks/useProtectedRoute"
 
 export default function ServerDetailPage() {
-  useProtectedRoute();
-  const params = useParams();
-  const router = useRouter();
-  const serverId = Number(params.id);
+  useProtectedRoute()
+  const params = useParams()
+  const router = useRouter()
+  const serverId = Number(params.id)
 
-  const [server, setServer] = useState<IServer | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [server, setServer] = useState<IServer | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    loadServer();
-  }, [serverId]);
+    loadServer()
+  }, [serverId])
 
   async function loadServer() {
     try {
-      const data = await serverService.getServer(serverId);
-      setServer(data);
+      const data = await serverService.getServer(serverId)
+      setServer(data)
     } catch {
       toast.error("서버 정보 로드 실패", {
         description: "서버 정보를 불러오는데 실패했습니다.",
-      });
+      })
     } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleDelete() {
-    if (!confirm("정말 서버를 삭제하시겠습니까?")) return;
-    try {
-      await serverService.deleteServer(serverId);
-      toast.success("서버가 삭제되었습니다");
-      router.push("/dashboard");
-    } catch {
-      toast.error("서버 삭제 실패");
-    }
-  }
-
-  async function handleLeave() {
-    if (!confirm("이 서버를 떠나시겠습니까?")) return;
-    try {
-      await serverService.leaveServer(serverId);
-      toast.success("서버를 떠났습니다");
-      router.push("/dashboard");
-    } catch {
-      toast.error("서버 떠나기 실패");
+      setIsLoading(false)
     }
   }
 
@@ -70,7 +47,7 @@ export default function ServerDetailPage() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (!server) {
@@ -88,11 +65,12 @@ export default function ServerDetailPage() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
-  const currentUser = localStorage.getItem("current-user");
-  const isOwner = server.owner === currentUser;
+  const currentUser = localStorage.getItem("current-user")
+  const isOwner = server.owner === currentUser
+
 
   return (
     <div className="min-h-screen">
@@ -118,29 +96,28 @@ export default function ServerDetailPage() {
               server={server}
               onServerUpdate={(s) => setServer(s)}
             />
-            <GameManagement serverId={serverId} />
-
             {!isOwner && (
               <Button
                 variant="destructive"
                 className="w-full mt-2 glass-button"
-                onClick={handleLeave}
+                onClick={async () => {
+                  if (!confirm("이 서버를 떠나시겠습니까?")) return
+                  try {
+                    await serverService.leaveServer(serverId)
+                    toast.success("서버를 떠났습니다")
+                    router.push("/dashboard")
+                  } catch {
+                    toast.error("서버 떠나기 실패")
+                  }
+                }}
               >
                 서버 떠나기
               </Button>
             )}
-            {isOwner && (
-              <Button
-                variant="destructive"
-                className="w-full mt-2 glass-button"
-                onClick={handleDelete}
-              >
-                서버 삭제
-              </Button>
-            )}
+
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

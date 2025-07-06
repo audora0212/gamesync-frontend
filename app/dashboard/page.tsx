@@ -68,6 +68,9 @@ export default function DashboardPage() {
     )
   }
 
+  // 현재 로그인한 유저의 ID
+  const currentUserId = authService.getCurrentUserId()
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -97,12 +100,8 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {servers.map((server) => {
-            // Debug: log owner vs current user
-            console.log(
-              "DashboardPage - server:", server.name,
-              "owner:", server.owner,
-              "currentUser:", authService.getCurrentUser()
-            )
+            const isOwner = server.ownerId === currentUserId
+
             return (
               <Card
                 key={server.id}
@@ -112,9 +111,7 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-white">{server.name}</CardTitle>
                     <Badge variant="secondary" className="glass text-white">
-                      {server.owner === authService.getCurrentUser()
-                        ? "소유자"
-                        : "멤버"}
+                      {isOwner ? "소유자" : "멤버"}
                     </Badge>
                   </div>
                   <CardDescription className="text-white/70">

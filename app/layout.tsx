@@ -10,8 +10,8 @@ import { Footer } from "@/components/Footer"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "GameSlots",
-  description: "GameSlots platform for scheduling games",
+  title: "GameSync",
+  description: "GameSync platform for scheduling games",
 }
 
 export default function RootLayout({
@@ -20,19 +20,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko" className="h-full">
+    <html lang="ko" className="min-h-screen">
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body
         className={`
           ${inter.className}
-          flex flex-col h-full
+          flex flex-col
+          min-h-screen
           bg-gradient-to-br
           from-purple-900
           via-blue-900
           to-indigo-900
-          bg-fixed
         `}
       >
         <AuthProvider>

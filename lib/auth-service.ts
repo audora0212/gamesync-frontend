@@ -11,68 +11,67 @@ interface SignupRequest {
   password: string
 }
 
+// 백엔드 응답 형태에 맞춰 LoginResponse 수정
 interface LoginResponse {
   token: string
   message: string
+  userId: number    // 사용자 ID
+  nickname: string  // 사용자 닉네임
 }
 
+// 백엔드에서 Signup 시 userId, nickname을 반환하면 저장할 수 있도록 옵션 추가
 interface SignupResponse {
   message: string
+  userId?: number
+  nickname?: string
 }
 
 class AuthService {
   private tokenKey = "auth-token"
   private userKey = "current-user"
+  private userIdKey = "current-user-id"
 
-
-    setToken(token: string) {
-    localStorage.setItem(this.tokenKey, token);
+  setToken(token: string) {
+    localStorage.setItem(this.tokenKey, token)
   }
-setCurrentUser(user: { id: number; nickname: string }) {
-  localStorage.setItem(this.userKey, user.nickname); 
-  localStorage.setItem("current-user-id", String(user.id));
-  localStorage.setItem("current-user-nickname", user.nickname);
-}
+
+  setCurrentUser(user: { id: number; nickname: string }) {
+    localStorage.setItem(this.userIdKey, String(user.id))
+    localStorage.setItem(this.userKey, user.nickname)
+  }
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const response = await fetch(`${API_BASE}/auth/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     })
-
-    if (!response.ok) {
-      throw new Error("Login failed")
-    }
+    if (!response.ok) throw new Error("Login failed")
 
     const data: LoginResponse = await response.json()
 
-    // Store token and user info
-    localStorage.setItem(this.tokenKey, data.token)
-    localStorage.setItem(this.userKey, credentials.username)
+    // 토큰 및 사용자 정보 저장
+    this.setToken(data.token)
+    this.setCurrentUser({ id: data.userId, nickname: data.nickname })
 
     return data
-
-
   }
-
 
   async signup(credentials: SignupRequest): Promise<SignupResponse> {
     const response = await fetch(`${API_BASE}/auth/signup`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     })
+    if (!response.ok) throw new Error("Signup failed")
 
-    if (!response.ok) {
-      throw new Error("Signup failed")
+    const data: SignupResponse = await response.json()
+
+    // 응답에 userId와 nickname이 포함되면 저장
+    if (data.userId !== undefined && data.nickname) {
+      this.setCurrentUser({ id: data.userId, nickname: data.nickname })
     }
-
-    return response.json()
+    return data
   }
 
   async logout(): Promise<void> {
@@ -81,35 +80,29 @@ setCurrentUser(user: { id: number; nickname: string }) {
       try {
         await fetch(`${API_BASE}/auth/logout`, {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         })
-      } catch (error) {
-        console.error("Logout request failed:", error)
+      } catch {
+        // 무시
       }
     }
-
     localStorage.removeItem(this.tokenKey)
     localStorage.removeItem(this.userKey)
+    localStorage.removeItem(this.userIdKey)
   }
 
   getToken(): string | null {
-    if (typeof window === "undefined") return null
-    return localStorage.getItem(this.tokenKey)
+    return typeof window !== "undefined" ? localStorage.getItem(this.tokenKey) : null
   }
 
   getCurrentUser(): string | null {
-    if (typeof window === "undefined") return null
-    return localStorage.getItem(this.userKey)
+    return typeof window !== "undefined" ? localStorage.getItem(this.userKey) : null
   }
+
   getCurrentUserId(): number | null {
-  const v = localStorage.getItem("current-user-id");
-  return v ? Number(v) : null;
-}
-getCurrentUserNickname(): string | null {
-  return localStorage.getItem("current-user-nickname");
-}
+    const v = typeof window !== "undefined" ? localStorage.getItem(this.userIdKey) : null
+    return v ? Number(v) : null
+  }
 
   isAuthenticated(): boolean {
     return !!this.getToken()
