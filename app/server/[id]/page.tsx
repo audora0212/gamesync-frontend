@@ -12,6 +12,23 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/ca
 import { Button } from "@/components/ui/button"
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute"
 
+async function copyText(text: string) {
+  if (navigator.clipboard?.writeText) {
+    return navigator.clipboard.writeText(text)
+  } else {
+    const textarea = document.createElement("textarea")
+    textarea.value = text
+    textarea.style.position = "fixed"
+    textarea.style.opacity = "0"
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+    document.execCommand("copy")
+    document.body.removeChild(textarea)
+    return Promise.resolve()
+  }
+}
+
 export default function ServerDetailPage() {
   useProtectedRoute()
   const params = useParams()
@@ -85,17 +102,20 @@ export default function ServerDetailPage() {
               <CardDescription className="text-white/70">
                 서버장: {server.owner}
               </CardDescription>
-              <div className="flex items-center">
+              <div className="flex items-center gap-2">
                 <CardDescription className="text-white/70">
                   초대코드 {server.inviteCode}
                 </CardDescription>
                 <Button
                   variant="outline"
                   className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white"
-                  onClick={() => {
-                    navigator.clipboard.writeText(server.inviteCode)
-                      .then(() => toast.success("초대 코드가 복사되었습니다"))
-                      .catch(() => toast.error("초대 코드 복사 실패"))
+                  onClick={async () => {
+                    try {
+                      await copyText(server.inviteCode)
+                      toast.success("초대 코드가 복사되었습니다")
+                    } catch {
+                      toast.error("초대 코드 복사 실패")
+                    }
                   }}
                 >
                   복사
