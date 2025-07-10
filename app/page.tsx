@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
+import GameSyncLanding from "@/components/GameSyncLanding"
 
 export default async function HomePage() {
   const cookieStore = await cookies()
@@ -7,7 +8,6 @@ export default async function HomePage() {
 
   if (token) {
     redirect("/dashboard")
-  } else {
-    redirect("/auth/login")
   }
+  return <GameSyncLanding />
 }
