@@ -69,13 +69,15 @@ export default function GameSyncLanding() {
             <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
               GameSync는 일정 공유, 초대 코드, 자동 초기화 기능을 제공하여 팀 게임을 더욱 쉽게 만들어줍니다.
             </p>
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105"
-            >
-              지금 시작하기
+            <Link href="/auth/signup" passHref>
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105"
+              >
+                지금 시작하기
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
+            </Link>
           </div>
         </div>
       </section>
