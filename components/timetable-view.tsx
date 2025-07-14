@@ -1,7 +1,7 @@
+// components/TimetableView.tsx
 "use client"
 
-import type React from "react"
-import { useState, useEffect, useMemo } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -48,7 +48,7 @@ interface UserSchedule {
 }
 
 export function TimetableView({ serverId }: TimetableViewProps) {
-  const today = new Date().toLocaleDateString("en-CA");
+  const today = new Date().toLocaleDateString("en-CA")
   const [entries, setEntries] = useState<TimetableEntry[]>([])
   const [defaultGames, setDefaultGames] = useState<Game[]>([])
   const [customGames, setCustomGames] = useState<Game[]>([])
@@ -60,6 +60,17 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [hoveredUser, setHoveredUser] = useState<string | null>(null)
   const [resetHour, setResetHour] = useState<number | null>(null)
+
+  // 30분 단위 시간 옵션 생성
+  const timeOptions = useMemo(() => {
+    const times: string[] = []
+    for (let h = 0; h < 24; h++) {
+      const hour = h.toString().padStart(2, "0")
+      times.push(`${hour}:00`)
+      times.push(`${hour}:30`)
+    }
+    return times
+  }, [])
 
   // 사용자별 스케줄 데이터 처리
   const userSchedules = useMemo(() => {
@@ -74,21 +85,13 @@ export function TimetableView({ serverId }: TimetableViewProps) {
         entry,
       }
     })
-
-    // 합류 시간 순으로 정렬
     return schedules.sort((a, b) => a.joinTime - b.joinTime)
   }, [entries])
 
-  // 시간 배열 생성 (0-23)
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
-  useEffect(() => {
-    loadData()
-  }, [serverId])
-
-  useEffect(() => {
-    loadTimetable()
-  }, [gameFilter, sortByGame])
+  useEffect(() => { loadData() }, [serverId])
+  useEffect(() => { loadTimetable() }, [gameFilter, sortByGame])
 
   const loadData = async () => {
     try {
@@ -98,11 +101,8 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       ])
       setDefaultGames(defaultData.defaultGames)
       setCustomGames(customData.customGames)
-
       const serverInfo = await serverService.getServer(serverId)
-      const hourPart = serverInfo.resetTime.split(":")[0]
-      setResetHour(Number(hourPart))
-
+      setResetHour(Number(serverInfo.resetTime.split(":")[0]))
       await loadTimetable()
     } catch {
       toast.error("데이터 로드 실패", { description: "데이터를 불러오는데 실패했습니다." })
@@ -122,23 +122,20 @@ export function TimetableView({ serverId }: TimetableViewProps) {
 
   const handleAddEntry = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedDate || !selectedTime || !selectedGame) {
+    if (!selectedTime || !selectedGame) {
       toast.error("입력 오류", { description: "모든 필드를 입력해주세요." })
       return
     }
-
     const slot = `${selectedDate}T${selectedTime}:00`
-    const [gameType, gameId] = selectedGame.split("-")
-
+    const [type, id] = selectedGame.split("-")
     try {
       await timetableService.addEntry({
         serverId,
         slot,
-        defaultGameId: gameType === "default" ? Number(gameId) : undefined,
-        customGameId: gameType === "custom" ? Number(gameId) : undefined,
+        defaultGameId: type === "default" ? Number(id) : undefined,
+        customGameId: type === "custom" ? Number(id) : undefined,
       })
       await loadTimetable()
-      setSelectedDate(today)
       setSelectedTime("")
       setSelectedGame("")
       toast.success("예약 완료", { description: "게임이 예약되었습니다." })
@@ -147,21 +144,11 @@ export function TimetableView({ serverId }: TimetableViewProps) {
     }
   }
 
-  const formatDateTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString("ko-KR", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  }
+  const formatDateTime = (dateTime: string) =>
+    new Date(dateTime).toLocaleString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
 
-  // 특정 시간에 해당 사용자가 온라인인지 확인
-  const isUserOnlineAtHour = (schedule: UserSchedule, hour: number) => {
-    return hour >= schedule.joinTime
-  }
+  const isUserOnlineAtHour = (schedule: UserSchedule, hour: number) => hour >= schedule.joinTime
 
-  // 사용자별 색상 생성 (랜덤)
   const getUserColor = (user: string, custom: boolean) => {
     const colors = [
       "from-blue-500/60 to-blue-600/40 border-blue-400/60",
@@ -173,12 +160,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       "from-red-500/60 to-red-600/40 border-red-400/60",
       "from-indigo-500/60 to-indigo-600/40 border-indigo-400/60",
     ]
-
-    const hash = user.split("").reduce((a, b) => {
-      a = (a << 5) - a + b.charCodeAt(0)
-      return a & a
-    }, 0)
-
+    const hash = user.split("").reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & a, 0)
     return colors[Math.abs(hash) % colors.length]
   }
 
@@ -187,8 +169,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       <Card className="glass border-white/20 h-full">
         <CardHeader>
           <CardTitle className="text-white flex items-center">
-            <Calendar className="mr-2 h-5 w-5 text-white" />
-            타임테이블
+            <Calendar className="mr-2 h-5 w-5" />합류 시간표
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -202,34 +183,32 @@ export function TimetableView({ serverId }: TimetableViewProps) {
     <Card className="glass border-white/20 h-full">
       <CardHeader>
         <CardTitle className="text-white flex items-center">
-          <Calendar className="mr-2 h-5 w-5 text-white" />
-          합류 시간표
+          <Calendar className="mr-2 h-5 w-5" />합류 시간표
         </CardTitle>
         <CardDescription className="text-white/70">
-          친구들이 언제 합류하는지 확인하고 새로운 예약을 추가하세요
+          친구들이 언제 합류하는지 확인하고 예약하세요
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {userSchedules.length > 0 && (
-          <div className="glass rounded-lg p-6">
-            <h3 className="text-white font-medium mb-6 flex items-center">
-              <Users className="mr-2 h-5 w-5" />
-              오늘의 합류 예정 ({userSchedules.length}명)
+          <div className="glass rounded-lg p-4 overflow-x-auto">
+            <h3 className="text-white font-medium mb-4 flex items-center text-sm">
+              <Users className="mr-2 h-5 w-5" />오늘의 합류 예정 ({userSchedules.length}명)
             </h3>
-
-            <div className="space-y-4">
-              <div className="flex items-center border-b border-white/20 pb-3">
-                <div className="w-48 text-sm text-white/80 font-medium">사용자 / 게임</div>
+            <div className="min-w-[600px]">
+              <div className="flex items-center border-b border-white/20 pb-2">
+                <div className="w-32 text-xs text-white/80 font-medium">사용자 / 게임</div>
                 <div className="flex-1 flex">
                   {hours.map((hour) => (
                     <div key={hour} className="flex-1 text-center">
-                      <div className="text-xs text-white/60 font-medium">{hour.toString().padStart(2, "0")}</div>
+                      <div className="text-[10px] text-white/60 font-medium">
+                        {hour.toString().padStart(2, "0")}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-
-              <div className="space-y-3">
+              <div className="space-y-2 mt-3">
                 {userSchedules.map((schedule) => (
                   <div
                     key={`${schedule.user}-${schedule.entry.id}`}
@@ -237,21 +216,18 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                     onMouseEnter={() => setHoveredUser(schedule.user)}
                     onMouseLeave={() => setHoveredUser(null)}
                   >
-                    <div className="w-48 pr-4">
-                      <div className="text-white font-medium text-sm mb-1">{schedule.user}</div>
-                      <div className="flex items-center gap-2">
-                        <GamepadIcon className="h-3 w-3 text-white/60 flex-shrink-0" />
-                        <span className="text-xs text-white/70 truncate">{schedule.gameName}</span>
-                        <Badge
-                          variant={schedule.custom ? "secondary" : "default"}
-                          className="text-xs px-1.5 py-0.5 bg-white/10 text-white/80 border-white/20"
-                        >
-                          {schedule.custom ? "커스텀" : "기본"}
-                        </Badge>
+                    <div className="w-32 pr-2">
+                      <div className="text-white font-medium text-[12px] truncate">
+                        {schedule.user}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <GamepadIcon className="h-3 w-3 text-white/60" />
+                        <span className="text-[10px] text-white/70 truncate">
+                          {schedule.gameName}
+                        </span>
                       </div>
                     </div>
-
-                    <div className="flex-1 flex h-10 gap-px">
+                    <div className="flex-1 flex h-8 gap-px">
                       {hours.map((hour) => (
                         <div
                           key={hour}
@@ -263,17 +239,17 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                               : "bg-white/5 border border-white/10"
                           } ${
                             hour === schedule.joinTime
-                              ? "rounded-l-md border-l-2"
+                              ? "rounded-l-sm border-l-2"
                               : hour === 23 && isUserOnlineAtHour(schedule, hour)
-                                ? "rounded-r-md border-r-2"
-                                : ""
+                              ? "rounded-r-sm border-r-2"
+                              : ""
                           }`}
                         >
                           {hour === new Date().getHours() && (
-                            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-green-400 opacity-80" />
+                            <div className="absolute top-0 left-1/2 w-[1px] h-full bg-green-400 opacity-80" />
                           )}
                           {resetHour !== null && hour === resetHour && (
-                            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-red-400 opacity-80" />
+                            <div className="absolute top-0 left-1/2 w-[1px] h-full bg-red-400 opacity-80" />
                           )}
                         </div>
                       ))}
@@ -281,56 +257,67 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                   </div>
                 ))}
               </div>
-
-              <div className="mt-6 pt-4 border-t border-white/20">
-                <div className="flex items-center gap-6 text-xs text-white/60">
-
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-3 bg-gradient-to-r from-blue-500/60 to-blue-600/40 rounded" />
-                    <span>온라인 시간</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-0.5 h-4 bg-green-400" />
-                    <span>현재 시간</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-0.5 h-4 bg-red-400" />
-                    <span>초기화 시간</span>
-                  </div>
+              <div className="mt-4 pt-2 border-t border-white/20 text-[10px] text-white/60 flex gap-4">
+                <div className="flex items-center gap-1">
+                  <div className="w-4 h-2 bg-gradient-to-r from-blue-500/60 to-blue-600/40 rounded-sm" />
+                  온라인 시간
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-[1px] h-3 bg-green-400" />
+                  현재 시간
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-[1px] h-3 bg-red-400" />
+                  초기화 시간
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        <form onSubmit={handleAddEntry} className="space-y-4 p-4 glass rounded-lg">
-          <h3 className="text-white font-medium">새 합류 시간 예약</h3>
-          <div className="grid grid-cols-2 gap-3">
+        <form onSubmit={handleAddEntry} className="space-y-3 p-4 glass rounded-lg">
+          <h3 className="text-white font-medium text-sm">새 합류 시간 예약</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <Input
               type="date"
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="glass border-white/30 text-white"
               disabled
+              className="glass border-white/30 text-white text-sm"
             />
-            <Input
-              type="time"
+            <Select
               value={selectedTime}
-              onChange={(e) => setSelectedTime(e.target.value)}
-              className="glass border-white/30 text-white"
+              onValueChange={setSelectedTime}
               required
-            />
+            >
+              <SelectTrigger className="glass border-white/30 text-white text-sm">
+                <SelectValue placeholder="시간 선택" />
+              </SelectTrigger>
+              <SelectContent className="glass border-white/20 text-white text-sm max-h-60 overflow-y-auto">
+                <SelectGroup>
+                  <SelectLabel>시간</SelectLabel>
+                  {timeOptions.map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={selectedGame} onValueChange={setSelectedGame} defaultValue="">
-            <SelectTrigger className="glass border-white/30 text-white">
+          <Select
+            value={selectedGame}
+            onValueChange={setSelectedGame}
+            defaultValue=""
+          >
+            <SelectTrigger className="glass border-white/30 text-white text-sm">
               <SelectValue placeholder="게임 선택" />
             </SelectTrigger>
-            <SelectContent className="glass border-white/20 text-white">
+            <SelectContent className="glass border-white/20 text-white text-sm max-h-60 overflow-y-auto">
               <SelectGroup>
                 <SelectLabel>기본 게임</SelectLabel>
                 {defaultGames.map((game) => (
                   <SelectItem key={`default-${game.id}`} value={`default-${game.id}`}>
-                    {`${game.name} (기본)`}
+                    {game.name}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -338,53 +325,63 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                 <SelectLabel>커스텀 게임</SelectLabel>
                 {customGames.map((game) => (
                   <SelectItem key={`custom-${game.id}`} value={`custom-${game.id}`}>
-                    {`${game.name} (커스텀)`}
+                    {game.name}
                   </SelectItem>
                 ))}
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Button type="submit" className="w-full glass-button text-white hover:bg-black/10">
+          <Button
+            type="submit"
+            className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+          >
             합류 시간 예약
           </Button>
         </form>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             placeholder="게임 이름으로 필터"
             value={gameFilter}
             onChange={(e) => setGameFilter(e.target.value)}
-            className="glass border-white/30 text-white placeholder:text-white/50"
+            className="glass border-white/30 text-white placeholder:text-white/50 text-sm"
           />
           <Button
             onClick={() => setSortByGame(!sortByGame)}
             variant="outline"
-            className={`glass border-white/30 text-white hover:bg-black/10 ${sortByGame ? "bg-white/10" : ""}`}
+            className={`glass border-white/30 text-white hover:bg-black/10 text-sm ${
+              sortByGame ? "bg-white/10" : ""
+            }`}
           >
-            <Filter className="mr-2 h-4 w-4 text-white " />
-            게임순
+            <Filter className="mr-1 h-4 w-4" /> 게임순
           </Button>
         </div>
 
-        <div className="space-y-3 max-h-96 overflow-y-auto">
+        <div className="space-y-2 max-h-64 sm:max-h-96 overflow-y-auto">
           {entries.map((entry) => (
             <div key={entry.id} className="p-3 glass rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-between mb-1 text-sm">
+                <div className="flex items-center space-x-1">
                   <Clock className="h-4 w-4 text-white/60" />
-                  <span className="text-white font-medium">{formatDateTime(entry.slot)}</span>
+                  <span className="text-white font-medium text-[12px]">
+                    {formatDateTime(entry.slot)}
+                  </span>
                 </div>
-                <Badge variant={entry.custom ? "secondary" : "default"} className="glass text-white hover:bg-black/10">
+                <Badge variant={entry.custom ? "secondary" : "default"} className="text-[10px]">
                   {entry.custom ? "커스텀" : "기본"}
                 </Badge>
               </div>
-              <div className="text-white/80 text-sm">
+              <div className="text-white/80 text-[12px]">
                 <div>게임: {entry.gameName}</div>
                 <div>플레이어: {entry.user}</div>
               </div>
             </div>
           ))}
-          {entries.length === 0 && <div className="text-center py-8 text-white/60">예약된 게임이 없습니다.</div>}
+          {entries.length === 0 && (
+            <div className="text-center py-6 text-white/60 text-sm">
+              예약된 게임이 없습니다.
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

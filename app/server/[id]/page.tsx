@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import React, { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
@@ -93,22 +93,23 @@ export default function ServerDetailPage() {
     <div className="min-h-screen">
       <Navbar />
       <div className="container mx-auto px-4 py-6">
+        {/* 서버 정보 카드 */}
         <Card className="glass border-white/20 mb-6">
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold text-white">
               {server.name}
             </CardTitle>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
               <CardDescription className="text-white/70">
                 서버장: {server.owner}
               </CardDescription>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
                 <CardDescription className="text-white/70">
                   초대코드 {server.inviteCode}
                 </CardDescription>
                 <Button
                   variant="outline"
-                  className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+                  className="w-full sm:w-auto glass border-white/30 text-white hover:bg-black/10 hover:text-white"
                   onClick={async () => {
                     try {
                       await copyText(server.inviteCode)
@@ -125,6 +126,7 @@ export default function ServerDetailPage() {
           </CardHeader>
         </Card>
 
+        {/* 메인 레이아웃: 모바일은 세로, 데스크탑은 9:3 컬럼 */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-9">
             <TimetableView serverId={serverId} />

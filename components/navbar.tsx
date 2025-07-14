@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { authService } from "@/lib/auth-service"
-import { GamepadIcon, Home, LogOut, Bell } from "lucide-react"
+import { GamepadIcon, LogOut, Bell } from "lucide-react"
 import { ChangeNicknameModal } from "@/components/ChangeNicknameModal"
 
 export function Navbar() {
@@ -28,25 +28,37 @@ export function Navbar() {
   return (
     <nav className="glass border-b border-white/20">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 space-x-4">
+          {/* 로고 및 타이틀 */}
           <Link href="/dashboard" className="flex items-center space-x-2">
-            <GamepadIcon className="h-8 w-8 text-white" />
-            <span className="text-xl font-bold text-white">GameSync</span>
+            <GamepadIcon className="h-6 w-6 text-white" />
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-white whitespace-nowrap">
+              GameSync
+            </span>
           </Link>
 
-          <div className="flex items-center space-x-4">
-            {/* 닉네임 표시: 클라이언트 마운트 후 렌더링 */}
-            {user && <span className="text-white font-medium">{user}</span>}
-            {/* 닉네임 변경 모달 트리거 */}
-            {/* 알림 아이콘 */}
-            <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/20 hover:text-white">
+          {/* 사용자 정보 및 액션 */}
+          <div className="flex items-center space-x-3">
+            {user && (
+              <span className="text-xs sm:text-sm md:text-base text-white font-medium whitespace-nowrap">
+                {user}
+              </span>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative text-white hover:bg-white/20 hover:text-white"
+            >
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
             </Button>
             <ChangeNicknameModal />
-            {/* 로그아웃 */}
-            <Button onClick={handleLogout} variant="ghost" className="text-white hover:bg-white/20 hover:text-white">
-              <LogOut className="mr-2 h-4 w-4" />
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              className="flex items-center text-xs sm:text-sm md:text-base text-white hover:bg-white/20 hover:text-white whitespace-nowrap"
+            >
+              <LogOut className="mr-1 h-4 w-4" />
               로그아웃
             </Button>
           </div>

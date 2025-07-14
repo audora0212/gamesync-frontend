@@ -18,7 +18,7 @@ import { CreateServerModal } from "@/components/create-server-modal";
 import { JoinByCodeModal } from "@/components/join-by-code-modal";
 import { Navbar } from "@/components/navbar";
 import { Plus, Users, Clock } from "lucide-react";
-import { useProtectedRoute } from "@/app/hooks/useProtectedRoute";  // <-- 절대 경로
+import { useProtectedRoute } from "@/app/hooks/useProtectedRoute";
 
 export default function DashboardPage() {
   useProtectedRoute();
@@ -74,29 +74,31 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
+        {/* 헤더: 모바일에서 세로, 데스크탑에서 가로 */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 space-y-4 sm:space-y-0">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">대시보드</h1>
             <p className="text-white/70">
               내가 참여한 서버를 관리하고 스케줄을 확인하세요
             </p>
           </div>
-          <div className="flex">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button
               onClick={() => setShowJoinModal(true)}
-              className="mr-2 glass-button hover:bg-white/20 h-12 px-6"
+              className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
             >
               초대 코드로 참가
             </Button>
             <Button
               onClick={() => setShowCreateModal(true)}
-              className="glass-button hover:bg-white/20 h-12 px-6"
+              className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
             >
               <Plus className="mr-2 h-4 w-4" />서버 생성
             </Button>
           </div>
         </div>
 
+        {/* 서버 카드 리스트 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {servers.map((server) => {
             const isOwner = server.ownerId === currentUserId;
@@ -144,6 +146,7 @@ export default function DashboardPage() {
           })}
         </div>
 
+        {/* 서버가 없을 때 */}
         {servers.length === 0 && (
           <div className="text-center py-12">
             <div className="glass max-w-md mx-auto p-8">
@@ -155,13 +158,13 @@ export default function DashboardPage() {
               </p>
               <Button
                 onClick={() => setShowJoinModal(true)}
-                className="glass-button hover:bg-white/20 h-12 px-6 mr-2"
+                className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6 mb-2"
               >
                 초대 코드로 참가
               </Button>
               <Button
                 onClick={() => setShowCreateModal(true)}
-                className="glass-button hover:bg-white/20 h-12 px-6"
+                className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
               >
                 서버 생성
               </Button>
@@ -170,6 +173,7 @@ export default function DashboardPage() {
         )}
       </div>
 
+      {/* 모달 컴포넌트 */}
       <CreateServerModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}

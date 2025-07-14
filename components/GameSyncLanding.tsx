@@ -1,8 +1,8 @@
-// components/GameSyncLanding.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -75,8 +75,8 @@ export default function GameSyncLanding() {
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105"
               >
                 지금 시작하기
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
             </Link>
           </div>
         </div>
@@ -149,70 +149,45 @@ export default function GameSyncLanding() {
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
-            <CardContent className="p-8">
-              <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/50 rounded-xl p-6 min-h-[400px] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="mb-6 p-4 rounded-full bg-white/10 w-fit mx-auto">
-                    <Gamepad2 className="w-12 h-12 text-blue-300" />
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-4">대시보드 미리보기</h3>
-                  <p className="text-white/70 mb-6 leading-relaxed">
-                    실시간 게임 일정, 팀원 현황, 통계 등을 한눈에 확인할 수 있는
-                    <br />
-                    직관적인 대시보드를 제공합니다
-                  </p>
-                  <div className="flex items-center justify-center gap-4 text-sm text-white/60">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      실시간 업데이트
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      팀원 관리
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4" />
-                      상세 통계
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <CardContent className="p-8 flex justify-center">
+              <Image
+                src="/pic.png"
+                alt="Dashboard Preview"
+                width={800}
+                height={450}
+                className="rounded-xl object-cover"
+              />
             </CardContent>
           </Card>
         </div>
       </section>
 
-
-
-{/* CTA Section */}
-<section className="relative px-4 py-20">
-  <div className="max-w-4xl mx-auto text-center">
-    <Card
-      className={`bg-gradient-to-br from-purple-700/30 via-blue-800/30 to-indigo-900/30 backdrop-blur-sm border border-white/10 transition-all duration-1000 delay-2500 ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
-    >
-      <CardContent className="p-12">
-        <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-          지금 바로 시작해보세요!
-        </h2>
-        <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-          GameSync와 함께 더 체계적이고 즐거운 게임 라이프를 경험해보세요. 무료로 시작할 수 있습니다.
-        </p>
-        <Link href="/auth/signup" passHref>
-          <Button
-            size="lg"
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-12 py-4 text-xl font-semibold rounded-xl shadow-lg hover:shadow-indigo-800/50 transition-all duration-300 transform hover:scale-105"
+      {/* CTA Section */}
+      <section className="relative px-4 py-20">
+        <div className="max-w-4xl mx-auto text-center">
+          <Card
+            className={`bg-white/5 backdrop-blur-sm border border-white/20 overflow-hidden transition-all duration-1000 delay-1500 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
           >
-            무료로 시작하기
-            <ArrowRight className="w-6 h-6 ml-2" />
-          </Button>
-        </Link>
-      </CardContent>
-    </Card>
-  </div>
-</section>
-
+            <CardContent className="p-12">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">지금 바로 시작해보세요!</h2>
+              <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+                GameSync와 함께 더 체계적이고 즐거운 게임 라이프를 경험해보세요. 무료로 시작할 수 있습니다.
+              </p>
+              <Link href="/auth/signup" passHref>
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-12 py-4 text-xl font-semibold rounded-xl shadow-lg hover:shadow-indigo-800/50 transition-all duration-300 transform hover:scale-105"
+                >
+                  무료로 시작하기
+                  <ArrowRight className="w-6 h-6 ml-2" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     </div>
   )
 }
