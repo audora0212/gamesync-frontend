@@ -26,7 +26,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning={true}
-        className={`${inter.className} flex flex-col min-h-screen bg-background text-foreground antialiased`}
+        className={`${inter.className} flex flex-col min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 selection:text-foreground`}
       >
         <AuthProvider>
           {children}

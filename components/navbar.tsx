@@ -28,7 +28,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="glass border-b border-white/10">
+    <nav className="glass border-b border-white/10/60">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 space-x-4">
           {/* 로고 및 타이틀 */}
