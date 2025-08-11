@@ -32,6 +32,14 @@ class NotificationService {
     })
     if (!res.ok) throw new Error("Failed to mark as read")
   }
+
+  async clearAll(): Promise<void> {
+    const res = await fetch(`${API_BASE}/notifications`, {
+      method: "DELETE",
+      headers: authService.getAuthHeaders(),
+    })
+    if (!res.ok) throw new Error("Failed to clear notifications")
+  }
 }
 
 export const notificationService = new NotificationService()

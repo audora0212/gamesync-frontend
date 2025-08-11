@@ -115,9 +115,28 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
       <div ref={panelRef} className={`w-[360px] glass border border-white/10 rounded-xl overflow-hidden`}>
         <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
           <div className="text-sm text-white/80">알림 {unread > 0 ? `(미읽음 ${unread})` : ""}</div>
-          <Button variant="ghost" size="sm" className="text-white/70" onClick={onClose}>
-            닫기
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white/70"
+              onClick={async () => {
+                try {
+                  await notificationService.clearAll()
+                  setItems([])
+                  setUnread(0)
+                  onUnreadChange?.(0)
+                } catch {
+                  toast.error("알림 삭제 실패")
+                }
+              }}
+            >
+              알림 지우기
+            </Button>
+            <Button variant="ghost" size="sm" className="text-white/70" onClick={onClose}>
+              닫기
+            </Button>
+          </div>
         </div>
         <div className={`p-2 overflow-y-auto ${heightClass}`}>
           {loading && <div className="text-white/70 p-4">불러오는 중...</div>}
