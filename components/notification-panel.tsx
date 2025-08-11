@@ -35,6 +35,17 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
         setItems(data.notifications)
         setUnread(data.unreadCount)
         onUnreadChange?.(data.unreadCount)
+
+        // 패널을 연 시점에 모두 읽음 처리
+        const unreadIds = data.notifications.filter(n => !n.read).map(n => n.id)
+        if (unreadIds.length > 0) {
+          await Promise.allSettled(unreadIds.map(id => notificationService.markAsRead(id)))
+          if (!active) return
+          // 로컬 상태 업데이트 및 배지 제거
+          setItems(prev => prev.map(i => ({ ...i, read: true })))
+          setUnread(0)
+          onUnreadChange?.(0)
+        }
       } catch {
         toast.error("알림 로드 실패")
       } finally {
@@ -62,18 +73,12 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
     return `max-h-[${base}px]`
   }, [items.length])
 
+  // 개별 읽음 버튼은 제거. 수동 호출이 필요한 내부 시나리오만 유지할 경우 아래 유틸 사용
   const markRead = async (id: number) => {
     try {
       await notificationService.markAsRead(id)
       setItems(prev => prev.map(i => (i.id === id ? { ...i, read: true } : i)))
-      setUnread(prev => {
-        const next = Math.max(0, prev - 1)
-        onUnreadChange?.(next)
-        return next
-      })
-    } catch {
-      toast.error("읽음 처리 실패")
-    }
+    } catch {}
   }
 
   // 메시지가 JSON이면 파싱, 아니면 null
@@ -117,7 +122,10 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
         <div className={`p-2 overflow-y-auto ${heightClass}`}>
           {loading && <div className="text-white/70 p-4">불러오는 중...</div>}
           {!loading && items.length === 0 && <div className="text-white/60 p-4 text-sm">알림이 없습니다.</div>}
-          {!loading && items.map((n) => {
+          {!loading && items
+            .slice()
+            .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .map((n) => {
             const isInvite = n.type === "INVITE"
             const payload = parseMessage<{ kind?: string, inviteId?: number, requestId?: number, serverName?: string, fromNickname?: string }>(n.message)
             const isFriendRequest = payload?.kind === 'friend_request' && typeof payload.requestId === 'number'
@@ -138,16 +146,10 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
                       <div className="text-xs text-white/70 mt-1">{payload?.fromNickname ?? '상대방'} → {payload?.serverName ?? ''}</div>
                     )}
                   </div>
-                  <div className="flex items-center gap-1">
-                    {!n.read && (
-                      <Button size="sm" variant="ghost" className="text-white/70" onClick={() => markRead(n.id)}>
-                        읽음
-                      </Button>
-                    )}
-                  </div>
+                  <div className="flex items-center gap-1" />
                 </div>
                 {/* 서버 초대 알림이면 수락/거절 버튼 */}
-                {isInvite && onInviteAction && inviteId && (
+                {onInviteAction && inviteId && (
                   <div className="mt-2 flex gap-2">
                     <Button size="sm" className="glass-button" onClick={() => handleInviteDecision(n, true, inviteId)}>
                       수락
