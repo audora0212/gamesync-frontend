@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
+// Demo image section removed; no Image import needed
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -12,9 +12,7 @@ import {
   RefreshCw,
   Users,
   BarChart3,
-  Star,
   ArrowRight,
-  Clock,
   Zap,
 } from 'lucide-react'
 
@@ -57,24 +55,24 @@ export default function GameSyncLanding() {
           <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <Badge className="mb-6 bg-white/5 backdrop-blur-sm border border-white/10 text-foreground hover:bg-white/10">
               <Zap className="w-4 h-4 mr-2" />
-              빠르고 쉬운 게임 예약 플랫폼
+              게임 약속, 쉽게 모아요
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              팀원들과 간편하게
+              함께 할 시간,
               <br />
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-                게임 시간을 예약하세요
+                GameSync와 함께
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
-              GameSync는 일정 공유, 초대 코드, 자동 초기화 기능을 제공하여 팀 게임을 더욱 쉽게 만들어줍니다.
+              GameSync는 약속 공유, 초대 코드, 자동 초기화를 지원해요.  번거로운 조율 없이 바로 모일 수 있어요.
             </p>
             <Link href="/auth/signup" passHref>
               <Button
                 size="lg"
                 className="px-8 py-4 text-lg font-semibold rounded-xl"
               >
-                지금 시작하기
+                무료로 시작하기
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
@@ -86,35 +84,35 @@ export default function GameSyncLanding() {
       <section className="relative px-4 py-20">
         <div className="max-w-6xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">왜 GameSync를 사용하나요?</h2>
-             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              게이머들을 위해 특별히 설계된 강력한 기능들을 만나보세요
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">GameSync로 할 수 있는 것들</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              필요한 기능만 담았어요. 가볍게 시작해보세요.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 icon: Calendar,
-                title: '예약 관리',
-                description: '원하는 시간에 게임 합류 일정을 간편하게 등록하고 관리하세요',
+                title: '약속 관리',
+                description: '원하는 시간에 약속을 만들고 참여를 받으세요.',
                 delay: 'delay-500',
               },
               {
                 icon: RefreshCw,
                 title: '자동 초기화',
-                description: '매일 지정된 시각에 자동으로 리셋되어 항상 깔끔한 상태를 유지합니다',
+                description: '매일 정해둔 시각에 자동으로 초기화돼요.',
                 delay: 'delay-700',
               },
               {
                 icon: Users,
                 title: '초대 코드',
-                description: '간단한 코드 하나로 팀원들을 쉽게 초대하고 참여할 수 있습니다',
+                description: '코드 한 번으로 친구들을 초대하세요.',
                 delay: 'delay-900',
               },
               {
                 icon: BarChart3,
-                title: '통계 대시보드',
-                description: '인기 게임과 피크 시간을 분석하여 최적의 게임 시간을 찾아보세요',
+                title: '활동 통계',
+                description: '언제 가장 많이 모이는지 한눈에 확인하세요.',
                 delay: 'delay-1100',
               },
             ].map((feature, idx) => (
@@ -137,30 +135,7 @@ export default function GameSyncLanding() {
         </div>
       </section>
 
-      {/* Demo Section */}
-      <section className="relative px-4 py-20">
-        <div className="max-w-6xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 delay-1300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">실제 대시보드를 미리 체험해보세요</h2>
-            <p className="text-xl text-muted-foreground">직관적인 인터페이스로 누구나 쉽게 사용할 수 있습니다</p>
-          </div>
-          <Card
-            className={`bg-white/5 backdrop-blur-sm border border-white/10 overflow-hidden transition-all duration-1000 delay-1500 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-          >
-            <CardContent className="p-8 flex justify-center">
-              <Image
-                src="/pic.png"
-                alt="Dashboard Preview"
-                width={800}
-                height={450}
-                className="rounded-xl object-cover"
-              />
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+      
 
       {/* CTA Section */}
       <section className="relative px-4 py-20">
@@ -171,9 +146,9 @@ export default function GameSyncLanding() {
             }`}
           >
             <CardContent className="p-12">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">지금 바로 시작해보세요!</h2>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">지금 시작하세요</h2>
               <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                GameSync와 함께 더 체계적이고 즐거운 게임 라이프를 경험해보세요. 무료로 시작할 수 있습니다.
+                GameSync로 팀의 게임 일정을 체계적으로 운영하세요. 지금 바로 무료로 시작할 수 있습니다.
               </p>
               <Link href="/auth/signup" passHref>
                 <Button
