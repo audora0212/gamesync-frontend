@@ -105,7 +105,7 @@ export default function SignupPage() {
             <Button
               onClick={handleDiscordSignup}
               disabled={isDiscordLoading || isLoading}
-              className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-none !bg-[#5865F2] hover:!bg-[#4752C4] text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#5865F2]/50"
             >
               {isDiscordLoading ? (
                 <>
@@ -115,7 +115,7 @@ export default function SignupPage() {
               ) : (
                 <>
                   <DiscordIcon className="w-5 h-5" />
-                  <span>Discord로 빠른 가입</span>
+                  <span>Discord로 계속하기</span>
                 </>
               )}
             </Button>
