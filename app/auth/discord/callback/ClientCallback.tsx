@@ -4,6 +4,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/lib/auth-service";
+import { toast } from "sonner";
 
 export default function ClientCallback() {
   const router = useRouter();
@@ -22,6 +23,13 @@ export default function ClientCallback() {
         return;
       }
       authService.setCurrentUser(userObj);
+      if (userObj?.existingUser) {
+        toast.success("디스코드 계정으로 로그인했습니다.");
+      } else if (userObj?.linkedByEmail) {
+        toast.success("기존 계정에 디스코드가 연동되었습니다.");
+      } else if (userObj?.newlyCreated) {
+        toast.success("디스코드 계정으로 새 계정이 생성되었습니다.");
+      }
       router.replace("/dashboard");
     } else {
       router.replace("/auth/login");
