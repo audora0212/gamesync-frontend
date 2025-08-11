@@ -55,17 +55,25 @@ export function ChangeNicknameModal() {
         }
       );
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Bad response');
+        // 에러 메시지 추출 (JSON 우선)
+        try {
+          const err = await res.json();
+          const msg = err?.message || err?.error || '닉네임 변경에 실패했습니다';
+          throw new Error(msg);
+        } catch {
+          const text = await res.text();
+          throw new Error(text || '닉네임 변경에 실패했습니다');
+        }
       }
       const data = await res.json();
-      // 로컬 저장
-      authService.setCurrentUser({ id: authService.getCurrentUserId()!, nickname: data.profile.nickname });
-      toast.success(data.message || '닉네임이 변경되었습니다');
+      // 백엔드가 Profile 객체를 그대로 반환하므로 바로 사용
+      authService.setCurrentUser({ id: authService.getCurrentUserId()!, nickname: data.nickname });
+      toast.success('닉네임이 변경되었습니다');
       setOpen(false);
     } catch (e: any) {
       const msg = typeof e?.message === 'string' ? e.message : '닉네임 변경에 실패했습니다';
-      toast.error(msg.includes('24시간') ? msg : '닉네임 변경에 실패했습니다');
+      // 서버에서 남은 시간 안내 메시지를 내려주면 그대로 출력
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
