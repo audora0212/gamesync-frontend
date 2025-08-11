@@ -52,22 +52,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-900
-          via-blue-900
-          to-indigo-900">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 glass rounded-2xl mb-4">
             <GamepadIcon className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">GameSync</h1>
-          <p className="text-white/70">게임 스케줄링 플랫폼에 로그인하세요</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">GameSync</h1>
+          <p className="text-muted-foreground">게임 스케줄링 플랫폼에 로그인하세요</p>
         </div>
 
-        <Card className="glass border-white/20">
+        <Card className="glass border-white/10">
           <CardHeader>
-            <CardTitle className="text-white">로그인</CardTitle>
-            <CardDescription className="text-white/70">계정 정보를 입력해주세요</CardDescription>
+            <CardTitle className="text-foreground">로그인</CardTitle>
+            <CardDescription className="text-muted-foreground">계정 정보를 입력해주세요</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Discord 로그인 버튼 */}
@@ -95,29 +93,29 @@ export default function LoginPage() {
                 <span className="w-full border-t border-white/20" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-transparent px-2 text-white/50">또는</span>
+                <span className="bg-transparent px-2 text-muted-foreground">또는</span>
               </div>
             </div>
 
             {/* 일반 로그인 폼 */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-white">
-                  사용자명
+                <Label htmlFor="username" className="text-foreground">
+                  로그인 아이디
                 </Label>
                 <Input
                   id="username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
-                  placeholder="사용자명을 입력하세요"
+                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
+                  placeholder="로그인 아이디를 입력하세요"
                   required
                   disabled={isDiscordLoading}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-white">
+                <Label htmlFor="password" className="text-foreground">
                   비밀번호
                 </Label>
                 <Input
@@ -125,7 +123,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
+                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
                   placeholder="비밀번호를 입력하세요"
                   required
                   disabled={isDiscordLoading}
@@ -148,11 +146,11 @@ export default function LoginPage() {
             </form>
 
             <div className="text-center">
-              <p className="text-white/70 text-sm">
+              <p className="text-muted-foreground text-sm">
                 계정이 없으신가요?{" "}
                 <Link
                   href="/auth/signup"
-                  className="text-blue-300 hover:text-blue-200 underline font-medium transition-colors"
+                  className="text-muted-foreground hover:text-foreground underline font-medium transition-colors"
                 >
                   회원가입
                 </Link>

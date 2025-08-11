@@ -26,24 +26,24 @@ export default function GameSyncLanding() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#4B0082] via-[#1E3A8A] to-[#312E81] text-white font-['Inter'] overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-[hsl(230,14%,12%)] via-[hsl(230,14%,13%)] to-[hsl(230,14%,15%)] text-foreground font-['Inter'] overflow-x-hidden">
       {/* Header */}
       <header className="relative z-50 px-4 py-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20">
-              <Gamepad2 className="w-6 h-6 text-white" />
+            <div className="p-2 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <Gamepad2 className="w-6 h-6 text-muted-foreground" />
             </div>
             <span className="text-2xl font-bold">GameSync</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/auth/login" passHref>
-              <Button variant="ghost" className="text-white hover:bg-white/10 backdrop-blur-sm border border-white/20">
+              <Button variant="ghost" className="text-muted-foreground hover:bg-white/10 backdrop-blur-sm border border-white/10">
                 로그인
               </Button>
             </Link>
             <Link href="/auth/signup" passHref>
-              <Button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white">
+              <Button className="bg-white/10 hover:bg-white/15 backdrop-blur-sm border border-white/10 text-foreground">
                 회원가입
               </Button>
             </Link>
@@ -55,14 +55,14 @@ export default function GameSyncLanding() {
       <section className="relative px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
           <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <Badge className="mb-6 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
+            <Badge className="mb-6 bg-white/5 backdrop-blur-sm border border-white/10 text-foreground hover:bg-white/10">
               <Zap className="w-4 h-4 mr-2" />
               새로운 게임 예약 플랫폼
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               팀원들과 간편하게
               <br />
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[hsl(235,60%,70%)] to-[hsl(260,55%,72%)]">
                 게임 시간을 예약하세요
               </span>
             </h1>
@@ -72,7 +72,7 @@ export default function GameSyncLanding() {
             <Link href="/auth/signup" passHref>
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105"
+                className="px-8 py-4 text-lg font-semibold rounded-xl bg-[hsl(235,60%,58%)] hover:bg-[hsl(235,60%,54%)] text-white"
               >
                 지금 시작하기
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -87,7 +87,7 @@ export default function GameSyncLanding() {
         <div className="max-w-6xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">왜 GameSync를 사용하나요?</h2>
-            <p className="text-xl text-white/70 max-w-2xl mx-auto">
+             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               게이머들을 위해 특별히 설계된 강력한 기능들을 만나보세요
             </p>
           </div>
@@ -120,16 +120,16 @@ export default function GameSyncLanding() {
             ].map((feature, idx) => (
               <Card
                 key={idx}
-                className={`bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/10 ${feature.delay} ${
+                className={`bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-500 ${feature.delay} ${
                   isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
               >
                 <CardContent className="p-6 text-center">
-                  <div className="mb-4 p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 w-fit mx-auto">
-                    <feature.icon className="w-8 h-8 text-blue-300" />
+                  <div className="mb-4 p-3 rounded-xl bg-[hsl(235,60%,58%)]/10 w-fit mx-auto">
+                    <feature.icon className="w-8 h-8 text-[hsl(235,60%,70%)]" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-white">{feature.title}</h3>
-                  <p className="text-white/70 leading-relaxed">{feature.description}</p>
+                  <h3 className="text-xl font-semibold mb-3 text-foreground">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -142,10 +142,10 @@ export default function GameSyncLanding() {
         <div className="max-w-6xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 delay-1300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">실제 대시보드를 미리 체험해보세요</h2>
-            <p className="text-xl text-white/70">직관적인 인터페이스로 누구나 쉽게 사용할 수 있습니다</p>
+            <p className="text-xl text-muted-foreground">직관적인 인터페이스로 누구나 쉽게 사용할 수 있습니다</p>
           </div>
           <Card
-            className={`bg-white/5 backdrop-blur-sm border border-white/20 overflow-hidden transition-all duration-1000 delay-1500 ${
+            className={`bg-white/5 backdrop-blur-sm border border-white/10 overflow-hidden transition-all duration-1000 delay-1500 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
@@ -166,19 +166,19 @@ export default function GameSyncLanding() {
       <section className="relative px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
           <Card
-            className={`bg-white/5 backdrop-blur-sm border border-white/20 overflow-hidden transition-all duration-1000 delay-1500 ${
+            className={`bg-white/5 backdrop-blur-sm border border-white/10 overflow-hidden transition-all duration-1000 delay-1500 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
             <CardContent className="p-12">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">지금 바로 시작해보세요!</h2>
-              <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">지금 바로 시작해보세요!</h2>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
                 GameSync와 함께 더 체계적이고 즐거운 게임 라이프를 경험해보세요. 무료로 시작할 수 있습니다.
               </p>
               <Link href="/auth/signup" passHref>
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-12 py-4 text-xl font-semibold rounded-xl shadow-lg hover:shadow-indigo-800/50 transition-all duration-300 transform hover:scale-105"
+                  className="px-12 py-4 text-xl font-semibold rounded-xl bg-[hsl(235,60%,58%)] hover:bg-[hsl(235,60%,54%)] text-white"
                 >
                   무료로 시작하기
                   <ArrowRight className="w-6 h-6 ml-2" />

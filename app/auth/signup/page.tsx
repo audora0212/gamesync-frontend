@@ -85,20 +85,20 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 glass rounded-2xl mb-4">
             <GamepadIcon className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">GameSync</h1>
-          <p className="text-white/70">게임 스케줄링 플랫폼에 가입하세요</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">GameSync</h1>
+          <p className="text-muted-foreground">게임 스케줄링 플랫폼에 가입하세요</p>
         </div>
 
-        <Card className="glass border-white/20">
+        <Card className="glass border-white/10">
           <CardHeader>
-            <CardTitle className="text-white">회원가입</CardTitle>
-            <CardDescription className="text-white/70">새 계정을 만들어보세요</CardDescription>
+            <CardTitle className="text-foreground">회원가입</CardTitle>
+            <CardDescription className="text-muted-foreground">새 계정을 만들어보세요</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Discord 회원가입 버튼 */}
@@ -126,14 +126,14 @@ export default function SignupPage() {
                 <span className="w-full border-t border-white/20" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-transparent px-2 text-white/50">또는</span>
+                <span className="bg-transparent px-2 text-muted-foreground">또는</span>
               </div>
             </div>
 
             {/* 일반 회원가입 폼 */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-white">
+                <Label htmlFor="username" className="text-foreground">
                   로그인 아이디 (3~20자, 영문,숫자)
                 </Label>
                 <Input
@@ -145,7 +145,7 @@ export default function SignupPage() {
                   maxLength={20}
                   pattern="^[a-zA-Z0-9_]+$"
                   title="3~20자 영문, 숫자, 밑줄(_)만 가능"
-                  className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
+                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
                   placeholder="로그인 아이디를 입력하세요"
                   required
                   disabled={isDiscordLoading}
@@ -153,7 +153,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="nickname" className="text-white">
+                <Label htmlFor="nickname" className="text-foreground">
                   사용자명 (2~30자)
                 </Label>
                 <Input
@@ -164,7 +164,7 @@ export default function SignupPage() {
                   minLength={2}
                   maxLength={30}
                   title="2~30자 사이로 입력해주세요"
-                  className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
+                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
                   placeholder="사용자명을 입력하세요"
                   required
                   disabled={isDiscordLoading}
@@ -172,7 +172,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-white">
+                <Label htmlFor="password" className="text-foreground">
  비밀번호 (최소 8자)
 </Label>
                 <Input
@@ -182,7 +182,7 @@ export default function SignupPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   minLength={8}
                   title="비밀번호는 최소 8자 이상이어야 합니다."
-                  className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
+                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
                   placeholder="비밀번호를 입력하세요"
                   required
                   disabled={isDiscordLoading}
@@ -190,7 +190,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-white">
+                <Label htmlFor="confirmPassword" className="text-foreground">
                   비밀번호 확인
                 </Label>
                 <Input
@@ -200,7 +200,7 @@ export default function SignupPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   minLength={8}
                   title="비밀번호를 다시 입력하세요"
-                  className="glass border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-white/20"
+                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
                   placeholder="비밀번호를 다시 입력하세요"
                   required
                   disabled={isDiscordLoading}
@@ -224,11 +224,11 @@ export default function SignupPage() {
             </form>
 
             <div className="text-center">
-              <p className="text-white/70 text-sm">
+              <p className="text-muted-foreground text-sm">
                 이미 계정이 있으신가요? {" "}
                 <Link
                   href="/auth/login"
-                  className="text-blue-300 hover:text-blue-200 underline font-medium transition-colors"
+                  className="text-muted-foreground hover:text-foreground underline font-medium transition-colors"
                 >
                   로그인
                 </Link>

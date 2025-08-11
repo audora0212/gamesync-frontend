@@ -20,20 +20,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko" className="min-h-screen">
+    <html lang="ko" className="min-h-screen dark">
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body
-        className={`
-          ${inter.className}
-          flex flex-col
-          min-h-screen
-          bg-gradient-to-br
-          from-purple-900
-          via-blue-900
-          to-indigo-900
-        `}
+        suppressHydrationWarning={true}
+        className={`${inter.className} flex flex-col min-h-screen bg-background text-foreground antialiased`}
       >
         <AuthProvider>
           {children}
