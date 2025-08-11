@@ -26,7 +26,7 @@ export default function GameSyncLanding() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[hsl(230,14%,12%)] via-[hsl(230,14%,13%)] to-[hsl(230,14%,15%)] text-foreground font-['Inter'] overflow-x-hidden">
+    <div className="min-h-screen text-foreground font-['Inter'] overflow-x-hidden">
       {/* Header */}
       <header className="relative z-50 px-4 py-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -62,7 +62,7 @@ export default function GameSyncLanding() {
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               팀원들과 간편하게
               <br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[hsl(235,60%,70%)] to-[hsl(260,55%,72%)]">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                 게임 시간을 예약하세요
               </span>
             </h1>
@@ -72,7 +72,7 @@ export default function GameSyncLanding() {
             <Link href="/auth/signup" passHref>
               <Button
                 size="lg"
-                className="px-8 py-4 text-lg font-semibold rounded-xl bg-[hsl(235,60%,58%)] hover:bg-[hsl(235,60%,54%)] text-white"
+                className="px-8 py-4 text-lg font-semibold rounded-xl"
               >
                 지금 시작하기
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -125,8 +125,8 @@ export default function GameSyncLanding() {
                 }`}
               >
                 <CardContent className="p-6 text-center">
-                  <div className="mb-4 p-3 rounded-xl bg-[hsl(235,60%,58%)]/10 w-fit mx-auto">
-                    <feature.icon className="w-8 h-8 text-[hsl(235,60%,70%)]" />
+                  <div className="mb-4 p-3 rounded-xl bg-primary/10 w-fit mx-auto">
+                    <feature.icon className="w-8 h-8 text-primary" />
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-foreground">{feature.title}</h3>
                   <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
