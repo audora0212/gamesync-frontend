@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { notificationService, type NotificationItem } from "@/lib/notification-service"
+import { friendService } from "@/lib/friend-service"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { toast } from "sonner"
@@ -10,13 +12,17 @@ interface Props {
   open: boolean
   onClose: () => void
   onInviteAction?: (inviteId: number, accept: boolean) => Promise<void>
+  onUnreadChange?: (unread: number) => void
 }
 
-export function NotificationPanel({ open, onClose, onInviteAction }: Props) {
+export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChange }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
   const [items, setItems] = useState<NotificationItem[]>([])
   const [unread, setUnread] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
     if (!open) return
@@ -28,6 +34,7 @@ export function NotificationPanel({ open, onClose, onInviteAction }: Props) {
         if (!active) return
         setItems(data.notifications)
         setUnread(data.unreadCount)
+        onUnreadChange?.(data.unreadCount)
       } catch {
         toast.error("알림 로드 실패")
       } finally {
@@ -59,14 +66,47 @@ export function NotificationPanel({ open, onClose, onInviteAction }: Props) {
     try {
       await notificationService.markAsRead(id)
       setItems(prev => prev.map(i => (i.id === id ? { ...i, read: true } : i)))
-      setUnread(prev => Math.max(0, prev - 1))
+      setUnread(prev => {
+        const next = Math.max(0, prev - 1)
+        onUnreadChange?.(next)
+        return next
+      })
     } catch {
       toast.error("읽음 처리 실패")
     }
   }
 
-  return (
-    <div className={`fixed top-16 right-4 z-[10002] transition ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+  // 메시지가 JSON이면 파싱, 아니면 null
+  function parseMessage<T = any>(msg: string | null): T | null {
+    if (!msg) return null
+    try { return JSON.parse(msg) as T } catch { return null }
+  }
+
+  async function handleInviteDecision(n: NotificationItem, accept: boolean, inviteId: number) {
+    if (!onInviteAction) return
+    try {
+      await onInviteAction(inviteId, accept)
+      await markRead(n.id)
+      setItems(prev => prev.filter(i => i.id !== n.id))
+      toast.success(accept ? "초대를 수락했습니다" : "초대를 거절했습니다")
+    } catch {
+      toast.error("초대 응답 실패")
+    }
+  }
+
+  async function handleFriendRequestDecision(n: NotificationItem, requestId: number, accept: boolean) {
+    try {
+      await friendService.respond(requestId, accept)
+      await markRead(n.id)
+      setItems(prev => prev.filter(i => i.id !== n.id))
+      toast.success(accept ? "친구 요청을 수락했습니다" : "친구 요청을 거절했습니다")
+    } catch {
+      toast.error("친구 요청 처리 실패")
+    }
+  }
+
+  const panel = (
+    <div className={`fixed top-16 right-4 z-[11000] transition ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
       <div ref={panelRef} className={`w-[360px] glass border border-white/10 rounded-xl overflow-hidden`}>
         <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
           <div className="text-sm text-white/80">알림 {unread > 0 ? `(미읽음 ${unread})` : ""}</div>
@@ -79,12 +119,24 @@ export function NotificationPanel({ open, onClose, onInviteAction }: Props) {
           {!loading && items.length === 0 && <div className="text-white/60 p-4 text-sm">알림이 없습니다.</div>}
           {!loading && items.map((n) => {
             const isInvite = n.type === "INVITE"
+            const payload = parseMessage<{ kind?: string, inviteId?: number, requestId?: number, serverName?: string, fromNickname?: string }>(n.message)
+            const isFriendRequest = payload?.kind === 'friend_request' && typeof payload.requestId === 'number'
+            const inviteId = payload?.kind === 'server_invite' && typeof payload.inviteId === 'number' ? payload.inviteId : undefined
             return (
               <Card key={n.id} className="glass border-white/10 p-3 mb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="text-sm text-white font-medium">{n.title}</div>
-                    {n.message && <div className="text-xs text-white/70 mt-1 whitespace-pre-line">{n.message}</div>}
+                    {/* JSON payload가 아니면 원문 출력 */}
+                    {!payload && n.message && (
+                      <div className="text-xs text-white/70 mt-1 whitespace-pre-line">{n.message}</div>
+                    )}
+                    {isFriendRequest && (
+                      <div className="text-xs text-white/70 mt-1">{payload?.fromNickname ?? '상대방'} 님이 친구 요청을 보냈습니다.</div>
+                    )}
+                    {isInvite && payload?.kind === 'server_invite' && (
+                      <div className="text-xs text-white/70 mt-1">{payload?.fromNickname ?? '상대방'} → {payload?.serverName ?? ''}</div>
+                    )}
                   </div>
                   <div className="flex items-center gap-1">
                     {!n.read && (
@@ -94,13 +146,24 @@ export function NotificationPanel({ open, onClose, onInviteAction }: Props) {
                     )}
                   </div>
                 </div>
-                {/* 초대 알림이면 수락/거절 버튼 */}
-                {isInvite && onInviteAction && (
+                {/* 서버 초대 알림이면 수락/거절 버튼 */}
+                {isInvite && onInviteAction && inviteId && (
                   <div className="mt-2 flex gap-2">
-                    <Button size="sm" className="glass-button" onClick={() => onInviteAction(n.id, true)}>
+                    <Button size="sm" className="glass-button" onClick={() => handleInviteDecision(n, true, inviteId)}>
                       수락
                     </Button>
-                    <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={() => onInviteAction(n.id, false)}>
+                    <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={() => handleInviteDecision(n, false, inviteId)}>
+                      거절
+                    </Button>
+                  </div>
+                )}
+                {/* 친구 요청 알림이면 수락/거절 버튼 */}
+                {isFriendRequest && (
+                  <div className="mt-2 flex gap-2">
+                    <Button size="sm" className="glass-button" onClick={() => handleFriendRequestDecision(n, payload!.requestId!, true)}>
+                      수락
+                    </Button>
+                    <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={() => handleFriendRequestDecision(n, payload!.requestId!, false)}>
                       거절
                     </Button>
                   </div>
@@ -112,6 +175,9 @@ export function NotificationPanel({ open, onClose, onInviteAction }: Props) {
       </div>
     </div>
   )
+
+  if (!mounted) return null
+  return createPortal(panel, document.body)
 }
 
 

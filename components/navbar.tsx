@@ -9,16 +9,24 @@ import { ChangeNicknameModal } from "@/components/ChangeNicknameModal"
 import { FriendDrawer } from "@/components/friend-drawer"
 import { NotificationPanel } from "@/components/notification-panel"
 import { serverService } from "@/lib/server-service"
+import { notificationService } from "@/lib/notification-service"
 
 export function Navbar() {
   const [user, setUser] = useState<string | null>(null)
   const [friendOpen, setFriendOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+  const [unread, setUnread] = useState(0)
 
   useEffect(() => {
     // 클라이언트에서만 실행
     const nickname = authService.getCurrentUser()
     setUser(nickname)
+    ;(async () => {
+      try {
+        const data = await notificationService.getNotifications()
+        setUnread(data.unreadCount)
+      } catch {}
+    })()
   }, [])
 
   const handleLogout = async () => {
@@ -65,7 +73,9 @@ export function Navbar() {
               onClick={() => setNotifOpen(v => !v)}
             >
               <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
+              {unread > 0 && (
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
+              )}
             </Button>
             <ChangeNicknameModal />
             <Button
@@ -84,6 +94,7 @@ export function Navbar() {
       <NotificationPanel
         open={notifOpen}
         onClose={() => setNotifOpen(false)}
+        onUnreadChange={setUnread}
         onInviteAction={async (inviteId, accept) => {
           try {
             // 초대 응답 API
