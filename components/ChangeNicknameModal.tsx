@@ -55,15 +55,16 @@ export function ChangeNicknameModal() {
         }
       );
       if (!res.ok) {
-        // 에러 메시지 추출 (JSON 우선)
+        // 에러 메시지 추출: 본문은 한 번만 읽고(JSON 파싱 시도 → 실패 시 원문 사용)
+        const bodyText = await res.text();
+        let msg = '닉네임 변경에 실패했습니다';
         try {
-          const err = await res.json();
-          const msg = err?.message || err?.error || '닉네임 변경에 실패했습니다';
-          throw new Error(msg);
+          const err = JSON.parse(bodyText);
+          msg = err?.message || err?.error || msg;
         } catch {
-          const text = await res.text();
-          throw new Error(text || '닉네임 변경에 실패했습니다');
+          if (bodyText) msg = bodyText;
         }
+        throw new Error(msg);
       }
       const data = await res.json();
       // 백엔드가 Profile 객체를 그대로 반환하므로 바로 사용
