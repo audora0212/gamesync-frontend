@@ -7,10 +7,13 @@ import { authService } from "@/lib/auth-service"
 import { GamepadIcon, LogOut, Bell, Users } from "lucide-react"
 import { ChangeNicknameModal } from "@/components/ChangeNicknameModal"
 import { FriendDrawer } from "@/components/friend-drawer"
+import { NotificationPanel } from "@/components/notification-panel"
+import { serverService } from "@/lib/server-service"
 
 export function Navbar() {
   const [user, setUser] = useState<string | null>(null)
   const [friendOpen, setFriendOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
 
   useEffect(() => {
     // 클라이언트에서만 실행
@@ -59,6 +62,7 @@ export function Navbar() {
               variant="ghost"
               size="icon"
               className="relative text-muted-foreground hover:bg-white/10 hover:text-foreground"
+              onClick={() => setNotifOpen(v => !v)}
             >
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
@@ -75,8 +79,26 @@ export function Navbar() {
           </div>
         </div>
       </div>
-      {/* 친구창이 항상 최상단에 오도록 nav 내부의 맨 마지막에 두고, 고정 z-index 사용 */}
+      {/* 친구/알림 패널이 항상 최상단에 오도록 nav 내부의 맨 마지막에 두고, 고정 z-index 사용 */}
       <FriendDrawer open={friendOpen} onClose={() => setFriendOpen(false)} />
+      <NotificationPanel
+        open={notifOpen}
+        onClose={() => setNotifOpen(false)}
+        onInviteAction={async (inviteId, accept) => {
+          try {
+            // 초대 응답 API
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
+            await fetch(`${API_BASE}/servers/invites/${inviteId}/respond`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...authService.getAuthHeaders() },
+              body: JSON.stringify({ accept })
+            })
+            // 수락이면 대시보드/서버 목록 새로고침은 사용자가 수동으로 함. 여기선 토스트만 처리
+          } catch {
+            console.error('초대 응답 실패')
+          }
+        }}
+      />
     </nav>
   )
 }
