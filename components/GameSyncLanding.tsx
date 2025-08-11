@@ -43,7 +43,7 @@ export default function GameSyncLanding() {
               </Button>
             </Link>
             <Link href="/auth/signup" passHref>
-              <Button className="bg-white/10 hover:bg-white/15 backdrop-blur-sm border border-white/10 text-foreground">
+              <Button>
                 회원가입
               </Button>
             </Link>
@@ -178,7 +178,7 @@ export default function GameSyncLanding() {
               <Link href="/auth/signup" passHref>
                 <Button
                   size="lg"
-                  className="px-12 py-4 text-xl font-semibold rounded-xl bg-[hsl(235,60%,58%)] hover:bg-[hsl(235,60%,54%)] text-white"
+                  className="px-12 py-4 text-xl font-semibold rounded-xl"
                 >
                   무료로 시작하기
                   <ArrowRight className="w-6 h-6 ml-2" />

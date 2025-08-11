@@ -147,30 +147,32 @@ export default function DashboardPage() {
         </div>
 
         {/* 서버가 없을 때 */}
-        {servers.length === 0 && (
-          <div className="text-center py-12">
-            <div className="glass max-w-md mx-auto p-8">
-              <h3 className="text-xl font-semibold text-white mb-2">
-                서버가 없습니다
-              </h3>
-              <p className="text-white/70 mb-4">
-                초대 코드를 입력하거나 새 서버를 생성하세요.
-              </p>
-              <Button
-                onClick={() => setShowJoinModal(true)}
-                className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6 mb-2"
-              >
-                초대 코드로 참가
-              </Button>
-              <Button
-                onClick={() => setShowCreateModal(true)}
-                className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
-              >
-                서버 생성
-              </Button>
+          {servers.length === 0 && (
+            <div className="text-center py-12">
+              <div className="glass max-w-md mx-auto p-8">
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  서버가 없습니다
+                </h3>
+                <p className="text-white/70 mb-6">
+                  초대 코드를 입력하거나 새 서버를 생성하세요.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                  <Button
+                    onClick={() => setShowJoinModal(true)}
+                    className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
+                  >
+                    초대 코드로 참가
+                  </Button>
+                  <Button
+                    onClick={() => setShowCreateModal(true)}
+                    className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
+                  >
+                    서버 생성
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
 
       {/* 모달 컴포넌트 */}
