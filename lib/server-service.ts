@@ -133,6 +133,15 @@ class ServerService {
     const res = await fetchWithAuth(`${API_BASE}/servers/${id}/leave`, { method: "POST" });
     if (!res.ok) throw new Error("Failed to leave server");
   }
+
+  async inviteUser(serverId: number, receiverUserId: number): Promise<void> {
+    const res = await fetch(`${API_BASE}/servers/invites`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      body: JSON.stringify({ serverId, receiverUserId }),
+    })
+    if (!res.ok) throw new Error("Failed to send invite")
+  }
 }
 
 export const serverService = new ServerService();

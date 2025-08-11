@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { Users, Crown, Settings as SettingsIcon, BarChart3 } from "lucide-react"
+import { Users, Crown, Settings as SettingsIcon, BarChart3, UserPlus, Copy } from "lucide-react"
 import {
   Dialog,
   DialogTrigger,
@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { authService } from "@/lib/auth-service"
 import { serverService, Server, MemberInfo } from "@/lib/server-service"
+import { friendService, type FriendListResponse } from "@/lib/friend-service"
 
 // Props 타입 정의
 interface ServerOverviewProps {
@@ -46,6 +47,9 @@ export function ServerOverview({
   const [showSettings, setShowSettings] = useState(false)
   const [newName, setNewName] = useState(server.name)
   const [newResetTime, setNewResetTime] = useState(server.resetTime)
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [friends, setFriends] = useState<FriendListResponse>({ friends: [] })
+  const [inviteLoading, setInviteLoading] = useState(false)
 
   // 멤버 강퇴 핸들러
   async function handleKickMember(member: MemberInfo) {
@@ -132,6 +136,7 @@ export function ServerOverview({
   }
 
   return (
+    <>
     <Card className="glass border-white/20 h-full flex flex-col">
       <CardHeader>
         <CardTitle className="text-white flex items-center">
@@ -157,6 +162,45 @@ export function ServerOverview({
             <div className="flex justify-between">
               <span>총 멤버:</span>
               <span>{server.members.length}명</span>
+            </div>
+            {/* 초대코드 및 초대 버튼 */}
+            <div className="pt-2">
+              <div className="text-white mb-1">초대</div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 px-3 py-2 rounded-md bg-white/5 border border-white/15 text-white/80 font-mono tracking-widest">
+                  {server.inviteCode}
+                </div>
+                <Button
+                  variant="outline"
+                  className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(server.inviteCode)
+                      toast.success("초대 코드가 복사되었습니다")
+                    } catch {
+                      toast.error("초대 코드 복사 실패")
+                    }
+                  }}
+                >
+                  <Copy className="h-4 w-4 mr-1" /> 복사
+                </Button>
+                {(isOwner || isAdmin) && (
+                  <Button
+                    className="glass-button"
+                    onClick={async () => {
+                      setInviteOpen(true)
+                      try {
+                        const f = await friendService.getFriends()
+                        setFriends(f)
+                      } catch {
+                        toast.error("친구 목록 로드 실패")
+                      }
+                    }}
+                  >
+                    <UserPlus className="h-4 w-4 mr-1" /> 초대
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -312,5 +356,49 @@ export function ServerOverview({
         </div>
       </CardContent>
     </Card>
+    {/* 초대 모달 */}
+    <Dialog open={inviteOpen} onOpenChange={setInviteOpen} key="invite">
+      <DialogContent className="glass border-white/20 max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-white">친구 초대</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-2 max-h-72 overflow-y-auto">
+          {friends.friends.length === 0 && (
+            <div className="text-white/60 text-sm">초대 가능한 친구가 없습니다.</div>
+          )}
+          {friends.friends.map((f) => (
+            <div key={f.id} className="flex items-center justify-between p-2 glass rounded-lg">
+              <div className="text-white text-sm">
+                {f.nickname} <span className="text-white/50">@{f.username}</span>
+              </div>
+              <Button
+                size="sm"
+                className="glass-button"
+                disabled={inviteLoading}
+                onClick={async () => {
+                  setInviteLoading(true)
+                  try {
+                    await serverService.inviteUser(server.id, f.id)
+                    toast.success("초대가 전송되었습니다")
+                  } catch {
+                    toast.error("초대 전송 실패")
+                  } finally {
+                    setInviteLoading(false)
+                  }
+                }}
+              >
+                초대
+              </Button>
+            </div>
+          ))}
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline" className="glass border-white/30 text-white">닫기</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   )
 }
