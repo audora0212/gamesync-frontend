@@ -42,6 +42,7 @@ export function ServerOverview({
   const currentUserId = authService.getCurrentUserId()
   const isOwner = server.ownerId === currentUserId
   const isAdmin = server.admins.some((a) => a.id === currentUserId)
+  const isMember = server.members.some((m) => m.id === currentUserId)
 
   const [isLoading, setIsLoading] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
@@ -167,8 +168,8 @@ export function ServerOverview({
             {/* 초대 */}
             <div className="pt-2">
               <div className="text-white mb-1">초대</div>
-              <div className="flex items-center gap-2">
-                {(isOwner || isAdmin) && (
+              <div className="flex items-center justify-center gap-2 w-full">
+                {isMember && (
                   <Button
                     className="glass-button"
                     onClick={async () => {
