@@ -1,11 +1,26 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Navbar } from "@/components/navbar"
 import { toast } from "sonner"
 import { timetableService } from "@/lib/timetable-service"
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip as ReTooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts"
 import { Trophy, Clock, TrendingUp, Users } from "lucide-react"
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute"
 
@@ -22,15 +37,18 @@ export default function StatsPage() {
   const serverId = Number.parseInt(params.id as string)
   const [stats, setStats] = useState<Stats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [entries, setEntries] = useState<Array<{ slot: string; gameName: string; user: string }>>([])
 
   useEffect(() => {
-    loadStats()
+    loadAll()
   }, [serverId])
 
-  const loadStats = async () => {
+  const loadAll = async () => {
     try {
       const data = await timetableService.getStats(serverId)
       setStats(data)
+      const list = await timetableService.getTimetable(serverId)
+      setEntries(list)
     } catch (error) {
       toast.error("통계 로드 실패", {
         description: "통계 정보를 불러오는데 실패했습니다.",
@@ -39,6 +57,36 @@ export default function StatsPage() {
       setIsLoading(false)
     }
   }
+
+  // 파생 데이터: 게임별 빈도, 시간대별 빈도
+  const gameFreq = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const e of entries) {
+      map.set(e.gameName, (map.get(e.gameName) || 0) + 1)
+    }
+    return Array.from(map.entries()).map(([name, value]) => ({ name, value }))
+  }, [entries])
+
+  const hourlyFreq = useMemo(() => {
+    const arr = Array.from({ length: 24 }, (_, h) => ({ hour: h, count: 0 }))
+    for (const e of entries) {
+      const d = new Date(e.slot)
+      const h = d.getHours()
+      arr[h].count += 1
+    }
+    return arr
+  }, [entries])
+
+  const userActivity = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const e of entries) {
+      map.set(e.user, (map.get(e.user) || 0) + 1)
+    }
+    return Array.from(map.entries())
+      .map(([user, count]) => ({ user, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10)
+  }, [entries])
 
   if (isLoading) {
     return (
@@ -126,6 +174,69 @@ export default function StatsPage() {
             </div>
           </div>
         )}
+
+        {/* 그래프 섹션 */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8">
+          {/* 게임별 분포 (파이차트) */}
+          <Card className="glass border-white/20">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-white text-base">게임별 예약 분포</CardTitle>
+            </CardHeader>
+            <CardContent className="h-72">
+              {gameFreq.length === 0 ? (
+                <div className="text-white/60">데이터 없음</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={gameFreq} dataKey="value" nameKey="name" label outerRadius={90}>
+                      {gameFreq.map((_, i) => (
+                        <Cell key={i} fill={["#60a5fa", "#34d399", "#a78bfa", "#fb923c", "#f472b6", "#22d3ee"][i % 6]} />
+                      ))}
+                    </Pie>
+                    <Legend />
+                    <ReTooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* 시간대별 예약 수 (라인차트) */}
+          <Card className="glass border-white/20">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-white text-base">시간대별 예약 수</CardTitle>
+            </CardHeader>
+            <CardContent className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={hourlyFreq} margin={{ left: 8, right: 16, top: 10, bottom: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+                  <XAxis dataKey="hour" stroke="#ffffff80" tickFormatter={(h)=>String(h).padStart(2,'0')} />
+                  <YAxis stroke="#ffffff80" />
+                  <ReTooltip />
+                  <Line type="monotone" dataKey="count" stroke="#60a5fa" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* 상위 활동 유저 (막대차트) */}
+          <Card className="glass border-white/20 xl:col-span-2">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-white text-base">상위 활동 유저 Top 10</CardTitle>
+            </CardHeader>
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={userActivity} layout="vertical" margin={{ left: 32, right: 16, top: 10, bottom: 10 }}>
+                  <CartesianGrid horizontal={false} stroke="#ffffff20" />
+                  <XAxis type="number" stroke="#ffffff80" />
+                  <YAxis type="category" dataKey="user" stroke="#ffffff80" width={100} />
+                  <ReTooltip />
+                  <Bar dataKey="count" fill="#34d399" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )

@@ -18,6 +18,9 @@ export interface Server {
   inviteCode: string;
   admins: MemberInfo[];
   resetTime: string;
+  description?: string | null;
+  maxMembers?: number | null;
+  resetPaused?: boolean;
 }
 
 interface SearchParams {
@@ -141,6 +144,36 @@ class ServerService {
       body: JSON.stringify({ serverId, receiverUserId }),
     })
     if (!res.ok) throw new Error("Failed to send invite")
+  }
+
+  async updateDescription(serverId: number, description: string): Promise<Server> {
+    const res = await fetch(`${API_BASE}/servers/${serverId}/description`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      body: JSON.stringify({ description }),
+    })
+    if (!res.ok) throw new Error("Failed to update description")
+    return res.json()
+  }
+
+  async updateMaxMembers(serverId: number, maxMembers: number | null): Promise<Server> {
+    const res = await fetch(`${API_BASE}/servers/${serverId}/max-members`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      body: JSON.stringify({ maxMembers }),
+    })
+    if (!res.ok) throw new Error("Failed to update max members")
+    return res.json()
+  }
+
+  async toggleResetPaused(serverId: number, paused: boolean): Promise<Server> {
+    const res = await fetch(`${API_BASE}/servers/${serverId}/reset-paused`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      body: JSON.stringify({ paused }),
+    })
+    if (!res.ok) throw new Error("Failed to toggle reset pause")
+    return res.json()
   }
 }
 
