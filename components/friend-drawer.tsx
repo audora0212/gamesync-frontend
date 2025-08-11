@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { X, UserPlus, Check, XCircle, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { friendService, FriendListResponse, PendingListResponse, FriendCodeResponse } from "@/lib/friend-service"
 
@@ -140,8 +141,15 @@ export function FriendDrawer({ open, onClose }: FriendDrawerProps) {
                 variant="ghost"
                 size="sm"
                 className="text-muted-foreground hover:bg-white/10"
-                onClick={() => {
-                  if (myCode?.code) navigator.clipboard.writeText(myCode.code)
+                onClick={async () => {
+                  try {
+                    if (myCode?.code) {
+                      await navigator.clipboard.writeText(myCode.code)
+                      toast.success("친구코드가 복사되었습니다")
+                    }
+                  } catch {
+                    toast.error("친구코드 복사 실패")
+                  }
                 }}
               >
                 복사
