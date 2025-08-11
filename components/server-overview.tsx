@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   Card,
@@ -52,6 +52,19 @@ export function ServerOverview({
   const [friends, setFriends] = useState<FriendListResponse>({ friends: [] })
   const [inviteLoading, setInviteLoading] = useState(false)
   const [serverNameConfirm, setServerNameConfirm] = useState("")
+  const [requestedIds, setRequestedIds] = useState<Set<number>>(new Set())
+
+  // 친구 목록 미리 로드 (멤버 리스트에서 친구추가 버튼 노출 판단)
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      try {
+        const f = await friendService.getFriends()
+        if (active) setFriends(f)
+      } catch {}
+    })()
+    return () => { active = false }
+  }, [])
 
   // 멤버 강퇴 핸들러
   async function handleKickMember(member: MemberInfo) {
@@ -212,6 +225,33 @@ export function ServerOverview({
                   {server.admins.some((a) => a.id === member.id) &&
                     member.id !== server.ownerId && (
                       <Crown className="h-4 w-4 text-blue-400" />
+                    )}
+
+                  {/* 친구 추가 아이콘: 본인이 아니고, 아직 친구가 아니며, 요청을 보내지 않은 경우 */}
+                  {member.id !== currentUserId &&
+                    !friends.friends.some((f) => f.id === member.id) &&
+                    !requestedIds.has(member.id) && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="hover:bg-white/10"
+                        title="친구 추가"
+                        onClick={async () => {
+                          try {
+                            await friendService.sendRequestByUserId(member.id)
+                            toast.success("친구 요청을 보냈습니다")
+                            setRequestedIds((prev) => {
+                              const next = new Set(prev)
+                              next.add(member.id)
+                              return next
+                            })
+                          } catch {
+                            toast.error("친구 요청 실패")
+                          }
+                        }}
+                      >
+                        <UserPlus className="h-4 w-4" />
+                      </Button>
                     )}
 
                   {/* 소유자 또는 관리자만 액션 */}
