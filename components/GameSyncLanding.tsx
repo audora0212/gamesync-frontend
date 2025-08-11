@@ -57,7 +57,7 @@ export default function GameSyncLanding() {
           <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <Badge className="mb-6 bg-white/5 backdrop-blur-sm border border-white/10 text-foreground hover:bg-white/10">
               <Zap className="w-4 h-4 mr-2" />
-              새로운 게임 예약 플랫폼
+              빠르고 쉬운 게임 예약 플랫폼
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               팀원들과 간편하게
