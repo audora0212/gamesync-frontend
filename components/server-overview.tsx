@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { Users, Crown, Settings as SettingsIcon, BarChart3, UserPlus, Copy } from "lucide-react"
+import { Users, Crown, Settings as SettingsIcon, BarChart3, UserPlus } from "lucide-react"
 import {
   Dialog,
   DialogTrigger,
@@ -50,6 +50,7 @@ export function ServerOverview({
   const [inviteOpen, setInviteOpen] = useState(false)
   const [friends, setFriends] = useState<FriendListResponse>({ friends: [] })
   const [inviteLoading, setInviteLoading] = useState(false)
+  const [serverNameConfirm, setServerNameConfirm] = useState("")
 
   // 멤버 강퇴 핸들러
   async function handleKickMember(member: MemberInfo) {
@@ -163,27 +164,10 @@ export function ServerOverview({
               <span>총 멤버:</span>
               <span>{server.members.length}명</span>
             </div>
-            {/* 초대코드 및 초대 버튼 */}
+            {/* 초대 */}
             <div className="pt-2">
               <div className="text-white mb-1">초대</div>
               <div className="flex items-center gap-2">
-                <div className="flex-1 px-3 py-2 rounded-md bg-white/5 border border-white/15 text-white/80 font-mono tracking-widest">
-                  {server.inviteCode}
-                </div>
-                <Button
-                  variant="outline"
-                  className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(server.inviteCode)
-                      toast.success("초대 코드가 복사되었습니다")
-                    } catch {
-                      toast.error("초대 코드 복사 실패")
-                    }
-                  }}
-                >
-                  <Copy className="h-4 w-4 mr-1" /> 복사
-                </Button>
                 {(isOwner || isAdmin) && (
                   <Button
                     className="glass-button"
@@ -197,7 +181,7 @@ export function ServerOverview({
                       }
                     }}
                   >
-                    <UserPlus className="h-4 w-4 mr-1" /> 초대
+                    <UserPlus className="h-4 w-4 mr-1" /> 친구 초대
                   </Button>
                 )}
               </div>
@@ -237,8 +221,7 @@ export function ServerOverview({
                         <Button
                           onClick={() => handleGrantAdmin(member)}
                           size="sm"
-                          variant="ghost"
-                          className="text-blue-400 truncate hover:text-blue-300 hover:bg-blue-500/20"
+                          className="glass-button text-white"
                           disabled={isLoading}
                         >
                           임명
@@ -248,8 +231,8 @@ export function ServerOverview({
                         <Button
                           onClick={() => handleRevokeAdmin(member)}
                           size="sm"
-                          variant="ghost"
-                          className="text-gray-400 truncate hover:text-gray-300 hover:bg-gray-500/20"
+                          variant="outline"
+                          className="glass border-white/30 text-white"
                           disabled={isLoading}
                         >
                           해임
@@ -339,12 +322,20 @@ export function ServerOverview({
                   </Button>
                 </DialogFooter>
                 {isOwner && (
-                  <div className="mt-4 border-t border-white/20 pt-4">
+                  <div className="mt-4 border-t border-white/20 pt-4 space-y-2">
+                    <Label htmlFor="srv-delete-confirm" className="text-white">서버 이름을 입력하여 삭제를 확인하세요</Label>
+                    <Input
+                      id="srv-delete-confirm"
+                      value={serverNameConfirm}
+                      onChange={(e) => setServerNameConfirm(e.target.value)}
+                      placeholder={server.name}
+                      className="glass border-white/30 text-white"
+                    />
                     <Button
                       variant="destructive"
                       className="w-full"
                       onClick={handleDeleteServer}
-                      disabled={isLoading}
+                      disabled={isLoading || serverNameConfirm !== server.name}
                     >
                       서버 삭제
                     </Button>
@@ -399,6 +390,7 @@ export function ServerOverview({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    {/* 친구 추가 모달 제거 요청에 따라 삭제됨 */}
     </>
   )
 }
