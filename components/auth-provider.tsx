@@ -48,10 +48,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
             // Foreground push handling: show toast (page가 포커스일 때 OS 알림은 표시되지 않을 수 있음)
             onForegroundMessage((payload) => {
-              const title = (payload?.notification?.title as string) || '알림'
+              const dataTitle = (payload?.data?.title as string) || undefined
+              const notifTitle = (payload?.notification?.title as string) || undefined
+              const title = dataTitle || notifTitle || '알림'
               const type = payload?.data?.type as string | undefined
               const raw = payload?.data?.payload as string | undefined
-              let description = ''
+              const bodyFromData = (payload?.data?.body as string) || ''
+              let description = bodyFromData
               if (type === 'INVITE') {
                 try {
                   const p = raw ? JSON.parse(raw) : undefined
