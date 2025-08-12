@@ -25,6 +25,25 @@ class NotificationService {
     return res.json()
   }
 
+  async registerPushToken(token: string, platform: string = "web"): Promise<void> {
+    const res = await fetch(`${API_BASE}/push-tokens`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      body: JSON.stringify({ token, platform }),
+    })
+    if (!res.ok) throw new Error("Failed to register push token")
+  }
+
+  async unregisterPushToken(token: string): Promise<void> {
+    const url = new URL(`${API_BASE}/push-tokens`)
+    url.searchParams.set("token", token)
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: authService.getAuthHeaders(),
+    })
+    if (!res.ok) throw new Error("Failed to unregister push token")
+  }
+
   async markAsRead(id: number): Promise<void> {
     const res = await fetch(`${API_BASE}/notifications/${id}/read`, {
       method: "POST",

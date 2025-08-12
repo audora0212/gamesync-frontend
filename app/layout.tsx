@@ -23,6 +23,7 @@ export default function RootLayout({
     <html lang="ko" className="min-h-screen dark">
       <head>
         <link rel="icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body
         suppressHydrationWarning={true}

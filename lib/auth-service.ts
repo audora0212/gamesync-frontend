@@ -30,6 +30,7 @@ class AuthService {
   private tokenKey = "auth-token"
   private userKey = "current-user"
   private userIdKey = "current-user-id"
+  private fcmTokenKey = "fcm-token"
 
   setToken(token: string) {
     localStorage.setItem(this.tokenKey, token)
@@ -38,6 +39,14 @@ class AuthService {
   setCurrentUser(user: { id: number; nickname: string }) {
     localStorage.setItem(this.userIdKey, String(user.id))
     localStorage.setItem(this.userKey, user.nickname)
+  }
+
+  setFcmToken(token: string) {
+    localStorage.setItem(this.fcmTokenKey, token)
+  }
+
+  getFcmToken(): string | null {
+    return typeof window !== "undefined" ? localStorage.getItem(this.fcmTokenKey) : null
   }
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
@@ -76,6 +85,7 @@ class AuthService {
 
   async logout(): Promise<void> {
     const token = this.getToken()
+    const fcmToken = this.getFcmToken()
     if (token) {
       try {
         await fetch(`${API_BASE}/auth/logout`, {
@@ -86,9 +96,17 @@ class AuthService {
         // 무시
       }
     }
+    if (fcmToken) {
+      try {
+        const url = new URL(`${API_BASE}/push-tokens`)
+        url.searchParams.set("token", fcmToken)
+        await fetch(url, { method: "DELETE", headers: this.getAuthHeaders() })
+      } catch {}
+    }
     localStorage.removeItem(this.tokenKey)
     localStorage.removeItem(this.userKey)
     localStorage.removeItem(this.userIdKey)
+    localStorage.removeItem(this.fcmTokenKey)
   }
 
   getToken(): string | null {
