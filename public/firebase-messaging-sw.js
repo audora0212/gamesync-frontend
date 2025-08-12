@@ -1,40 +1,40 @@
 /* global self */
-importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js');
+// Fallback service worker without importScripts to avoid external CDN blocking
+// We handle background pushes via the standard 'push' event.
 
-// Note: The config below should match the client config
-firebase.initializeApp({
-  apiKey: "AIzaSyDfwB0dOlR86iQfVzZTuO1G0jYoI6ZTMfY",
-  authDomain: "gamesync-0212.firebaseapp.com",
-  projectId: "gamesync-0212",
-  storageBucket: "gamesync-0212.firebasestorage.app",
-  messagingSenderId: "551919197948",
-  appId: "1:551919197948:web:cb8eaca23e4596c3008179",
-  measurementId: "G-EE1FWZ9B9M"
-});
-
-const messaging = firebase.messaging();
 const handledMessageIds = new Set();
 
-// Background message handler
-messaging.onBackgroundMessage((payload) => {
-  const mid = (payload && (payload.messageId || (payload.data && payload.data.messageId))) || null;
+self.addEventListener('push', (event) => {
+  if (!event) return;
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    // if JSON parse fails, try raw text
+    const text = event.data ? event.data.text() : '';
+    payload = { data: { title: 'GameSync 알림', body: text } };
+  }
+
+  const dataObj = payload.data || payload; // support both {data:{...}} and flat {...}
+  const mid = dataObj && (dataObj.messageId || dataObj.mid) || null;
   if (mid && handledMessageIds.has(mid)) return;
   if (mid) handledMessageIds.add(mid);
-  // Prefer data-only message
-  const title = (payload.data && payload.data.title) || (payload.notification && payload.notification.title) || 'GameSync 알림';
-  const body  = (payload.data && payload.data.body)  || (payload.notification && payload.notification.body)  || '';
+
+  const title = dataObj.title || (payload.notification && payload.notification.title) || 'GameSync 알림';
+  const body  = dataObj.body  || (payload.notification && payload.notification.body)  || '';
+
   const options = {
     body,
-    data: payload.data || {},
+    data: dataObj || {},
     icon: '/favicon.ico'
   };
-  self.registration.showNotification(title, options);
+
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = '/dashboard'; // Could deep-link using event.notification.data
+  const url = '/dashboard';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
