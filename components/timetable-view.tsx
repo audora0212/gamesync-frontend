@@ -72,9 +72,9 @@ export function TimetableView({ serverId }: TimetableViewProps) {
     return times
   }, [])
 
-  // 사용자별 스케줄 데이터 처리
+  // 사용자별 스케줄 데이터 처리 (게임별로 묶고, 게임 내에서는 시간 순)
   const userSchedules = useMemo(() => {
-    const schedules: UserSchedule[] = entries.map((entry) => {
+    const schedulesRaw: UserSchedule[] = entries.map((entry) => {
       const date = new Date(entry.slot)
       const joinTime = date.getHours()
       return {
@@ -85,7 +85,20 @@ export function TimetableView({ serverId }: TimetableViewProps) {
         entry,
       }
     })
-    return schedules.sort((a, b) => a.joinTime - b.joinTime)
+
+    // 1) 시간 순으로 한 번 정렬
+    const sortedByTime = [...schedulesRaw].sort((a, b) => a.joinTime - b.joinTime)
+
+    // 2) 최초 등장 순서대로 게임 그룹 순서를 결정
+    const gameOrder: string[] = []
+    for (const s of sortedByTime) {
+      if (!gameOrder.includes(s.gameName)) gameOrder.push(s.gameName)
+    }
+
+    // 3) 각 게임 그룹별로 시간 순 정렬을 유지한 채로 이어붙이기
+    const grouped = gameOrder.flatMap((game) => sortedByTime.filter((s) => s.gameName === game))
+
+    return grouped
   }, [entries])
 
   const hours = Array.from({ length: 24 }, (_, i) => i)
@@ -149,7 +162,8 @@ export function TimetableView({ serverId }: TimetableViewProps) {
 
   const isUserOnlineAtHour = (schedule: UserSchedule, hour: number) => hour >= schedule.joinTime
 
-  const getUserColor = (user: string, custom: boolean) => {
+  // 게임별 색상 고정
+  const getGameColor = (gameName: string, custom: boolean) => {
     const colors = [
       "from-blue-500/60 to-blue-600/40 border-blue-400/60",
       "from-green-500/60 to-green-600/40 border-green-400/60",
@@ -160,7 +174,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       "from-red-500/60 to-red-600/40 border-red-400/60",
       "from-indigo-500/60 to-indigo-600/40 border-indigo-400/60",
     ]
-    const hash = user.split("").reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & a, 0)
+    const hash = gameName.split("").reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & a, 0)
     return colors[Math.abs(hash) % colors.length]
   }
 
@@ -233,7 +247,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                           key={hour}
                           className={`flex-1 relative transition-all duration-300 ${
                             isUserOnlineAtHour(schedule, hour)
-                              ? `bg-gradient-to-r ${getUserColor(schedule.user, schedule.custom)} border ${
+                              ? `bg-gradient-to-r ${getGameColor(schedule.gameName, schedule.custom)} border ${
                                   hoveredUser === schedule.user ? "scale-y-110 brightness-125" : ""
                                 }`
                               : "bg-white/5 border border-white/10"
