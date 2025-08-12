@@ -98,7 +98,7 @@ export function Navbar() {
         onInviteAction={async (inviteId, accept) => {
           try {
             // 초대 응답 API
-            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api"
             await fetch(`${API_BASE}/servers/invites/${inviteId}/respond`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', ...authService.getAuthHeaders() },
