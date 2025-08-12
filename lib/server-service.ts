@@ -1,7 +1,7 @@
 import { authService } from "./auth-service";
 import { fetchWithAuth } from "./fetch-with-auth";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api"
 
 export interface MemberInfo {
   id: number;
