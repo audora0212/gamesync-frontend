@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 try {
                   const p = raw ? JSON.parse(raw) : undefined
                   if (p && p.kind === 'friend_request' && p.fromNickname) {
-                    description = `${p.fromNickname}님이 보냈습니다`
+                    description = `알림 패널에서 수락/거절할 수 있어요`
                   }
                 } catch {}
               }
