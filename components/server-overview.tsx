@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { Users, Crown, Settings as SettingsIcon, BarChart3, UserPlus } from "lucide-react"
+import { Dialog as ConfirmDialog, DialogContent as ConfirmContent, DialogHeader as ConfirmHeader, DialogFooter as ConfirmFooter, DialogTitle as ConfirmTitle, DialogClose as ConfirmClose } from "@/components/ui/dialog"
 import {
   Dialog,
   DialogTrigger,
@@ -52,7 +53,10 @@ export function ServerOverview({
   const [friends, setFriends] = useState<FriendListResponse>({ friends: [] })
   const [inviteLoading, setInviteLoading] = useState(false)
   const [serverNameConfirm, setServerNameConfirm] = useState("")
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [requestedIds, setRequestedIds] = useState<Set<number>>(new Set())
+  const [kickOpen, setKickOpen] = useState(false)
+  const [kickTarget, setKickTarget] = useState<MemberInfo | null>(null)
 
   // 친구 목록 미리 로드 (멤버 리스트에서 친구추가 버튼 노출 판단)
   useEffect(() => {
@@ -67,11 +71,11 @@ export function ServerOverview({
   }, [])
 
   // 멤버 강퇴 핸들러
-  async function handleKickMember(member: MemberInfo) {
-    if (!confirm(`${member.nickname}을(를) 강퇴하시겠습니까?`)) return
+  async function handleConfirmKick() {
+    if (!kickTarget) return
     setIsLoading(true)
     try {
-      await serverService.kickMember(server.id, member.id)
+      await serverService.kickMember(server.id, kickTarget.id)
       toast.success("멤버 강퇴 완료")
       const updated = await serverService.getServer(server.id)
       onServerUpdate(updated)
@@ -79,6 +83,8 @@ export function ServerOverview({
       toast.error("강퇴 실패")
     } finally {
       setIsLoading(false)
+      setKickOpen(false)
+      setKickTarget(null)
     }
   }
 
@@ -137,7 +143,6 @@ export function ServerOverview({
 
   // 서버 삭제 핸들러 (소유자 전용)
   async function handleDeleteServer() {
-    if (!confirm("정말 서버를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return
     setIsLoading(true)
     try {
       await serverService.deleteServer(server.id)
@@ -283,7 +288,7 @@ export function ServerOverview({
                       {/* 강퇴: 관리자에게는 표시하지 않음 */}
                       {!server.admins.some((a) => a.id === member.id) && (
                         <Button
-                          onClick={() => handleKickMember(member)}
+                          onClick={() => { setKickTarget(member); setKickOpen(true) }}
                           size="sm"
                           variant="ghost"
                           className="text-red-400 truncate hover:text-red-300 hover:bg-red-500/20"
@@ -375,7 +380,7 @@ export function ServerOverview({
                     <Button
                       variant="destructive"
                       className="w-full"
-                      onClick={handleDeleteServer}
+                      onClick={() => setDeleteOpen(true)}
                       disabled={isLoading || serverNameConfirm !== server.name}
                     >
                       서버 삭제
@@ -433,6 +438,52 @@ export function ServerOverview({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    {/* 강퇴 확인 다이얼로그 */}
+    <ConfirmDialog open={kickOpen} onOpenChange={setKickOpen}>
+      <ConfirmContent className="glass border-white/20 max-w-sm">
+        <ConfirmHeader>
+          <ConfirmTitle className="text-white">멤버 강퇴</ConfirmTitle>
+        </ConfirmHeader>
+        <div className="text-white/80 text-sm">
+          {kickTarget ? `${kickTarget.nickname} 을(를) 강퇴하시겠습니까?` : "대상을 선택해주세요."}
+        </div>
+        <ConfirmFooter>
+          <ConfirmClose asChild>
+            <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
+          </ConfirmClose>
+          <Button
+            className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300"
+            disabled={isLoading || !kickTarget}
+            onClick={handleConfirmKick}
+          >
+            강퇴
+          </Button>
+        </ConfirmFooter>
+      </ConfirmContent>
+    </ConfirmDialog>
+    {/* 서버 삭제 확인 다이얼로그 */}
+    <ConfirmDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+      <ConfirmContent className="glass border-white/20 max-w-sm">
+        <ConfirmHeader>
+          <ConfirmTitle className="text-white">서버 삭제</ConfirmTitle>
+        </ConfirmHeader>
+        <div className="text-white/80 text-sm">
+          정말 서버를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+        </div>
+        <ConfirmFooter>
+          <ConfirmClose asChild>
+            <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
+          </ConfirmClose>
+          <Button
+            className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300"
+            disabled={isLoading || serverNameConfirm !== server.name}
+            onClick={handleDeleteServer}
+          >
+            삭제
+          </Button>
+        </ConfirmFooter>
+      </ConfirmContent>
+    </ConfirmDialog>
     {/* 친구 추가 모달 제거 요청에 따라 삭제됨 */}
     </>
   )

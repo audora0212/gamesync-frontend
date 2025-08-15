@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { serverService, Server as IServer } from "@/lib/server-service"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Dialog as ConfirmDialog, DialogContent as ConfirmContent, DialogHeader as ConfirmHeader, DialogFooter as ConfirmFooter, DialogTitle as ConfirmTitle, DialogClose as ConfirmClose } from "@/components/ui/dialog"
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute"
 
 async function copyText(text: string) {
@@ -37,6 +38,7 @@ export default function ServerDetailPage() {
 
   const [server, setServer] = useState<IServer | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [leaveOpen, setLeaveOpen] = useState(false)
 
   useEffect(() => {
     loadServer()
@@ -138,22 +140,44 @@ export default function ServerDetailPage() {
             />
             <GameManagement serverId={serverId} />
             {!isOwner && (
-              <Button
-                variant="destructive"
-                className="w-full mt-2 glass-button"
-                onClick={async () => {
-                  if (!confirm("이 서버를 떠나시겠습니까?")) return
-                  try {
-                    await serverService.leaveServer(serverId)
-                    toast.success("서버를 떠났습니다")
-                    router.push("/dashboard")
-                  } catch {
-                    toast.error("서버 떠나기 실패")
-                  }
-                }}
-              >
-                서버 떠나기
-              </Button>
+              <>
+                <Button
+                  variant="destructive"
+                  className="w-full mt-2 glass-button"
+                  onClick={() => setLeaveOpen(true)}
+                >
+                  서버 떠나기
+                </Button>
+                <ConfirmDialog open={leaveOpen} onOpenChange={setLeaveOpen}>
+                  <ConfirmContent className="glass border-white/20 max-w-sm">
+                    <ConfirmHeader>
+                      <ConfirmTitle className="text-white">서버 떠나기</ConfirmTitle>
+                    </ConfirmHeader>
+                    <div className="text-white/80 text-sm">이 서버를 떠나시겠습니까?</div>
+                    <ConfirmFooter>
+                      <ConfirmClose asChild>
+                        <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
+                      </ConfirmClose>
+                      <Button
+                        className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300"
+                        onClick={async () => {
+                          try {
+                            await serverService.leaveServer(serverId)
+                            toast.success("서버를 떠났습니다")
+                            router.push("/dashboard")
+                          } catch {
+                            toast.error("서버 떠나기 실패")
+                          } finally {
+                            setLeaveOpen(false)
+                          }
+                        }}
+                      >
+                        떠나기
+                      </Button>
+                    </ConfirmFooter>
+                  </ConfirmContent>
+                </ConfirmDialog>
+              </>
             )}
           </div>
         </div>

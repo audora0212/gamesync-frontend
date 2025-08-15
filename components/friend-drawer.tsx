@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { X, UserPlus, Check, XCircle, Users, Trash2 } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogClose } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
@@ -30,6 +31,9 @@ export function FriendDrawer({ open, onClose }: FriendDrawerProps) {
       return true
     })
   }, [friends])
+
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; nickname: string } | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -237,16 +241,9 @@ export function FriendDrawer({ open, onClose }: FriendDrawerProps) {
                       className="hover:bg-white/10 text-red-400"
                       disabled={isLoading}
                       title="친구 삭제"
-                      onClick={async () => {
-                        if (!confirm(`${u.nickname} 님을 친구에서 삭제할까요?`)) return
-                        try {
-                          await friendService.deleteFriend(u.id)
-                          const f = await friendService.getFriends()
-                          setFriends(f)
-                          toast.success("친구를 삭제했습니다")
-                        } catch {
-                          toast.error("친구 삭제 실패")
-                        }
+                      onClick={() => {
+                        setDeleteTarget({ id: u.id, nickname: u.nickname })
+                        setDeleteOpen(true)
                       }}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -262,7 +259,47 @@ export function FriendDrawer({ open, onClose }: FriendDrawerProps) {
   )
 
   if (!mounted) return null
-  return createPortal(drawerUi, document.body)
+  return createPortal(
+    <>
+      {drawerUi}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="glass border-white/20 max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-white">친구 삭제</DialogTitle>
+          </DialogHeader>
+          <div className="text-white/80 text-sm">
+            {deleteTarget ? `${deleteTarget.nickname} 님을 친구에서 삭제할까요?` : "선택된 친구가 없습니다."}
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
+            </DialogClose>
+            <Button
+              className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300"
+              disabled={isLoading || !deleteTarget}
+              onClick={async () => {
+                if (!deleteTarget) return
+                try {
+                  await friendService.deleteFriend(deleteTarget.id)
+                  const f = await friendService.getFriends()
+                  setFriends(f)
+                  toast.success("친구를 삭제했습니다")
+                } catch {
+                  toast.error("친구 삭제 실패")
+                } finally {
+                  setDeleteOpen(false)
+                  setDeleteTarget(null)
+                }
+              }}
+            >
+              삭제
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>,
+    document.body
+  )
 }
 
 
