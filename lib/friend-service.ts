@@ -76,6 +76,13 @@ class FriendService {
     if (!res.ok) throw new Error("Failed to fetch friend code")
     return res.json()
   }
+
+  async deleteFriend(friendUserId: number): Promise<void> {
+    const res = await fetchWithAuth(`${API_BASE}/friends/${friendUserId}`, {
+      method: "DELETE",
+    })
+    if (!res.ok) throw new Error("Failed to delete friend")
+  }
 }
 
 export const friendService = new FriendService()

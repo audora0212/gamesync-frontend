@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { X, UserPlus, Check, XCircle, Users } from "lucide-react"
+import { X, UserPlus, Check, XCircle, Users, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
@@ -229,6 +229,28 @@ export function FriendDrawer({ open, onClose }: FriendDrawerProps) {
                   <div>
                     <div className="text-sm font-medium">{u.nickname}</div>
                     <div className="text-xs text-muted-foreground">@{u.username}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="hover:bg-white/10 text-red-400"
+                      disabled={isLoading}
+                      title="친구 삭제"
+                      onClick={async () => {
+                        if (!confirm(`${u.nickname} 님을 친구에서 삭제할까요?`)) return
+                        try {
+                          await friendService.deleteFriend(u.id)
+                          const f = await friendService.getFriends()
+                          setFriends(f)
+                          toast.success("친구를 삭제했습니다")
+                        } catch {
+                          toast.error("친구 삭제 실패")
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
