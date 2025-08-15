@@ -101,6 +101,19 @@ export function TimetableView({ serverId }: TimetableViewProps) {
     return grouped
   }, [entries])
 
+  // 범례 표시용: 현재 표시 중인 게임의 고유 목록(등장 순서 유지)
+  const gameLegendItems = useMemo(() => {
+    const seen = new Set<string>()
+    const list: { name: string; custom: boolean }[] = []
+    for (const s of userSchedules) {
+      if (!seen.has(s.gameName)) {
+        seen.add(s.gameName)
+        list.push({ name: s.gameName, custom: s.custom })
+      }
+    }
+    return list
+  }, [userSchedules])
+
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
   useEffect(() => { loadData() }, [serverId])
@@ -174,7 +187,11 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       "from-red-500/60 to-red-600/40 border-red-400/60",
       "from-indigo-500/60 to-indigo-600/40 border-indigo-400/60",
     ]
-    const hash = gameName.split("").reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & a, 0)
+    // 안정적인 문자열 해시 (32-bit)
+    let hash = 0
+    for (let i = 0; i < gameName.length; i++) {
+      hash = ((hash << 5) - hash + gameName.charCodeAt(i)) | 0
+    }
     return colors[Math.abs(hash) % colors.length]
   }
 
@@ -271,18 +288,24 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                   </div>
                 ))}
               </div>
-              <div className="mt-4 pt-2 border-t border-white/20 text-[10px] text-white/60 flex gap-4">
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-2 bg-gradient-to-r from-blue-500/60 to-blue-600/40 rounded-sm" />
-                  온라인 시간
+              <div className="mt-4 pt-2 border-t border-white/20 text-[10px] text-white/60 flex flex-col gap-2">
+                <div className="flex items-center gap-3 flex-wrap">
+                  {gameLegendItems.map((g) => (
+                    <div key={g.name} className="flex items-center gap-1">
+                      <div className={`w-4 h-2 bg-gradient-to-r ${getGameColor(g.name, g.custom)} rounded-sm`} />
+                      <span className="text-white/70">{g.name}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-[1px] h-3 bg-green-400" />
-                  현재 시간
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-[1px] h-3 bg-red-400" />
-                  초기화 시간
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
+                    <div className="w-[1px] h-3 bg-green-400" />
+                    현재 시간
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-[1px] h-3 bg-red-400" />
+                    초기화 시간
+                  </div>
                 </div>
               </div>
             </div>
