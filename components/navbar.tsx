@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { authService } from "@/lib/auth-service"
 import { GamepadIcon, LogOut, Bell, Users } from "lucide-react"
-import { ChangeNicknameModal } from "@/components/ChangeNicknameModal"
+import { SettingModal } from "@/components/ChangeNicknameModal"
 import { FriendDrawer } from "@/components/friend-drawer"
 import { NotificationPanel } from "@/components/notification-panel"
 import { serverService } from "@/lib/server-service"
@@ -77,7 +77,7 @@ export function Navbar() {
                 <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
               )}
             </Button>
-            <ChangeNicknameModal />
+            <SettingModal />
             <Button
               onClick={handleLogout}
               variant="ghost"
