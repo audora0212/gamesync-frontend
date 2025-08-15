@@ -9,7 +9,7 @@ export async function fetchWithAuth(input: RequestInfo, init: RequestInit = {}) 
 
   const res = await fetch(input, { ...init, headers })
 
-  if (res.status === 403) {
+  if (res.status === 401 || res.status === 403) {
     // 인증 만료
     authService.logout()
     // 로그인 페이지로 바로 이동
