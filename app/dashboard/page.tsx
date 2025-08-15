@@ -24,13 +24,14 @@ export default function DashboardPage() {
   useProtectedRoute();
 
   const [servers, setServers] = useState<IServer[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    loadServers();
+    loadServersAndFavorites();
   }, []);
 
   const loadServers = async () => {
@@ -44,6 +45,45 @@ export default function DashboardPage() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadServersAndFavorites = async () => {
+    setIsLoading(true);
+    try {
+      const [data, favs] = await Promise.all([
+        serverService.getMyServers(),
+        serverService.getMyFavorites(),
+      ]);
+      setServers(data);
+      setFavoriteIds(new Set(favs.map((s) => s.id)));
+    } catch {
+      toast.error("서버 로드 실패", {
+        description: "내 서버 정보를 불러오는데 실패했습니다.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleFavorite = async (srv: IServer) => {
+    const isFav = favoriteIds.has(srv.id);
+    try {
+      if (isFav) {
+        await serverService.unfavoriteServer(srv.id);
+        setFavoriteIds((prev) => {
+          const next = new Set(prev);
+          next.delete(srv.id);
+          return next;
+        });
+        toast.success("즐겨찾기 해제");
+      } else {
+        await serverService.favoriteServer(srv.id);
+        setFavoriteIds((prev) => new Set(prev).add(srv.id));
+        toast.success("즐겨찾기 등록");
+      }
+    } catch {
+      toast.error("즐겨찾기 변경 실패");
     }
   };
 
@@ -69,8 +109,8 @@ export default function DashboardPage() {
   }
 
   const currentUserId = authService.getCurrentUserId();
-  const featuredServers = servers.slice(0, 3);
-  const otherServers = servers.slice(3);
+  const favoriteServers = servers.filter((s) => favoriteIds.has(s.id));
+  const otherServers = servers.filter((s) => !favoriteIds.has(s.id));
 
   return (
     <div className="min-h-screen">
@@ -102,16 +142,17 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 추천 서버 (상위 1~3개) */}
-        {featuredServers.length > 0 && (
+        {/* 즐겨찾기 서버 */}
+        {favoriteServers.length > 0 && (
           <div className="mb-10">
             <div className="flex items-center gap-2 mb-3">
               <Star className="w-4 h-4 text-yellow-300" />
-              <span className="text-white/80 text-sm">추천 서버</span>
+              <span className="text-white/80 text-sm">즐겨찾기</span>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-2">
-              {featuredServers.map((server) => {
+              {favoriteServers.map((server) => {
                 const isOwner = server.ownerId === currentUserId;
+                const isFav = favoriteIds.has(server.id);
                 return (
                   <div key={server.id} className="min-w-[280px] md:min-w-[320px]">
                     <Card className="relative glass border-white/20 bg-gradient-to-br from-white/10 to-white/5 hover:from-white/20 hover:to-white/10 transition-all duration-300 shadow-xl">
@@ -130,7 +171,13 @@ export default function DashboardPage() {
                             <Users className="mr-2 h-4 w-4" />
                             <span>{server.members.length}명</span>
                           </div>
-                          <div className="flex items-center">
+                          <div className="flex items-center gap-2">
+                            <Star
+                              onClick={() => toggleFavorite(server)}
+                              className="mr-2 h-4 w-4 cursor-pointer"
+                              style={{ color: isFav ? "#FACC15" : "#9CA3AF" }}
+                              fill={isFav ? "currentColor" : "none"}
+                            />
                             <Clock className="mr-2 h-4 w-4" />
                             <span>{server.resetTime}</span>
                           </div>
@@ -157,8 +204,9 @@ export default function DashboardPage() {
           <span className="text-white/80 text-sm">모든 서버</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {(otherServers.length > 0 ? otherServers : servers).map((server) => {
+          {servers.map((server) => {
             const isOwner = server.ownerId === currentUserId;
+            const isFav = favoriteIds.has(server.id);
             return (
               <Card
                 key={server.id}
@@ -180,7 +228,13 @@ export default function DashboardPage() {
                       <span>{server.members.length}명 참여</span>
                     </div>
                     <div className="flex items-center justify-between text-white/80">
-                      <div className="flex items-center">
+                      <div className="flex items-center gap-2">
+                        <Star
+                          onClick={() => toggleFavorite(server)}
+                          className="mr-2 h-4 w-4 cursor-pointer"
+                          style={{ color: isFav ? "#FACC15" : "#9CA3AF" }}
+                          fill={isFav ? "currentColor" : "none"}
+                        />
                         <Clock className="mr-2 h-4 w-4" />
                         <span>초기화: {server.resetTime}</span>
                       </div>
@@ -200,32 +254,32 @@ export default function DashboardPage() {
         </div>
 
         {/* 서버가 없을 때 */}
-          {servers.length === 0 && (
-            <div className="text-center py-12">
-              <div className="glass max-w-md mx-auto p-8">
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  서버가 없습니다
-                </h3>
-                <p className="text-white/70 mb-6">
-                  초대 코드를 입력하거나 새 서버를 생성하세요.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                  <Button
-                    onClick={() => setShowJoinModal(true)}
-                    className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
-                  >
-                    초대 코드로 참가
-                  </Button>
-                  <Button
-                    onClick={() => setShowCreateModal(true)}
-                    className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
-                  >
-                    서버 생성
-                  </Button>
-                </div>
+        {servers.length === 0 && (
+          <div className="text-center py-12">
+            <div className="glass max-w-md mx-auto p-8">
+              <h3 className="text-xl font-semibold text-white mb-2">
+                서버가 없습니다
+              </h3>
+              <p className="text-white/70 mb-6">
+                초대 코드를 입력하거나 새 서버를 생성하세요.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                <Button
+                  onClick={() => setShowJoinModal(true)}
+                  className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
+                >
+                  초대 코드로 참가
+                </Button>
+                <Button
+                  onClick={() => setShowCreateModal(true)}
+                  className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
+                >
+                  서버 생성
+                </Button>
               </div>
             </div>
-          )}
+          </div>
+        )}
       </div>
 
       {/* 모달 컴포넌트 */}
@@ -237,7 +291,7 @@ export default function DashboardPage() {
       <JoinByCodeModal
         open={showJoinModal}
         onClose={() => setShowJoinModal(false)}
-        onJoinSuccess={loadServers}
+        onJoinSuccess={loadServersAndFavorites}
       />
     </div>
   );

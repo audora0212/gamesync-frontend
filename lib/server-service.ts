@@ -58,6 +58,22 @@ class ServerService {
     return res.json();
   }
 
+  async getMyFavorites(): Promise<Server[]> {
+    const res = await fetchWithAuth(`${API_BASE}/servers/favorites/mine`)
+    if (!res.ok) throw new Error("Failed to fetch favorite servers")
+    return res.json()
+  }
+
+  async favoriteServer(id: number): Promise<void> {
+    const res = await fetchWithAuth(`${API_BASE}/servers/${id}/favorite`, { method: "POST" })
+    if (!res.ok) throw new Error("Failed to favorite server")
+  }
+
+  async unfavoriteServer(id: number): Promise<void> {
+    const res = await fetchWithAuth(`${API_BASE}/servers/${id}/favorite`, { method: "DELETE" })
+    if (!res.ok) throw new Error("Failed to unfavorite server")
+  }
+
   async joinByCode(code: string): Promise<Server> {
   const res = await fetch(`${API_BASE}/servers/join?code=${code}`, {
     method: "POST",
