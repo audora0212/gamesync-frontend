@@ -13,6 +13,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { serverService, Server as IServer } from "@/lib/server-service";
+import { friendService } from "@/lib/friend-service";
+import { timetableService } from "@/lib/timetable-service";
 import { authService } from "@/lib/auth-service";
 import { CreateServerModal } from "@/components/create-server-modal";
 import { JoinByCodeModal } from "@/components/join-by-code-modal";
@@ -26,6 +28,7 @@ export default function DashboardPage() {
   const [servers, setServers] = useState<IServer[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
+  const [friendSummaries, setFriendSummaries] = useState<Record<number, { friend: string; others: number }>>({});
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const router = useRouter();
@@ -39,6 +42,7 @@ export default function DashboardPage() {
     try {
       const data = await serverService.getMyServers();
       setServers(data);
+      await buildFriendSummaries(data);
     } catch {
       toast.error("서버 로드 실패", {
         description: "내 서버 정보를 불러오는데 실패했습니다.",
@@ -57,12 +61,52 @@ export default function DashboardPage() {
       ]);
       setServers(data);
       setFavoriteIds(new Set(favs.map((s) => s.id)));
+      await buildFriendSummaries(data);
     } catch {
       toast.error("서버 로드 실패", {
         description: "내 서버 정보를 불러오는데 실패했습니다.",
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // 각 서버에 내 친구가 스케줄을 등록했는지 요약 계산
+  const buildFriendSummaries = async (serversList: IServer[]) => {
+    try {
+      // 친구 닉네임 집합 구성
+      const friends = await friendService.getFriends();
+      const friendNickSet = new Set((friends.friends || []).map((f) => f.nickname));
+
+      // 서버별 타임테이블 병렬 조회
+      const entriesPerServer = await Promise.all(
+        serversList.map(async (s) => {
+          try {
+            const entries = await timetableService.getTimetable(s.id);
+            return { id: s.id, entries } as { id: number; entries: Array<{ user: string }> };
+          } catch {
+            return { id: s.id, entries: [] } as { id: number; entries: Array<{ user: string }> };
+          }
+        })
+      );
+
+      const result: Record<number, { friend: string; others: number }> = {};
+      for (const { id, entries } of entriesPerServer) {
+        const uniqueFriends = new Set<string>();
+        for (const e of entries) {
+          if (e && typeof e.user === "string" && friendNickSet.has(e.user)) {
+            uniqueFriends.add(e.user);
+          }
+        }
+        if (uniqueFriends.size > 0) {
+          const first = Array.from(uniqueFriends)[0];
+          result[id] = { friend: first, others: Math.max(0, uniqueFriends.size - 1) };
+        }
+      }
+      setFriendSummaries(result);
+    } catch {
+      // 요약 실패는 무시 (UI에만 추가 정보)
+      setFriendSummaries({});
     }
   };
 
@@ -154,7 +198,7 @@ export default function DashboardPage() {
                 const isOwner = server.ownerId === currentUserId;
                 const isFav = favoriteIds.has(server.id);
                 return (
-                  <div key={server.id} className="min-w-[280px] md:min-w-[320px]">
+                  <div key={server.id} className="min-w-[320px] md:min-w-[360px]">
                     <Card className="relative glass border-white/20 bg-gradient-to-br from-white/10 to-white/5 hover:from-white/20 hover:to-white/10 transition-all duration-300 shadow-xl">
                       <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
@@ -182,6 +226,14 @@ export default function DashboardPage() {
                             <span>{server.resetTime}</span>
                           </div>
                         </div>
+                        {/* 친구 스케줄 요약 (아주 작은 텍스트) */}
+                        {friendSummaries[server.id] && (
+                          <div className="text-white/60 text-[10px] mt-2">
+                            {friendSummaries[server.id].others > 0
+                              ? `${friendSummaries[server.id].friend}님 외에 ${friendSummaries[server.id].others}명이 스케줄을 등록했어요`
+                              : `${friendSummaries[server.id].friend}님이 스케줄을 등록했어요`}
+                          </div>
+                        )}
                         <div className="mt-4">
                           <Button
                             onClick={() => router.push(`/server/${server.id}`)}
