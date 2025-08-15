@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { X, UserPlus, Check, XCircle, Users, Trash2 } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogClose } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
@@ -121,7 +120,7 @@ export function FriendDrawer({ open, onClose }: FriendDrawerProps) {
       {/* Drawer Panel */}
       <div
         ref={panelRef}
-        className={`fixed top-0 right-0 h-screen w-full sm:w-[420px] max-w-[100vw] bg-background border-l border-white/10 text-foreground z-[10001] transform transition-transform duration-300 ${
+        className={`fixed top-0 right-0 h-screen w-full sm:w-[420px] max-w-[100vw] bg-background border-l border-white/10 text-foreground z-[11000] transform transition-transform duration-300 ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -254,52 +253,52 @@ export function FriendDrawer({ open, onClose }: FriendDrawerProps) {
             </div>
           </div>
         </div>
+        {deleteOpen && (
+          <>
+            <div className="fixed inset-0 bg-black/60 z-[11001]" />
+            <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[11002] w-[90%] max-w-sm glass border-white/20 rounded-lg p-4">
+              <div className="text-white text-base font-semibold mb-2">친구 삭제</div>
+              <div className="text-white/80 text-sm mb-4">{deleteTarget ? `${deleteTarget.nickname} 님을 친구에서 삭제할까요?` : "선택된 친구가 없습니다."}</div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  className="glass border-white/30 text-white"
+                  onClick={() => { setDeleteOpen(false); setDeleteTarget(null) }}
+                >
+                  취소
+                </Button>
+                <Button
+                  className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300"
+                  disabled={isLoading || !deleteTarget}
+                  onClick={async () => {
+                    if (!deleteTarget) return
+                    setIsLoading(true)
+                    try {
+                      await friendService.deleteFriend(deleteTarget.id)
+                      const f = await friendService.getFriends()
+                      setFriends(f)
+                      toast.success("친구를 삭제했습니다")
+                    } catch {
+                      toast.error("친구 삭제 실패")
+                    } finally {
+                      setIsLoading(false)
+                      setDeleteOpen(false)
+                      setDeleteTarget(null)
+                    }
+                  }}
+                >
+                  삭제
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   )
 
   if (!mounted) return null
-  return createPortal(
-    <>
-      {drawerUi}
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="glass border-white/20 max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-white">친구 삭제</DialogTitle>
-          </DialogHeader>
-          <div className="text-white/80 text-sm">
-            {deleteTarget ? `${deleteTarget.nickname} 님을 친구에서 삭제할까요?` : "선택된 친구가 없습니다."}
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
-            </DialogClose>
-            <Button
-              className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300"
-              disabled={isLoading || !deleteTarget}
-              onClick={async () => {
-                if (!deleteTarget) return
-                try {
-                  await friendService.deleteFriend(deleteTarget.id)
-                  const f = await friendService.getFriends()
-                  setFriends(f)
-                  toast.success("친구를 삭제했습니다")
-                } catch {
-                  toast.error("친구 삭제 실패")
-                } finally {
-                  setDeleteOpen(false)
-                  setDeleteTarget(null)
-                }
-              }}
-            >
-              삭제
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>,
-    document.body
-  )
+  return createPortal(drawerUi, document.body)
 }
 
 
