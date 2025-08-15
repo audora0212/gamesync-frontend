@@ -395,10 +395,12 @@ export function ServerOverview({
           <DialogTitle className="text-white">친구 초대</DialogTitle>
         </DialogHeader>
         <div className="space-y-2 max-h-72 overflow-y-auto">
-          {friends.friends.length === 0 && (
+          {friends.friends.filter((f) => !server.members.some((m) => m.id === f.id)).length === 0 && (
             <div className="text-white/60 text-sm">초대 가능한 친구가 없습니다.</div>
           )}
-          {friends.friends.map((f) => (
+          {friends.friends
+            .filter((f) => !server.members.some((m) => m.id === f.id))
+            .map((f) => (
             <div key={f.id} className="flex items-center justify-between p-2 glass rounded-lg">
               <div className="text-white text-sm">
                 {f.nickname} <span className="text-white/50">@{f.username}</span>
