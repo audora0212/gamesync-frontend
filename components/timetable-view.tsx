@@ -19,7 +19,8 @@ import { toast } from "sonner"
 import { timetableService } from "@/lib/timetable-service"
 import { gameService } from "@/lib/game-service"
 import { serverService } from "@/lib/server-service"
-import { Calendar, Clock, Filter, Users, GamepadIcon } from "lucide-react"
+import { Calendar, Clock, Filter, Users, GamepadIcon, Plus } from "lucide-react"
+import { NewTimetableEntryModal } from "@/components/new-timetable-entry-modal"
 
 interface TimetableEntry {
   id: number
@@ -60,6 +61,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [hoveredUser, setHoveredUser] = useState<string | null>(null)
   const [resetHour, setResetHour] = useState<number | null>(null)
+  const [isNewEntryOpen, setIsNewEntryOpen] = useState<boolean>(false)
 
   // 30분 단위 시간 옵션 생성
   const timeOptions = useMemo(() => {
@@ -213,12 +215,24 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   return (
     <Card className="glass border-white/20 h-full">
       <CardHeader>
-        <CardTitle className="text-white flex items-center">
-          <Calendar className="mr-2 h-5 w-5" />합류 시간표
-        </CardTitle>
-        <CardDescription className="text-white/70">
-          친구들이 언제 합류하는지 확인하고 예약하세요
-        </CardDescription>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <CardTitle className="text-white flex items-center">
+              <Calendar className="mr-2 h-5 w-5" />합류 시간표
+            </CardTitle>
+            <CardDescription className="text-white/70">
+              친구들이 언제 합류하는지 확인하고 예약하세요
+            </CardDescription>
+          </div>
+          <div className="pt-1">
+            <Button
+              onClick={() => setIsNewEntryOpen(true)}
+              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm"
+            >
+              <Plus className="mr-1 h-4 w-4" /> 새 합류 시간 예약하기
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {userSchedules.length > 0 && (
@@ -312,69 +326,18 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           </div>
         )}
 
-        <form onSubmit={handleAddEntry} className="space-y-3 p-4 glass rounded-lg">
-          <h3 className="text-white font-medium text-sm">새 합류 시간 예약</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <Input
-              type="date"
-              value={selectedDate}
-              disabled
-              className="glass border-white/30 text-white text-sm"
-            />
-            <Select
-              value={selectedTime}
-              onValueChange={setSelectedTime}
-              required
-            >
-              <SelectTrigger className="glass border-white/30 text-white text-sm">
-                <SelectValue placeholder="시간 선택" />
-              </SelectTrigger>
-              <SelectContent className="glass border-white/20 text-white text-sm max-h-60 overflow-y-auto">
-                <SelectGroup>
-                  <SelectLabel>시간</SelectLabel>
-                  {timeOptions.map((time) => (
-                    <SelectItem key={time} value={time}>
-                      {time}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <Select
-            value={selectedGame}
-            onValueChange={setSelectedGame}
-            defaultValue=""
-          >
-            <SelectTrigger className="glass border-white/30 text-white text-sm">
-              <SelectValue placeholder="게임 선택" />
-            </SelectTrigger>
-            <SelectContent className="glass border-white/20 text-white text-sm max-h-60 overflow-y-auto">
-              <SelectGroup>
-                <SelectLabel>기본 게임</SelectLabel>
-                {defaultGames.map((game) => (
-                  <SelectItem key={`default-${game.id}`} value={`default-${game.id}`}>
-                    {game.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>커스텀 게임</SelectLabel>
-                {customGames.map((game) => (
-                  <SelectItem key={`custom-${game.id}`} value={`custom-${game.id}`}>
-                    {game.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <Button
-            type="submit"
-            className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white"
-          >
-            합류 시간 예약
-          </Button>
-        </form>
+        <NewTimetableEntryModal
+          open={isNewEntryOpen}
+          onClose={() => setIsNewEntryOpen(false)}
+          serverId={serverId}
+          selectedDate={selectedDate}
+          defaultGames={defaultGames}
+          customGames={customGames}
+          timeOptions={timeOptions}
+          onAdded={async () => {
+            await loadTimetable()
+          }}
+        />
 
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
