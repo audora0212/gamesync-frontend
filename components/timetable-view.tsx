@@ -365,22 +365,47 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="text-white/70 text-[12px]">모집자: {p.creator}{p.participantNames?.length ? ` · 참가자: ${p.participantNames.join(", ")}` : ""}</div>
-                    <Button
-                      size="sm"
-                      disabled={full}
-                      onClick={async () => {
-                        try {
-                          await partyService.join(serverId, p.id)
-                          await Promise.all([loadParties(), loadTimetable()])
-                          toast.success("파티에 참가했습니다.")
-                        } catch (e) {
-                          toast.error("파티 참가 실패", { description: "정원이 찼거나 오류가 발생했습니다." })
-                        }
-                      }}
-                      className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-xs"
-                    >
-                      {full ? "정원 마감" : "파티 참가하기"}
-                    </Button>
+                    {p.joined ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={async () => {
+                          try {
+                            await partyService.leave(serverId, p.id)
+                            await Promise.all([loadParties(), loadTimetable()])
+                            toast.success("파티에서 떠났습니다.")
+                          } catch (e) {
+                            toast.error("파티 떠나기 실패")
+                          }
+                        }}
+                        className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-xs"
+                      >
+                        파티 떠나기
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        disabled={full}
+                        onClick={async () => {
+                          try {
+                            // 다른 파티에 참가 중인 경우 확인
+                            const alreadyJoined = parties.some(pp => pp.joined)
+                            if (alreadyJoined) {
+                              const ok = window.confirm("현재 참가 중인 파티에서 떠나고 새로운 파티에 가입하시겠습니까?")
+                              if (!ok) return
+                            }
+                            await partyService.join(serverId, p.id)
+                            await Promise.all([loadParties(), loadTimetable()])
+                            toast.success("파티에 참가했습니다.")
+                          } catch (e) {
+                            toast.error("파티 참가 실패", { description: "정원이 찼거나 오류가 발생했습니다." })
+                          }
+                        }}
+                        className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-xs"
+                      >
+                        {full ? "정원 마감" : "파티 참가하기"}
+                      </Button>
+                    )}
                   </div>
                 </div>
               )

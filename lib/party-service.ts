@@ -14,6 +14,7 @@ export interface PartyResponse {
   participants: number
   full: boolean
   participantNames: string[]
+  joined?: boolean
 }
 
 export interface PartyCreateRequest {
@@ -52,6 +53,15 @@ class PartyService {
       headers: authService.getAuthHeaders(),
     })
     if (!res.ok) throw new Error("Failed to join party")
+    return res.json()
+  }
+
+  async leave(serverId: number, partyId: number): Promise<PartyResponse> {
+    const res = await fetch(`${API_BASE}/servers/${serverId}/parties/${partyId}/leave`, {
+      method: "POST",
+      headers: authService.getAuthHeaders(),
+    })
+    if (!res.ok) throw new Error("Failed to leave party")
     return res.json()
   }
 }
