@@ -66,6 +66,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   const [isNewEntryOpen, setIsNewEntryOpen] = useState<boolean>(false)
   const [isNewPartyOpen, setIsNewPartyOpen] = useState<boolean>(false)
   const [parties, setParties] = useState<PartyResponse[]>([])
+  const isJoinedSomeParty = useMemo(() => parties.some(p => p.joined), [parties])
 
   // 30분 단위 시간 옵션 생성
   const timeOptions = useMemo(() => {
@@ -238,12 +239,18 @@ export function TimetableView({ serverId }: TimetableViewProps) {
             </CardDescription>
           </div>
           <div className="pt-1">
-            <Button
-              onClick={() => setIsNewEntryOpen(true)}
-              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+            <div
+              title={isJoinedSomeParty ? "파티를 떠난 후에 합류 시간을 등록할 수 있습니다" : undefined}
+              className={isJoinedSomeParty ? "cursor-not-allowed" : undefined}
             >
-              <Plus className="mr-1 h-4 w-4" /> 새 합류 시간 예약하기
-            </Button>
+              <Button
+                onClick={() => setIsNewEntryOpen(true)}
+                className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+                disabled={isJoinedSomeParty}
+              >
+                <Plus className="mr-1 h-4 w-4" /> 새 합류 시간 예약하기
+              </Button>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -343,12 +350,18 @@ export function TimetableView({ serverId }: TimetableViewProps) {
         <div className="glass rounded-lg p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-white font-medium text-sm flex items-center"><PartyPopper className="mr-2 h-5 w-5" />파티 모집</h3>
-            <Button
-              onClick={() => setIsNewPartyOpen(true)}
-              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+            <div
+              title={isJoinedSomeParty ? "파티를 떠난 후에 파티를 모집할 수 있습니다" : undefined}
+              className={isJoinedSomeParty ? "cursor-not-allowed" : undefined}
             >
-              <Plus className="mr-1 h-4 w-4" /> 새 파티 모집하기
-            </Button>
+              <Button
+                onClick={() => setIsNewPartyOpen(true)}
+                className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+                disabled={isJoinedSomeParty}
+              >
+                <Plus className="mr-1 h-4 w-4" /> 새 파티 모집하기
+              </Button>
+            </div>
           </div>
           <div className="space-y-2">
             {parties.map((p) => {
