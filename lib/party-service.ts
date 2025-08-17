@@ -15,6 +15,7 @@ export interface PartyResponse {
   full: boolean
   participantNames: string[]
   joined?: boolean
+  owner?: boolean
 }
 
 export interface PartyCreateRequest {
@@ -63,6 +64,14 @@ class PartyService {
     })
     if (!res.ok) throw new Error("Failed to leave party")
     return res.json()
+  }
+
+  async delete(serverId: number, partyId: number): Promise<void> {
+    const res = await fetch(`${API_BASE}/servers/${serverId}/parties/${partyId}`, {
+      method: "DELETE",
+      headers: authService.getAuthHeaders(),
+    })
+    if (!res.ok) throw new Error("Failed to delete party")
   }
 }
 

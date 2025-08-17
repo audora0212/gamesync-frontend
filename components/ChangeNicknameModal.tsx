@@ -26,6 +26,7 @@ export function SettingModal() {
   const [pushInvite, setPushInvite] = useState<boolean>(true)
   const [pushFriendReq, setPushFriendReq] = useState<boolean>(true)
   const [pushFriendSchedule, setPushFriendSchedule] = useState<boolean>(true)
+  const [pushParty, setPushParty] = useState<boolean>(true)
   // 패널 표시는 친구 스케줄 FCM과 동일 토글로 통합
 
   useEffect(() => {
@@ -50,6 +51,7 @@ export function SettingModal() {
             setPushInvite(s.pushInviteEnabled ?? true)
             setPushFriendReq(s.pushFriendRequestEnabled ?? true)
             setPushFriendSchedule(s.pushFriendScheduleEnabled ?? true)
+            setPushParty(s.pushPartyEnabled ?? true)
             // 통합 반영: 서버는 panel 값을 push와 동일로 돌려줌
           }
         } catch {}
@@ -75,6 +77,7 @@ export function SettingModal() {
           pushFriendRequestEnabled: pushFriendReq,
           pushFriendScheduleEnabled: pushFriendSchedule,
           panelFriendScheduleEnabled: pushFriendSchedule,
+          pushPartyEnabled: pushParty,
         }),
       })
       toast.success('설정이 저장되었습니다')
@@ -201,6 +204,13 @@ export function SettingModal() {
             <div className="flex items-center justify-between text-white/70 text-xs">
               <span>친구 스케줄 등록 알림 (FCM + 패널)</span>
               <button type="button" className={`toggle ${pushFriendSchedule ? 'on' : ''}`} onClick={() => setPushFriendSchedule(!pushFriendSchedule)}>
+                <span className="knob" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between text-white/70 text-xs">
+              <span>파티 모집 알림</span>
+              <button type="button" className={`toggle ${pushParty ? 'on' : ''}`} onClick={() => setPushParty(!pushParty)}>
                 <span className="knob" />
               </button>
             </div>
