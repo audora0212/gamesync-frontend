@@ -240,7 +240,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           <div className="pt-1">
             <Button
               onClick={() => setIsNewEntryOpen(true)}
-              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm"
+              className="glass border-white/30 text-black hover:bg-black/10 hover:text-white text-sm rainbow-anim"
             >
               <Plus className="mr-1 h-4 w-4" /> 새 합류 시간 예약하기
             </Button>
