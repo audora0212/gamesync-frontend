@@ -20,8 +20,32 @@ self.addEventListener('push', (event) => {
   if (mid && handledMessageIds.has(mid)) return;
   if (mid) handledMessageIds.add(mid);
 
-  const title = dataObj.title || (payload.notification && payload.notification.title) || 'GameSync 알림';
-  const body  = dataObj.body  || (payload.notification && payload.notification.body)  || '';
+  const titleFromPayload = (payload.notification && payload.notification.title) || undefined;
+  let title = dataObj.title || titleFromPayload || 'GameSync 알림';
+  let body = dataObj.body  || (payload.notification && payload.notification.body)  || '';
+
+  // If payload contains JSON string, prefer friendly text over raw JSON
+  try {
+    if (typeof dataObj.payload === 'string' && dataObj.payload.trim().startsWith('{')) {
+      const p = JSON.parse(dataObj.payload);
+      const kind = p.kind;
+      if (kind === 'friend_request') {
+        const fromNickname = p.fromNickname || '상대방';
+        if (!titleFromPayload && !dataObj.title) title = '친구 요청';
+        body = `${fromNickname} 님이 친구 요청을 보냈어요.\n친구패널에서 수락/거절할 수 있어요`;
+      } else if (kind === 'server_invite') {
+        const fromNickname = p.fromNickname || '상대방';
+        const serverName = p.serverName || '';
+        if (!titleFromPayload && !dataObj.title) title = '서버 초대';
+        body = `${fromNickname} → ${serverName}`;
+      }
+    }
+  } catch {}
+
+  // Simple fallback for PARTY notifications when no body supplied
+  if ((!body || body === '') && dataObj.type === 'PARTY') {
+    body = '새 파티 모집 알림이 도착했습니다.';
+  }
 
   const options = {
     body,

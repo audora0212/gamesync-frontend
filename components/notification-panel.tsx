@@ -147,21 +147,24 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
             .map((n) => {
             const isInvite = n.type === "INVITE"
             const payload = parseMessage<{ kind?: string, inviteId?: number, requestId?: number, serverName?: string, fromNickname?: string }>(n.message)
-            const isFriendRequest = payload?.kind === 'friend_request' && typeof payload.requestId === 'number'
+            const friendMarker = n.message?.includes('"kind":"friend_request"')
+            const inviteMarker = n.message?.includes('"kind":"server_invite"')
+            const isFriendRequest = (payload?.kind === 'friend_request' && typeof payload.requestId === 'number') || !!friendMarker
             const inviteId = payload?.kind === 'server_invite' && typeof payload.inviteId === 'number' ? payload.inviteId : undefined
+            const fromNickname = payload?.fromNickname || (n.message && (n.message.match(/\"fromNickname\":\"([^\"]+)\"/)?.[1])) || undefined
             return (
               <Card key={n.id} className="glass border-white/10 p-3 mb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="text-sm text-white font-medium">{n.title}</div>
-                    {/* JSON payload가 아니면 원문 출력 */}
-                    {!payload && n.message && (
+                    {/* JSON payload가 아니면 원문 출력 (친구요청/초대 JSON은 숨김) */}
+                    {!payload && n.message && !(isFriendRequest || (isInvite && inviteMarker)) && (
                       <div className="text-xs text-white/70 mt-1 whitespace-pre-line">{n.message}</div>
                     )}
                     {isFriendRequest && (
-                      <div className="text-xs text-white/70 mt-1">{payload?.fromNickname ?? '상대방'} 님이 친구 요청을 보냈습니다.</div>
+                      <div className="text-xs text-white/70 mt-1">{fromNickname ?? '상대방'} 님이 친구 요청을 보냈습니다.</div>
                     )}
-                    {isInvite && payload?.kind === 'server_invite' && (
+                    {isInvite && ((payload?.kind === 'server_invite') || inviteMarker) && (
                       <div className="text-xs text-white/70 mt-1">{payload?.fromNickname ?? '상대방'} → {payload?.serverName ?? ''}</div>
                     )}
                   </div>

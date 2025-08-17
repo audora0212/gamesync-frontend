@@ -4,7 +4,7 @@ import { authService } from "./auth-service"
 
 export interface NotificationItem {
   id: number
-  type: "INVITE" | "TIMETABLE" | "GENERIC"
+  type: "INVITE" | "TIMETABLE" | "GENERIC" | "PARTY"
   title: string
   message: string | null
   read: boolean
