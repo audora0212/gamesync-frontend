@@ -21,6 +21,8 @@ import { gameService } from "@/lib/game-service"
 import { serverService } from "@/lib/server-service"
 import { Calendar, Clock, Filter, Users, GamepadIcon, Plus } from "lucide-react"
 import { NewTimetableEntryModal } from "@/components/new-timetable-entry-modal"
+import { NewPartyModal } from "@/components/new-party-modal"
+import { partyService, type PartyResponse } from "@/lib/party-service"
 
 interface TimetableEntry {
   id: number
@@ -62,6 +64,8 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   const [hoveredUser, setHoveredUser] = useState<string | null>(null)
   const [resetHour, setResetHour] = useState<number | null>(null)
   const [isNewEntryOpen, setIsNewEntryOpen] = useState<boolean>(false)
+  const [isNewPartyOpen, setIsNewPartyOpen] = useState<boolean>(false)
+  const [parties, setParties] = useState<PartyResponse[]>([])
 
   // 30분 단위 시간 옵션 생성
   const timeOptions = useMemo(() => {
@@ -131,7 +135,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       setCustomGames(customData.customGames)
       const serverInfo = await serverService.getServer(serverId)
       setResetHour(Number(serverInfo.resetTime.split(":")[0]))
-      await loadTimetable()
+      await Promise.all([loadTimetable(), loadParties()])
     } catch {
       toast.error("데이터 로드 실패", { description: "데이터를 불러오는데 실패했습니다." })
     } finally {
@@ -145,6 +149,15 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       setEntries(data)
     } catch {
       toast.error("타임테이블 로드 실패", { description: "타임테이블을 불러오는데 실패했습니다." })
+    }
+  }
+
+  const loadParties = async () => {
+    try {
+      const data = await partyService.list(serverId)
+      setParties(data)
+    } catch {
+      toast.error("파티 목록 로드 실패", { description: "파티 목록을 불러오는데 실패했습니다." })
     }
   }
 
@@ -326,6 +339,58 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           </div>
         )}
 
+        {/* 파티 모집 영역 */}
+        <div className="glass rounded-lg p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-white font-medium text-sm">파티 모집</h3>
+            <Button
+              onClick={() => setIsNewPartyOpen(true)}
+              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm"
+            >
+              <Plus className="mr-1 h-4 w-4" /> 새 파티 모집하기
+            </Button>
+          </div>
+          <div className="space-y-2">
+            {parties.map((p) => {
+              const full = p.full || p.participants >= p.capacity
+              return (
+                <div key={p.id} className="p-3 glass rounded-lg">
+                  <div className="flex items-center justify-between mb-1 text-sm">
+                    <div className="text-white font-medium text-[12px]">
+                      {new Date(p.slot).toLocaleString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })} · {p.gameName}
+                    </div>
+                    <div className={`text-[12px] ${full ? "text-red-400" : "text-white/70"}`}>
+                      정원 {p.participants}/{p.capacity}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-white/70 text-[12px]">모집자: {p.creator}{p.participantNames?.length ? ` · 참가자: ${p.participantNames.join(", ")}` : ""}</div>
+                    <Button
+                      size="sm"
+                      disabled={full}
+                      onClick={async () => {
+                        try {
+                          await partyService.join(serverId, p.id)
+                          await Promise.all([loadParties(), loadTimetable()])
+                          toast.success("파티에 참가했습니다.")
+                        } catch (e) {
+                          toast.error("파티 참가 실패", { description: "정원이 찼거나 오류가 발생했습니다." })
+                        }
+                      }}
+                      className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-xs"
+                    >
+                      {full ? "정원 마감" : "파티 참가하기"}
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
+            {parties.length === 0 && (
+              <div className="text-center py-4 text-white/60 text-sm">진행 중인 파티 모집이 없습니다.</div>
+            )}
+          </div>
+        </div>
+
         <NewTimetableEntryModal
           open={isNewEntryOpen}
           onClose={() => setIsNewEntryOpen(false)}
@@ -336,6 +401,18 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           timeOptions={timeOptions}
           onAdded={async () => {
             await loadTimetable()
+          }}
+        />
+        <NewPartyModal
+          open={isNewPartyOpen}
+          onClose={() => setIsNewPartyOpen(false)}
+          serverId={serverId}
+          selectedDate={selectedDate}
+          defaultGames={defaultGames}
+          customGames={customGames}
+          timeOptions={timeOptions}
+          onCreated={async () => {
+            await loadParties()
           }}
         />
 
