@@ -255,7 +255,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {userSchedules.length > 0 && (
+        {userSchedules.length > 0 ? (
           <div className="glass rounded-lg p-4 overflow-x-auto">
             <h3 className="text-white font-medium mb-4 flex items-center text-sm">
               <Users className="mr-2 h-5 w-5" />오늘의 합류 예정 ({userSchedules.length}명)
@@ -343,6 +343,18 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                 </div>
               </div>
             </div>
+          </div>
+        ) : (
+          <div className="glass rounded-lg p-8 text-center">
+            <div className="text-white/60 mb-3 text-sm">아직 등록된 합류 시간이 없습니다.</div>
+            <Button
+              onClick={() => setIsNewEntryOpen(true)}
+              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+              disabled={isJoinedSomeParty}
+              title={isJoinedSomeParty ? "파티를 떠난 후에 합류 시간을 등록할 수 있습니다" : undefined}
+            >
+              <Plus className="mr-1 h-4 w-4" /> 새 합류 시간 예약하기
+            </Button>
           </div>
         )}
 
@@ -446,7 +458,19 @@ export function TimetableView({ serverId }: TimetableViewProps) {
               )
             })}
             {parties.length === 0 && (
-              <div className="text-center py-4 text-white/60 text-sm">진행 중인 파티 모집이 없습니다.</div>
+              <div className="text-center py-6 text-white/60 text-sm">
+                진행 중인 파티 모집이 없습니다.
+                <div className="mt-3">
+                  <Button
+                    onClick={() => setIsNewPartyOpen(true)}
+                    className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+                    disabled={isJoinedSomeParty}
+                    title={isJoinedSomeParty ? "파티를 떠난 후에 파티를 모집할 수 있습니다" : undefined}
+                  >
+                    <Plus className="mr-1 h-4 w-4" /> 새 파티 모집하기
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
         </div>
