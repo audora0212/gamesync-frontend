@@ -20,26 +20,22 @@ export function SettingModal() {
   const [open, setOpen] = useState(false);
   const [nickname, setNickname] = useState(authService.getCurrentUser() || "");
   const [loading, setLoading] = useState(false);
-  const [discordLinked, setDiscordLinked] = useState<boolean | null>(null);
+  // const [discordLinked, setDiscordLinked] = useState<boolean | null>(null);
   // 푸시 알림 설정 상태
   const [pushAll, setPushAll] = useState<boolean>(true)
   const [pushInvite, setPushInvite] = useState<boolean>(true)
   const [pushFriendReq, setPushFriendReq] = useState<boolean>(true)
   const [pushFriendSchedule, setPushFriendSchedule] = useState<boolean>(true)
   const [pushParty, setPushParty] = useState<boolean>(true)
+  const [pushMyTT, setPushMyTT] = useState<boolean>(true)
+  const [myTTMinutes, setMyTTMinutes] = useState<number>(10)
   // 패널 표시는 친구 스케줄 FCM과 동일 토글로 통합
 
   useEffect(() => {
     if (!open) return;
     (async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
-          headers: { ...authService.getAuthHeaders() },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setDiscordLinked(Boolean(data.discordLinked));
-        }
+        // 기존: 디스코드 연동 여부 조회 제거
         // 푸시 설정 불러오기
         try {
           const ps = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me/push-settings`, {
@@ -52,6 +48,8 @@ export function SettingModal() {
             setPushFriendReq(s.pushFriendRequestEnabled ?? true)
             setPushFriendSchedule(s.pushFriendScheduleEnabled ?? true)
             setPushParty(s.pushPartyEnabled ?? true)
+            setPushMyTT(s.pushMyTimetableReminderEnabled ?? true)
+            setMyTTMinutes(s.myTimetableReminderMinutes ?? 10)
             // 통합 반영: 서버는 panel 값을 push와 동일로 돌려줌
           }
         } catch {}
@@ -78,6 +76,8 @@ export function SettingModal() {
           pushFriendScheduleEnabled: pushFriendSchedule,
           panelFriendScheduleEnabled: pushFriendSchedule,
           pushPartyEnabled: pushParty,
+          pushMyTimetableReminderEnabled: pushMyTT,
+          myTimetableReminderMinutes: myTTMinutes,
         }),
       })
       toast.success('설정이 저장되었습니다')
@@ -134,7 +134,7 @@ export function SettingModal() {
       </DialogTrigger>
       <DialogContent className="glass border-white/20 max-w-sm">
         <DialogHeader>
-          <DialogTitle className="text-white">닉네임 변경</DialogTitle>
+          <DialogTitle className="text-white">설정</DialogTitle>
         </DialogHeader>
         <div className="p-4 space-y-3">
           <div className="flex items-center gap-2">
@@ -148,25 +148,7 @@ export function SettingModal() {
             </Button>
           </div>
           <div className="text-xs text-white/60">닉네임은 24시간에 한 번만 변경할 수 있습니다.</div>
-          <div className="pt-2 border-t border-white/10">
-            {discordLinked ? (
-              <div className="w-full text-center text-xs text-emerald-300/90 py-2">디스코드에 연동되었습니다</div>
-            ) : (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full glass border-white/30 text-white flex items-center justify-center gap-2"
-                  onClick={() => {
-                    window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/discord`;
-                  }}
-                >
-                  <Link2 className="w-4 h-4" /> 디스코드로 연동하기
-                </Button>
-                <div className="text-[11px] text-white/50 mt-1">이미 다른 계정에 연동되어 있다면, 연동된 계정이라는 안내가 표시됩니다.</div>
-              </>
-            )}
-          </div>
+          {/* 디스코드 연동 섹션 제거 */}
           {/* 푸시 알림 설정 */}
           <div className="pt-3 border-t border-white/10 space-y-3">
             <div className="text-white text-sm">푸시 알림 설정</div>
@@ -213,6 +195,29 @@ export function SettingModal() {
               <button type="button" className={`toggle ${pushParty ? 'on' : ''}`} onClick={() => setPushParty(!pushParty)}>
                 <span className="knob" />
               </button>
+            </div>
+
+            <div className="flex items-center justify-between text-white/70 text-xs">
+              <span>내 합류시간 알림</span>
+              <button type="button" className={`toggle ${pushMyTT ? 'on' : ''}`} onClick={() => setPushMyTT(!pushMyTT)}>
+                <span className="knob" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-[auto_minmax(0,0.7fr)_auto] items-center text-white/70 text-xs gap-2">
+              <span>합류시간 전 알림</span>
+              <div className="justify-self-end mr-1">
+                <Input
+                  type="number"
+                  min={0}
+                  max={120}
+                  value={myTTMinutes}
+                  onChange={(e) => setMyTTMinutes(Number(e.target.value))}
+                  disabled={!pushMyTT}
+                  className="glass border-white/30 text-white h-6 w-14 text-center text-xs px-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+              </div>
+              <span className="text-white/50">분</span>
             </div>
 
             <div className="text-[10px] text-white/50">
