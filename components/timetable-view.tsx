@@ -22,6 +22,7 @@ import { serverService } from "@/lib/server-service"
 import { Calendar, Clock, Filter, Users, GamepadIcon, Plus, PartyPopper } from "lucide-react"
 import { NewTimetableEntryModal } from "@/components/new-timetable-entry-modal"
 import { NewPartyModal } from "@/components/new-party-modal"
+import { Dialog as ConfirmDialog, DialogContent as ConfirmContent, DialogHeader as ConfirmHeader, DialogFooter as ConfirmFooter, DialogTitle as ConfirmTitle, DialogClose as ConfirmClose } from "@/components/ui/dialog"
 import { partyService, type PartyResponse } from "@/lib/party-service"
 
 interface TimetableEntry {
@@ -66,7 +67,18 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   const [isNewEntryOpen, setIsNewEntryOpen] = useState<boolean>(false)
   const [isNewPartyOpen, setIsNewPartyOpen] = useState<boolean>(false)
   const [parties, setParties] = useState<PartyResponse[]>([])
+  const [deleteParty, setDeleteParty] = useState<PartyResponse | null>(null)
   const isJoinedSomeParty = useMemo(() => parties.some(p => p.joined), [parties])
+  const currentUserName = useMemo(() => (typeof window !== "undefined" ? localStorage.getItem("current-user") : null), [])
+  const hasOwnEntryToday = useMemo(() => {
+    if (!currentUserName) return false
+    const todayStr = new Date().toLocaleDateString("en-CA")
+    return entries.some(e => {
+      const d = new Date(e.slot)
+      const dStr = d.toLocaleDateString("en-CA")
+      return e.user === currentUserName && dStr === todayStr
+    })
+  }, [entries, currentUserName])
 
   // 30분 단위 시간 옵션 생성
   const timeOptions = useMemo(() => {
@@ -239,17 +251,36 @@ export function TimetableView({ serverId }: TimetableViewProps) {
             </CardDescription>
           </div>
           <div className="pt-1">
-            <div
-              title={isJoinedSomeParty ? "파티를 떠난 후에 합류 시간을 등록할 수 있습니다" : undefined}
-              className={isJoinedSomeParty ? "cursor-not-allowed" : undefined}
-            >
-              <Button
-                onClick={() => setIsNewEntryOpen(true)}
-                className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
-                disabled={isJoinedSomeParty}
+            <div className="flex items-center gap-2">
+              {hasOwnEntryToday && (
+                <Button
+                  onClick={async () => {
+                    try {
+                      await timetableService.deleteMyEntry(serverId)
+                      await Promise.all([loadTimetable(), loadParties()])
+                      toast.success("합류 시간이 취소되었습니다.")
+                    } catch {
+                      toast.error("합류 시간 취소 실패")
+                    }
+                  }}
+                  variant="outline"
+                  className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm"
+                >
+                  합류 시간 취소하기
+                </Button>
+              )}
+              <div
+                title={isJoinedSomeParty ? "파티를 떠난 후에 합류 시간을 등록할 수 있습니다" : undefined}
+                className={isJoinedSomeParty ? "cursor-not-allowed" : undefined}
               >
-                <Plus className="mr-1 h-4 w-4" /> 새 합류 시간 예약하기
-              </Button>
+                <Button
+                  onClick={() => setIsNewEntryOpen(true)}
+                  className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+                  disabled={isJoinedSomeParty}
+                >
+                  <Plus className="mr-1 h-4 w-4" /> {hasOwnEntryToday ? "합류 시간 다시 정하기" : "새 합류 시간 예약하기"}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -358,23 +389,28 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           </div>
         )}
 
-        {/* 파티 모집 영역 */}
-        <div className="glass rounded-lg p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-white font-medium text-sm flex items-center"><PartyPopper className="mr-2 h-5 w-5" />파티 모집</h3>
-            <div
-              title={isJoinedSomeParty ? "파티를 떠난 후에 파티를 모집할 수 있습니다" : undefined}
-              className={isJoinedSomeParty ? "cursor-not-allowed" : undefined}
-            >
-              <Button
-                onClick={() => setIsNewPartyOpen(true)}
-                className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
-                disabled={isJoinedSomeParty}
-              >
-                <Plus className="mr-1 h-4 w-4" /> 새 파티 모집하기
-              </Button>
-            </div>
+        {/* 파티 모집 헤더 (상단) */}
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h3 className="text-white font-medium text-sm flex items-center">
+              <PartyPopper className="mr-2 h-5 w-5" />파티 모집
+            </h3>
           </div>
+          <div className="pt-1"
+            title={isJoinedSomeParty ? "파티를 떠난 후에 파티를 모집할 수 있습니다" : undefined}
+          >
+            <Button
+              onClick={() => setIsNewPartyOpen(true)}
+              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+              disabled={isJoinedSomeParty}
+            >
+              <Plus className="mr-1 h-4 w-4" /> 새 파티 모집하기
+            </Button>
+          </div>
+        </div>
+
+        {/* 파티 모집 영역 (리스트 박스) */}
+        <div className="glass rounded-lg p-4">
           <div className="space-y-2">
             {parties.map((p) => {
               const full = p.full || p.participants >= p.capacity
@@ -395,17 +431,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                       {p.owner && (
                         <Button
                           size="sm"
-                          onClick={async () => {
-                            const ok = window.confirm("이 파티를 삭제하시겠습니까?")
-                            if (!ok) return
-                            try {
-                              await partyService.delete(serverId, p.id)
-                              await loadParties()
-                              toast.success("파티가 삭제되었습니다.")
-                            } catch {
-                              toast.error("파티 삭제 실패")
-                            }
-                          }}
+                          onClick={() => setDeleteParty(p)}
                           className="glass border-red-400/60 text-red-400 hover:bg-red-500/15 hover:text-red-300 text-xs"
                         >
                           파티 삭제
@@ -496,9 +522,41 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           customGames={customGames}
           timeOptions={timeOptions}
           onCreated={async () => {
-            await loadParties()
+            await Promise.all([loadParties(), loadTimetable()])
           }}
         />
+
+        {/* 파티 삭제 확인 모달 */}
+        <ConfirmDialog open={!!deleteParty} onOpenChange={(open) => { if (!open) setDeleteParty(null) }}>
+          <ConfirmContent className="glass border-white/20 max-w-sm">
+            <ConfirmHeader>
+              <ConfirmTitle className="text-white">파티 삭제</ConfirmTitle>
+            </ConfirmHeader>
+            <div className="text-white/80 text-sm">이 파티를 삭제하시겠습니까?</div>
+            <ConfirmFooter>
+              <ConfirmClose asChild>
+                <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
+              </ConfirmClose>
+              <Button
+                className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300"
+                onClick={async () => {
+                  if (!deleteParty) return
+                  try {
+                    await partyService.delete(serverId, deleteParty.id)
+                    await Promise.all([loadParties(), loadTimetable()])
+                    toast.success("파티가 삭제되었습니다.")
+                  } catch {
+                    toast.error("파티 삭제 실패")
+                  } finally {
+                    setDeleteParty(null)
+                  }
+                }}
+              >
+                삭제
+              </Button>
+            </ConfirmFooter>
+          </ConfirmContent>
+        </ConfirmDialog>
 
         <div className="flex flex-col sm:flex-row gap-2">
           <Input

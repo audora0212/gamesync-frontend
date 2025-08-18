@@ -70,6 +70,16 @@ class TimetableService {
 
     return response.json()
   }
+
+  async deleteMyEntry(serverId: number): Promise<void> {
+    const response = await fetch(`${API_BASE}/servers/${serverId}/timetable`, {
+      method: "DELETE",
+      headers: authService.getAuthHeaders(),
+    })
+    if (!response.ok) {
+      throw new Error("Failed to delete timetable entry")
+    }
+  }
 }
 
 export const timetableService = new TimetableService()
