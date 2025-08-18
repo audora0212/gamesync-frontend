@@ -20,6 +20,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isDiscordLoading, setIsDiscordLoading] = useState(false)
+  const [isKakaoLoading, setIsKakaoLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,6 +85,11 @@ export default function SignupPage() {
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/discord`
   }
 
+  const handleKakaoSignup = () => {
+    setIsKakaoLoading(true)
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/kakao`
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md">
@@ -104,7 +110,7 @@ export default function SignupPage() {
             {/* Discord 회원가입 버튼 */}
             <Button
               onClick={handleDiscordSignup}
-              disabled={isDiscordLoading || isLoading}
+              disabled={isDiscordLoading || isKakaoLoading || isLoading}
               className="w-full bg-none !bg-[#5865F2] hover:!bg-[#4752C4] text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#5865F2]/50"
             >
               {isDiscordLoading ? (
@@ -116,6 +122,24 @@ export default function SignupPage() {
                 <>
                   <DiscordIcon className="w-5 h-5" />
                   <span>Discord로 계속하기</span>
+                </>
+              )}
+            </Button>
+
+            {/* Kakao 회원가입 버튼 */}
+            <Button
+              onClick={handleKakaoSignup}
+              disabled={isKakaoLoading || isDiscordLoading || isLoading}
+              className="w-full bg-none !bg-[#FEE500] hover:!bg-[#F7D400] text-black font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#FEE500]/50"
+            >
+              {isKakaoLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>카카오 연결 중...</span>
+                </>
+              ) : (
+                <>
+                  <span>카카오로 계속하기</span>
                 </>
               )}
             </Button>
@@ -148,7 +172,7 @@ export default function SignupPage() {
                   className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
                   placeholder="로그인 아이디를 입력하세요"
                   required
-                  disabled={isDiscordLoading}
+                  disabled={isDiscordLoading || isKakaoLoading}
                 />
               </div>
 
@@ -167,7 +191,7 @@ export default function SignupPage() {
                   className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
                   placeholder="사용자명을 입력하세요"
                   required
-                  disabled={isDiscordLoading}
+                  disabled={isDiscordLoading || isKakaoLoading}
                 />
               </div>
 
@@ -185,7 +209,7 @@ export default function SignupPage() {
                   className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
                   placeholder="비밀번호를 입력하세요"
                   required
-                  disabled={isDiscordLoading}
+                  disabled={isDiscordLoading || isKakaoLoading}
                 />
               </div>
 
@@ -203,14 +227,14 @@ export default function SignupPage() {
                   className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
                   placeholder="비밀번호를 다시 입력하세요"
                   required
-                  disabled={isDiscordLoading}
+                  disabled={isDiscordLoading || isKakaoLoading}
                 />
               </div>
 
               <Button
                 type="submit"
                 className="w-full glass-button font-medium py-3"
-                disabled={isLoading || isDiscordLoading}
+                disabled={isLoading || isDiscordLoading || isKakaoLoading}
               >
                 {isLoading ? (
                   <>

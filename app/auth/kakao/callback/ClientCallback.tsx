@@ -1,4 +1,3 @@
-// app/(auth)/auth/discord/callback/ClientCallback.tsx
 "use client";
 
 import { useEffect } from "react";
@@ -23,7 +22,7 @@ export default function ClientCallback() {
         return;
       }
       authService.setCurrentUser(userObj);
-      toast.success("디스코드 계정으로 로그인했습니다.");
+      toast.success("카카오 계정으로 로그인했습니다.");
       router.replace("/dashboard");
     } else {
       router.replace("/auth/login");
@@ -32,3 +31,5 @@ export default function ClientCallback() {
 
   return <div>처리 중입니다…</div>;
 }
+
+
