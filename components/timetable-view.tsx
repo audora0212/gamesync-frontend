@@ -68,6 +68,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   const [isNewPartyOpen, setIsNewPartyOpen] = useState<boolean>(false)
   const [parties, setParties] = useState<PartyResponse[]>([])
   const [deleteParty, setDeleteParty] = useState<PartyResponse | null>(null)
+  const [labelStep, setLabelStep] = useState<number>(1)
   const isJoinedSomeParty = useMemo(() => parties.some(p => p.joined), [parties])
   const currentUserName = useMemo(() => (typeof window !== "undefined" ? localStorage.getItem("current-user") : null), [])
   const hasOwnEntryToday = useMemo(() => {
@@ -134,6 +135,18 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   }, [userSchedules])
 
   const hours = Array.from({ length: 24 }, (_, i) => i)
+
+  useEffect(() => {
+    const updateLabelStep = () => {
+      const w = typeof window !== 'undefined' ? window.innerWidth : 1024
+      if (w < 380) setLabelStep(6)
+      else if (w < 640) setLabelStep(3)
+      else setLabelStep(1)
+    }
+    updateLabelStep()
+    window.addEventListener('resize', updateLabelStep)
+    return () => window.removeEventListener('resize', updateLabelStep)
+  }, [])
 
   useEffect(() => { loadData() }, [serverId])
   useEffect(() => { loadTimetable() }, [gameFilter, sortByGame])
@@ -292,18 +305,21 @@ export function TimetableView({ serverId }: TimetableViewProps) {
             <h3 className="text-white font-medium mb-4 flex items-center text-sm">
               <Users className="mr-2 h-5 w-5" />오늘의 합류 예정 ({userSchedules.length}명)
             </h3>
-            <div className="min-w-[600px]">
-              <div className="flex items-center border-b border-white/20 pb-2">
+            <div className="w-full sm:min-w-[600px]">
+              <div className="flex items-center border-b border-white/20 pb-2 relative">
                 <div className="w-32 text-xs text-white/80 font-medium">사용자 / 게임</div>
                 <div className="flex-1 flex">
                   {hours.map((hour) => (
                     <div key={hour} className="flex-1 text-center">
                       <div className="text-[10px] text-white/60 font-medium">
-                        {hour.toString().padStart(2, "0")}
+                        {hour % labelStep === 0 ? (labelStep === 1 ? hour.toString().padStart(2, "0") : String(hour)) : ''}
                       </div>
                     </div>
                   ))}
                 </div>
+                {labelStep > 1 && (
+                  <div className="absolute right-0 translate-x-1/2 text-[10px] text-white/60 font-medium">24</div>
+                )}
               </div>
               <div className="space-y-2 mt-3">
                 {userSchedules.map((schedule) => (
@@ -324,7 +340,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                         </span>
                       </div>
                     </div>
-                    <div className="flex-1 flex h-8 gap-px">
+                    <div className="flex-1 flex h-6 sm:h-8 gap-px">
                       {hours.map((hour) => (
                         <div
                           key={hour}
