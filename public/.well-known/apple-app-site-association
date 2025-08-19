@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAMID.cloud.gamesync.app",
+        "paths": [ 
+          "/oauth/*",
+          "/auth/*",
+          "*"
+        ]
+      }
+    ]
+  }
+}
+
+

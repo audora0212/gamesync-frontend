@@ -6,6 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { authService } from "@/lib/auth-service"
 import { requestFcmToken, onForegroundMessage } from "@/lib/fcm"
+import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet } from "@/lib/native"
 import { notificationService } from "@/lib/notification-service"
 import { toast } from "sonner"
 
@@ -36,6 +37,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Attempt to register FCM token (ignore failures)
       ;(async () => {
         try {
+          // If inside native app, register native push (APNs/FCM)
+          if (await isNative()) {
+            const platform = await getPlatform()
+            const nativeToken = await registerNativePush()
+            if (nativeToken) {
+              await notificationService.registerPushToken(nativeToken, platform)
+              authService.setFcmToken(nativeToken)
+            }
+            // Listen deep links (e.g., gamesync://oauth/callback?code=...)
+            onAppUrlOpen((url) => {
+              try {
+                const u = new URL(url)
+                if (u.protocol.startsWith('gamesync')) {
+                  if (u.pathname.startsWith('/oauth/callback') || u.pathname.startsWith('/auth/discord/callback')) {
+                    const query = u.search || ''
+                    router.replace(`/auth/discord/callback${query}`)
+                  }
+                }
+              } catch {}
+            })
+          }
+
           const vapidKey = process.env.NEXT_PUBLIC_FCM_VAPID_KEY || "BNPiSmtH-uSrFLgGI-4N75uPFIWsLVxfQgJ6kmm4ixhwc3QjdUbp_qSqHaf0xsLrG3sVNRnqbNmAoi7FAQCk6dk"
           if (typeof window !== "undefined" && 'Notification' in window) {
             const permission = await Notification.requestPermission()

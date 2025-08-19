@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/lib/auth-service";
 import { toast } from "sonner";
+import { secureSet, isNative } from "@/lib/native";
 
 export default function ClientCallback() {
   const router = useRouter();
@@ -15,6 +16,8 @@ export default function ClientCallback() {
   useEffect(() => {
     if (token && userParam) {
       authService.setToken(token);
+      // Store token securely when native
+      (async () => { try { if (await isNative()) await secureSet('auth-token', token) } catch {} })()
       let userObj;
       try {
         userObj = JSON.parse(decodeURIComponent(userParam));
