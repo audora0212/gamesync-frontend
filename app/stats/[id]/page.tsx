@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Navbar } from "@/components/navbar"
 import { toast } from "sonner"
@@ -21,7 +21,8 @@ import {
   Cell,
   Legend,
 } from "recharts"
-import { Trophy, Clock, TrendingUp, Users } from "lucide-react"
+import { Trophy, Clock, TrendingUp, Users, ArrowLeft } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute"
 
 interface Stats {
@@ -35,6 +36,7 @@ export default function StatsPage() {
   useProtectedRoute()
   const params = useParams()
   const serverId = Number.parseInt(params.id as string)
+  const router = useRouter()
   const [stats, setStats] = useState<Stats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [entries, setEntries] = useState<Array<{ slot: string; gameName: string; user: string }>>([])
@@ -105,6 +107,11 @@ export default function StatsPage() {
     <div className="min-h-screen">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-end mb-4">
+          <Button size="sm" variant="outline" className="glass border-white/30 text-white hover:bg-black/10" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4 mr-1" /> 뒤로가기
+          </Button>
+        </div>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">서버 통계</h1>
           <p className="text-white/70">게임 플레이 패턴과 인기 시간대를 확인하세요</p>

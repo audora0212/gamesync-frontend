@@ -241,16 +241,17 @@ export function TimetableView({ serverId }: TimetableViewProps) {
   return (
     <Card className="glass border-white/20 h-full">
       <CardHeader>
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <CardTitle className="text-white flex items-center">
-              <Calendar className="mr-2 h-5 w-5" />합류 시간표
+        <div className="flex flex-col sm:flex-row items-start sm:items-start justify-start sm:justify-between gap-2">
+          <div className="min-w-0">
+            <CardTitle className="text-white flex items-center break-keep">
+              <Calendar className="mr-2 h-5 w-5 shrink-0" />
+              <span className="truncate">합류 시간표</span>
             </CardTitle>
-            <CardDescription className="text-white/70">
+            <CardDescription className="text-white/70 break-keep text-sm">
               친구들이 언제 합류하는지 확인하고 예약하세요
             </CardDescription>
           </div>
-          <div className="pt-1">
+          <div className="pt-0 sm:pt-1 mt-2 sm:mt-0 w-full sm:w-auto">
             <div className="flex items-center gap-2">
               {hasOwnEntryToday && (
                 <Button
@@ -275,7 +276,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
               >
                 <Button
                   onClick={() => setIsNewEntryOpen(true)}
-                  className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+                  className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-xs sm:text-sm rainbow-border"
                   disabled={isJoinedSomeParty}
                 >
                   <Plus className="mr-1 h-4 w-4" /> {hasOwnEntryToday ? "합류 시간 다시 정하기" : "새 합류 시간 예약하기"}
@@ -401,7 +402,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           >
             <Button
               onClick={() => setIsNewPartyOpen(true)}
-              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-xs sm:text-sm rainbow-border"
               disabled={isJoinedSomeParty}
             >
               <Plus className="mr-1 h-4 w-4" /> 새 파티 모집하기
@@ -568,7 +569,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           <Button
             onClick={() => setSortByGame(!sortByGame)}
             variant="outline"
-            className={`glass border-white/30 text-white hover:bg-black/10 text-sm ${
+            className={`glass border-white/30 text-white hover:bg-black/10 text-xs sm:text-sm ${
               sortByGame ? "bg-white/10" : ""
             }`}
           >
