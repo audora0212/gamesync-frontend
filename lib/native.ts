@@ -1,7 +1,6 @@
 // Client-only helpers to interact with Capacitor when running inside the hybrid app
 
 function getCap(): any | null {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const w = typeof window !== 'undefined' ? (window as any) : null;
   return w && w.Capacitor ? w.Capacitor : null;
 }
