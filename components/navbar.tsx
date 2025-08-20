@@ -45,7 +45,7 @@ export function Navbar() {
           {/* 로고 및 타이틀 */}
           <Link href="/dashboard" className="flex items-center space-x-2">
             <GamepadIcon className="h-6 w-6 text-muted-foreground" />
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-foreground whitespace-nowrap">
+            <span className="hidden sm:inline text-xs sm:text-sm md:text-base lg:text-lg font-bold text-foreground whitespace-nowrap">
               GameSync
             </span>
           </Link>
@@ -53,7 +53,7 @@ export function Navbar() {
           {/* 사용자 정보 및 액션 */}
           <div className="flex items-center space-x-3">
             {user && (
-              <span className="text-xs sm:text-sm md:text-base text-foreground font-medium whitespace-nowrap">
+              <span className="max-w-[30vw] truncate text-xs sm:text-sm md:text-base text-foreground font-medium whitespace-nowrap">
                 {user}
               </span>
             )}
