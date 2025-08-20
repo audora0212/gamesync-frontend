@@ -264,7 +264,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
               친구들이 언제 합류하는지 확인하고 예약하세요
             </CardDescription>
           </div>
-          <div className="pt-0 sm:pt-1 mt-2 sm:mt-0 w-full sm:w-auto">
+          <div className="pt-0 sm:pt-1 mt-2 sm:mt-0 w-full sm:w-auto flex justify-end">
             <div className="flex items-center gap-2">
               {hasOwnEntryToday && (
                 <Button

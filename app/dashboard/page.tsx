@@ -193,28 +193,31 @@ export default function DashboardPage() {
               <Star className="w-4 h-4 text-yellow-300" />
               <span className="text-white/80 text-sm">즐겨찾기</span>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {favoriteServers.map((server) => {
                 const isOwner = server.ownerId === currentUserId;
                 const isFav = favoriteIds.has(server.id);
                 return (
-                  <div key={server.id} className="min-w-[320px] md:min-w-[360px]">
-                    <Card className="relative glass border-white/20 bg-gradient-to-br from-white/10 to-white/5 hover:from-white/20 hover:to-white/10 transition-all duration-300 shadow-xl">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-white text-xl">{server.name}</CardTitle>
-                          <Badge variant="secondary" className="glass text-yellow-300">
-                            {isOwner ? "소유자" : "멤버"}
-                          </Badge>
+                  <Card
+                    key={server.id}
+                    className="glass bg-white/10 border-white/20 hover:bg-white/20 hover:shadow-lg hover:shadow-white/10 transition-all duration-300"
+                  >
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-white">{server.name}</CardTitle>
+                        <Badge variant="secondary" className="glass text-yellow-300">
+                          {isOwner ? "소유자" : "멤버"}
+                        </Badge>
+                      </div>
+                      <CardDescription className="text-white/70">서버장: {server.owner}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center text-white/80">
+                          <Users className="mr-2 h-4 w-4" />
+                          <span>{server.members.length}명 참여</span>
                         </div>
-                        <CardDescription className="text-white/70">서버장: {server.owner}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
                         <div className="flex items-center justify-between text-white/80">
-                          <div className="flex items-center">
-                            <Users className="mr-2 h-4 w-4" />
-                            <span>{server.members.length}명</span>
-                          </div>
                           <div className="flex items-center gap-2">
                             <Star
                               onClick={() => toggleFavorite(server)}
@@ -223,28 +226,19 @@ export default function DashboardPage() {
                               fill={isFav ? "currentColor" : "none"}
                             />
                             <Clock className="mr-2 h-4 w-4" />
-                            <span>{server.resetTime}</span>
+                            <span>초기화: {server.resetTime}</span>
                           </div>
-                        </div>
-                        {/* 친구 스케줄 요약 (아주 작은 텍스트) */}
-                        {friendSummaries[server.id] && (
-                          <div className="text-white/60 text-[10px] mt-2">
-                            {friendSummaries[server.id].others > 0
-                              ? `${friendSummaries[server.id].friend}님 외에 ${friendSummaries[server.id].others}명이 스케줄을 등록했어요`
-                              : `${friendSummaries[server.id].friend}님이 스케줄을 등록했어요`}
-                          </div>
-                        )}
-                        <div className="mt-4">
                           <Button
                             onClick={() => router.push(`/server/${server.id}`)}
-                            className="w-full glass-button hover:bg-white/20"
+                            className="glass-button hover:bg-white/20 h-15 px-8"
+                            size="sm"
                           >
                             입장
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 );
               })}
             </div>

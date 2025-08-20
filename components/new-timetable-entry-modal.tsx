@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -86,7 +85,7 @@ export function NewTimetableEntryModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="glass border-white/20">
+      <DialogContent className="glass border-white/20 max-w-sm">
         <DialogHeader>
           <DialogTitle className="text-white">새 합류 시간 예약</DialogTitle>
           <DialogDescription className="text-white/70">
@@ -135,16 +134,16 @@ export function NewTimetableEntryModal({
               </SelectGroup>
             </SelectContent>
           </Select>
-          <DialogFooter>
+          <div className="flex justify-end space-x-2 pt-4">
             <DialogClose asChild>
               <Button type="button" variant="outline" className="glass border-white/30 text-white">
                 취소
               </Button>
             </DialogClose>
-            <Button type="submit" className="glass border-white/30 text-white" disabled={!canSubmit || isSubmitting}>
+            <Button type="submit" className="glass-button text-white" disabled={!canSubmit || isSubmitting}>
               {isSubmitting ? "예약 중..." : "합류 시간 예약"}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

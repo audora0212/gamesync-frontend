@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
@@ -225,14 +224,14 @@ export function SettingModal() {
             </div>
           </div>
         </div>
-        <DialogFooter>
+        <div className="flex justify-end space-x-2 pt-4">
           <DialogClose asChild>
-            <Button variant="outline">취소</Button>
+            <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
           </DialogClose>
-          <Button onClick={save} disabled={loading}>
+          <Button onClick={save} disabled={loading} className="glass-button">
             {loading ? '저장 중...' : '저장'}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

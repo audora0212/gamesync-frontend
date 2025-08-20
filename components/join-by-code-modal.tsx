@@ -7,7 +7,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -50,12 +49,12 @@ export function JoinByCodeModal({ open, onClose, onJoinSuccess }: JoinByCodeModa
             className="glass border-white/30 text-white"
           />
         </div>
-        <DialogFooter>
+        <div className="flex justify-end space-x-2 pt-4">
           <DialogClose asChild>
             <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
           </DialogClose>
           <Button onClick={handleJoin} className="glass-button text-white">참가</Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )

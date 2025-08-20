@@ -10,7 +10,7 @@ import { toast } from "sonner"
 import { serverService, Server as IServer } from "@/lib/server-service"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Dialog as ConfirmDialog, DialogContent as ConfirmContent, DialogHeader as ConfirmHeader, DialogFooter as ConfirmFooter, DialogTitle as ConfirmTitle, DialogClose as ConfirmClose } from "@/components/ui/dialog"
+import { Dialog as ConfirmDialog, DialogContent as ConfirmContent, DialogHeader as ConfirmHeader, DialogTitle as ConfirmTitle, DialogClose as ConfirmClose } from "@/components/ui/dialog"
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute"
 
 async function copyText(text: string) {
@@ -154,7 +154,7 @@ export default function ServerDetailPage() {
                       <ConfirmTitle className="text-white">서버 떠나기</ConfirmTitle>
                     </ConfirmHeader>
                     <div className="text-white/80 text-sm">이 서버를 떠나시겠습니까?</div>
-                    <ConfirmFooter>
+                    <div className="flex justify-end space-x-2 pt-4">
                       <ConfirmClose asChild>
                         <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
                       </ConfirmClose>
@@ -174,7 +174,7 @@ export default function ServerDetailPage() {
                       >
                         떠나기
                       </Button>
-                    </ConfirmFooter>
+                    </div>
                   </ConfirmContent>
                 </ConfirmDialog>
               </>

@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -89,7 +88,7 @@ export function NewPartyModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="glass border-white/20">
+      <DialogContent className="glass border-white/20 max-w-sm">
         <DialogHeader>
           <DialogTitle className="text-white">새 파티 모집</DialogTitle>
           <DialogDescription className="text-white/70">
@@ -142,16 +141,16 @@ export function NewPartyModal({
             <label className="text-white text-sm">정원</label>
             <Input type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="glass border-white/30 text-white text-sm" />
           </div>
-          <DialogFooter>
+          <div className="flex justify-end space-x-2 pt-4">
             <DialogClose asChild>
               <Button type="button" variant="outline" className="glass border-white/30 text-white">
                 취소
               </Button>
             </DialogClose>
-            <Button type="submit" className="glass border-white/30 text-white" disabled={!canSubmit || isSubmitting}>
+            <Button type="submit" className="glass-button text-white" disabled={!canSubmit || isSubmitting}>
               {isSubmitting ? "생성 중..." : "파티 모집하기"}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

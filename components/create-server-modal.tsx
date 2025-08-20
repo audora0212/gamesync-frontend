@@ -45,7 +45,7 @@ export function CreateServerModal({ open, onClose, onServerCreated }: CreateServ
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="glass border-white/20">
+      <DialogContent className="glass border-white/20 max-w-sm">
         <DialogHeader>
           <DialogTitle className="text-white">새 서버 생성</DialogTitle>
           <DialogDescription className="text-white/70">새로운 게임 서버를 생성합니다.</DialogDescription>

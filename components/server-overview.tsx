@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { authService } from "@/lib/auth-service"
 import { serverService, Server, MemberInfo } from "@/lib/server-service"
+import { timetableService } from "@/lib/timetable-service"
 import { friendService, type FriendListResponse } from "@/lib/friend-service"
 
 // Props 타입 정의
@@ -57,6 +58,8 @@ export function ServerOverview({
   const [requestedIds, setRequestedIds] = useState<Set<number>>(new Set())
   const [kickOpen, setKickOpen] = useState(false)
   const [kickTarget, setKickTarget] = useState<MemberInfo | null>(null)
+  const [noStatsOpen, setNoStatsOpen] = useState(false)
+  const [checkingStats, setCheckingStats] = useState(false)
 
   // 친구 목록 미리 로드 (멤버 리스트에서 친구추가 버튼 노출 판단)
   useEffect(() => {
@@ -307,13 +310,30 @@ export function ServerOverview({
 
         {/* 통계 및 설정 버튼 */}
         <div className="space-y-2 p-4">
-          <Button
-            variant="outline"
-             className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white"
-            onClick={() => router.push(`/stats/${server.id}`)}
-          >
-            <BarChart3 className="mr-2 h-4 w-4 text-white" /> 통계 보기
-          </Button>
+          <div className={isMember ? "flex justify-center sm:justify-start" : undefined}>
+            <Button
+              variant="outline"
+              className="w-auto glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+              disabled={checkingStats}
+              onClick={async () => {
+                setCheckingStats(true)
+                try {
+                  const entries = await timetableService.getTimetable(server.id)
+                  if (!entries || entries.length === 0) {
+                    setNoStatsOpen(true)
+                    return
+                  }
+                  router.push(`/stats/${server.id}`)
+                } catch {
+                  toast.error("통계 확인 실패", { description: "스케줄 정보를 확인할 수 없습니다." })
+                } finally {
+                  setCheckingStats(false)
+                }
+              }}
+            >
+              <BarChart3 className="mr-2 h-4 w-4 text-white" /> 통계 보기
+            </Button>
+          </div>
           {(isOwner || isAdmin) && (
             <Dialog open={showSettings} onOpenChange={setShowSettings}>
               <DialogTrigger asChild>
@@ -393,6 +413,20 @@ export function ServerOverview({
         </div>
       </CardContent>
     </Card>
+    {/* 스케줄 없음 안내 모달 */}
+    <Dialog open={noStatsOpen} onOpenChange={setNoStatsOpen}>
+      <DialogContent className="glass border-white/20 max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="text-white">통계 데이터 없음</DialogTitle>
+        </DialogHeader>
+        <div className="text-white/80 text-sm">아직 통계가 없습니다. 스케줄을 먼저 등록해주세요.</div>
+        <div className="flex justify-end space-x-2 pt-4">
+          <DialogClose asChild>
+            <Button variant="outline" className="glass border-white/30 text-white">닫기</Button>
+          </DialogClose>
+        </div>
+      </DialogContent>
+    </Dialog>
     {/* 초대 모달 */}
     <Dialog open={inviteOpen} onOpenChange={setInviteOpen} key="invite">
       <DialogContent className="glass border-white/20 max-w-md">
