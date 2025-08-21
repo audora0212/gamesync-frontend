@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,15 @@ import { toast } from "sonner"
 import { Navbar } from "@/components/navbar"
 
 export default function InvitePage() {
+  // useSearchParams()를 사용하는 클라이언트 컴포넌트를 Suspense 경계로 감쌉니다
+  return (
+    <Suspense fallback={<div className="min-h-screen"><Navbar /></div>}>
+      <InviteInner />
+    </Suspense>
+  )
+}
+
+function InviteInner() {
   const router = useRouter()
   const params = useSearchParams()
   const code = params.get("code") || ""
