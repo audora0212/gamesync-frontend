@@ -34,6 +34,8 @@ class AuthService {
 
   setToken(token: string) {
     localStorage.setItem(this.tokenKey, token)
+    // 쿠키에도 저장하여 서버사이드에서 인증 상태를 판별할 수 있게 함 (랜딩→대시보드 리다이렉트)
+    this.setAuthCookie(token)
   }
 
   setCurrentUser(user: { id: number; nickname: string }) {
@@ -107,6 +109,7 @@ class AuthService {
     localStorage.removeItem(this.userKey)
     localStorage.removeItem(this.userIdKey)
     localStorage.removeItem(this.fcmTokenKey)
+    this.clearAuthCookie()
   }
 
   getToken(): string | null {
@@ -129,6 +132,45 @@ class AuthService {
   getAuthHeaders(): Record<string, string> {
     const token = this.getToken()
     return token ? { Authorization: `Bearer ${token}` } : {}
+  }
+
+  private setAuthCookie(token: string) {
+    try {
+      // JWT exp 기반 만료 설정 (가능하다면)
+      const parts = token.split(".")
+      let attrs: string[] = ["path=/", "samesite=lax"]
+      try {
+        if (typeof window !== "undefined" && window.location.protocol === "https:") {
+          attrs.push("secure")
+        }
+      } catch {}
+
+      try {
+        if (parts.length === 3) {
+          const payloadJson = atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
+          const payload = JSON.parse(payloadJson)
+          const expMs = typeof payload.exp === "number" ? payload.exp * 1000 : undefined
+          if (expMs && expMs > Date.now()) {
+            const maxAge = Math.max(0, Math.floor((expMs - Date.now()) / 1000))
+            attrs.push(`max-age=${maxAge}`)
+          }
+        }
+      } catch {}
+
+      document.cookie = `auth-token=${encodeURIComponent(token)}; ${attrs.join("; ")}`
+    } catch {}
+  }
+
+  private clearAuthCookie() {
+    try {
+      let attrs: string[] = ["path=/", "samesite=lax", "max-age=0"]
+      try {
+        if (typeof window !== "undefined" && window.location.protocol === "https:") {
+          attrs.push("secure")
+        }
+      } catch {}
+      document.cookie = `auth-token=; ${attrs.join("; ")}`
+    } catch {}
   }
 }
 
