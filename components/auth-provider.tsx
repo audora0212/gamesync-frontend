@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Attempt to register FCM token (ignore failures)
       ;(async () => {
         try {
-          // If inside native app, register native push (APNs/FCM)
+          // If inside native app, register native push (APNs/FCM) and handle deep links
           if (await isNative()) {
             const platform = await getPlatform()
             const nativeToken = await registerNativePush()
@@ -49,18 +49,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             onAppUrlOpen((url) => {
               try {
                 const u = new URL(url)
-                if (u.protocol.startsWith('gamesync')) {
-                  if (u.pathname.startsWith('/oauth/callback') || u.pathname.startsWith('/auth/discord/callback')) {
-                    const query = u.search || ''
-                    router.replace(`/auth/discord/callback${query}`)
-                  }
+                const isAppScheme = u.protocol.startsWith('gamesync')
+                const isUniversalLink = (u.protocol === 'https:' && u.host.endsWith('gamesync.cloud'))
+                if (!isAppScheme && !isUniversalLink) return
+                const query = u.search || ''
+                // Kakao
+                if (u.pathname.startsWith('/auth/kakao/callback')) {
+                  router.replace(`/auth/kakao/callback${query}`)
+                  try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                  return
+                }
+                // Discord
+                if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
+                  router.replace(`/auth/discord/callback${query}`)
+                  try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                  return
                 }
               } catch {}
             })
           }
 
           const vapidKey = process.env.NEXT_PUBLIC_FCM_VAPID_KEY || "BNPiSmtH-uSrFLgGI-4N75uPFIWsLVxfQgJ6kmm4ixhwc3QjdUbp_qSqHaf0xsLrG3sVNRnqbNmAoi7FAQCk6dk"
-          if (typeof window !== "undefined" && 'Notification' in window) {
+          // In native app, skip Web FCM (APNs를 사용)
+          if (!(await isNative()) && typeof window !== "undefined" && 'Notification' in window) {
             const permission = await Notification.requestPermission()
             if (permission === 'granted') {
               const fcmToken = await requestFcmToken(vapidKey)

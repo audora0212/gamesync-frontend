@@ -51,6 +51,17 @@ export async function openExternal(url: string) {
 
 export async function registerNativePush(): Promise<string | null> {
   if (!(await isNative())) return null;
+  // Prefer Firebase Messaging for FCM registration token on iOS/Android
+  const FCM: any = getPlugin('FirebaseMessaging');
+  if (FCM && typeof FCM.requestPermissions === 'function') {
+    try {
+      await FCM.requestPermissions();
+      const res = await FCM.getToken();
+      if (res && typeof res.token === 'string' && res.token.length > 0) {
+        return res.token as string; // FCM token
+      }
+    } catch {}
+  }
   const Push: any = getPlugin('PushNotifications');
   if (!Push) return null;
   try {
