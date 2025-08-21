@@ -83,6 +83,19 @@ export default function StatsPage() {
     return { dowGamesData: data, gameKeys: keys }
   }, [weekly])
 
+  // 오늘: 시간대별 누적 유저 수 데이터 및 Y축 ticks(1단위)
+  const { cumulativeHourly, yTicks } = useMemo(() => {
+    const src = today?.hourlyCounts || []
+    let cum = 0
+    const data = src.map((p) => {
+      cum += (p.count || 0)
+      return { hour: p.hour, count: cum }
+    })
+    const max = data.reduce((m, p) => Math.max(m, p.count || 0), 0)
+    const ticks = Array.from({ length: max + 1 }, (_, i) => i)
+    return { cumulativeHourly: data, yTicks: ticks }
+  }, [today])
+
   if (isLoading) {
     return (
       <div className="min-h-screen">
@@ -158,18 +171,18 @@ export default function StatsPage() {
           </div>
         )}
 
-        {/* 오늘: 시간대별 예약 수 */}
+        {/* 오늘: 시간대별 유저 수(누적) */}
         <div className="grid grid-cols-1 gap-6 mt-6">
           <Card className="glass border-white/20">
             <CardHeader className="pb-2">
-              <CardTitle className="text-white text-base">오늘 시간대별 예약 수</CardTitle>
+              <CardTitle className="text-white text-base">오늘 시간대별 유저 수 (누적)</CardTitle>
             </CardHeader>
-            <CardContent className="h-72">
+            <CardContent className="h-56">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={today?.hourlyCounts || []} margin={{ left: 8, right: 16, top: 10, bottom: 10 }}>
+                <LineChart data={cumulativeHourly} margin={{ left: 8, right: 16, top: 10, bottom: 10 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
                   <XAxis dataKey="hour" stroke="#ffffff80" tickFormatter={(h)=>String(h).padStart(2,'0')} />
-                  <YAxis stroke="#ffffff80" />
+                  <YAxis stroke="#ffffff80" allowDecimals={false} ticks={yTicks} domain={[0, (dataMax) => Math.max(dataMax || 0, 0)]} />
                   <ReTooltip />
                   <Line type="monotone" dataKey="count" stroke="#60a5fa" strokeWidth={2} dot={false} />
                 </LineChart>

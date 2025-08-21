@@ -187,24 +187,42 @@ export function ServerOverview({
               <span>{server.members.length}명</span>
             </div>
             {/* 초대 */}
-            <div className="pt-2">
+            <div className="pt-2 space-y-2">
               <div className="text-white mb-1">초대</div>
               <div className="flex items-center justify-center gap-2 w-full">
                 {isMember && (
-                  <Button
-                    className="glass-button"
-                    onClick={async () => {
-                      setInviteOpen(true)
-                      try {
-                        const f = await friendService.getFriends()
-                        setFriends(f)
-                      } catch {
-                        toast.error("친구 목록 로드 실패")
-                      }
-                    }}
-                  >
-                    <UserPlus className="h-4 w-4 mr-1" /> 친구 초대
-                  </Button>
+                  <>
+                    <Button
+                      className="glass-button"
+                      onClick={async () => {
+                        setInviteOpen(true)
+                        try {
+                          const f = await friendService.getFriends()
+                          setFriends(f)
+                        } catch {
+                          toast.error("친구 목록 로드 실패")
+                        }
+                      }}
+                    >
+                      <UserPlus className="h-4 w-4 mr-1" /> 친구 초대
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+                      onClick={async () => {
+                        const origin = typeof window !== 'undefined' ? window.location.origin : ''
+                        const link = `${origin}/invite?code=${server.inviteCode}`
+                        try {
+                          await navigator.clipboard.writeText(link)
+                          toast.success("초대 링크가 복사되었습니다")
+                        } catch {
+                          toast.error("초대 링크 복사 실패")
+                        }
+                      }}
+                    >
+                      초대 링크 복사
+                    </Button>
+                  </>
                 )}
               </div>
             </div>

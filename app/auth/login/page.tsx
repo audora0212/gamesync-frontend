@@ -20,6 +20,9 @@ export default function LoginPage() {
   const [isDiscordLoading, setIsDiscordLoading] = useState(false)
   const [isKakaoLoading, setIsKakaoLoading] = useState(false)
   const router = useRouter()
+  const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
+  const inviteCode = params?.get("code") || null
+  const returnUrl = params?.get("return") || null
 
   useEffect(() => {
     if (authService.isAuthenticated()) {
@@ -36,7 +39,13 @@ export default function LoginPage() {
       toast.success("로그인 성공", {
         description: "환영합니다!",
       })
-      router.push("/dashboard")
+      if (returnUrl) {
+        router.push(returnUrl)
+      } else if (inviteCode) {
+        router.push(`/invite?code=${inviteCode}`)
+      } else {
+        router.push("/dashboard")
+      }
     } catch (error) {
       toast.error("로그인 실패", {
         description: "아이디 또는 비밀번호를 확인해주세요.",

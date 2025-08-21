@@ -150,6 +150,12 @@ class ServerService {
   return res.json()
 }
 
+  async lookupByCode(code: string): Promise<Server> {
+    const res = await fetchWithAuth(`${API_BASE}/servers/lookup?code=${code}`)
+    if (!res.ok) throw new Error(res.status === 400 ? "INVALID_CODE" : "LOOKUP_FAILED")
+    return res.json()
+  }
+
   async searchServers(params: SearchParams): Promise<Server[]> {
     const qs = new URLSearchParams();
     qs.append("page", params.page.toString());

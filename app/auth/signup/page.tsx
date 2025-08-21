@@ -22,6 +22,8 @@ export default function SignupPage() {
   const [isDiscordLoading, setIsDiscordLoading] = useState(false)
   const [isKakaoLoading, setIsKakaoLoading] = useState(false)
   const router = useRouter()
+  const inviteCode = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("code") : null
+  const returnUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("return") : null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -67,10 +69,15 @@ export default function SignupPage() {
 
     try {
       await authService.signup({ username, password, nickname })
-      toast.success("회원가입 성공", {
-        description: "계정이 생성되었습니다. 로그인해주세요.",
-      })
-      router.push("/auth/login")
+      toast.success("회원가입 성공", { description: "계정이 생성되었습니다. 로그인해주세요." })
+      if (inviteCode) {
+        const next = `/invite?code=${inviteCode}`
+        router.push(`/auth/login?return=${encodeURIComponent(next)}`)
+      } else if (returnUrl) {
+        router.push(`/auth/login?return=${encodeURIComponent(returnUrl)}`)
+      } else {
+        router.push("/auth/login")
+      }
     } catch (error) {
       toast.error("회원가입 실패", {
         description: "다시 시도해주세요.",
