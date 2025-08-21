@@ -23,6 +23,73 @@ export interface Server {
   resetPaused?: boolean;
 }
 
+export interface AggregatedStatsResponse {
+  range: "weekly"
+  start: string
+  end: string
+  topGame: string | null
+  topHour: number
+  topHourCount: number
+  topGames: Array<{ name: string; count: number }>
+  hourCounts: Array<{ hour: number; count: number }>
+  collecting: boolean
+}
+
+export async function getAggregatedStats(serverId: number, range: "weekly" = "weekly"): Promise<AggregatedStatsResponse> {
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api"
+  const res = await fetch(`${API_BASE}/servers/${serverId}/stats?range=${range}`, {
+    headers: authService.getAuthHeaders?.() || {},
+  })
+  if (!res.ok) throw new Error("Failed to fetch aggregated stats")
+  return res.json()
+}
+
+// ---- Today & Weekly (new) ----
+export interface TodayStatsResponse {
+  topGame: string | null
+  avgMinuteOfDay: number
+  peakHour: number
+  peakHourCount: number
+  hourlyCounts: Array<{ hour: number; count: number }>
+}
+
+export interface WeeklyTopUser {
+  userId: number
+  nickname: string | null
+  count: number
+}
+
+export interface WeeklyDayAvg {
+  dow: number // 1=Mon..7=Sun
+  avgMinuteOfDay: number
+  sampleCount: number
+}
+
+export interface WeeklyDayGamesItem { name: string; count: number }
+export interface WeeklyDayGames { dow: number; items: WeeklyDayGamesItem[] }
+
+export interface WeeklyStatsResponse {
+  topUsers: WeeklyTopUser[]
+  dowAvg: WeeklyDayAvg[]
+  dowGames: WeeklyDayGames[]
+}
+
+export async function getTodayStats(serverId: number): Promise<TodayStatsResponse> {
+  const res = await fetch(`${API_BASE}/servers/${serverId}/stats/today`, {
+    headers: authService.getAuthHeaders?.() || {},
+  })
+  if (!res.ok) throw new Error("Failed to fetch today stats")
+  return res.json()
+}
+
+export async function getWeeklyStats(serverId: number): Promise<WeeklyStatsResponse> {
+  const res = await fetch(`${API_BASE}/servers/${serverId}/stats/weekly`, {
+    headers: authService.getAuthHeaders?.() || {},
+  })
+  if (!res.ok) throw new Error("Failed to fetch weekly stats")
+  return res.json()
+}
+
 interface SearchParams {
   page: number;
   size: number;
