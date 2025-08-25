@@ -78,41 +78,19 @@ export default function ClientCallback() {
             const appSchemeAbs = `gamesync:///auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
             setDidAttemptOpenApp(true);
             try { window.location.href = appSchemeAbs } catch {}
-            setTimeout(() => { try { (window as Location).href = universalAbs } catch {} }, 600);
+            setTimeout(() => { try { window.location.href = universalAbs } catch {} }, 600);
             setTimeout(() => {
               const tf = process.env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL as string | undefined;
-              if (isIOS && typeof tf === 'string' && tf.length > 0) (window as Location).href = tf;
+              if (isIOS && typeof tf === 'string' && tf.length > 0) window.location.href = tf;
             }, 1400);
-            toast.success('앱으로 열기를 시도했어요. 설치되어 있지 않다면 안내로 이동합니다.');
+            toast.success('앱으로 열기를 시도했어요. 설치되어 있지 않다면 안내로 이동합니다.' as string);
             return;
           } catch {}
         }
         try { console.log('[CB/discord] success → dashboard') } catch {}
-        toast.success("디스코드 계정으로 로그인했습니다.");
+        toast.success("디스코드 계정으로 로그인했습니다." as string);
         router.replace("/dashboard");
       })()
-      // 모바일 웹 → 앱 열기 시도, 실패 시 안내/폴백
-      if (oauthTarget === 'mobile-web') {
-        try {
-          clearCookie('oauth_target');
-          const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-          const isIOS = /iphone|ipad|ipod/i.test(ua);
-          const universalAbs = `https://gamesync.cloud/auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
-          const appSchemeAbs = `gamesync:///auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
-          setDidAttemptOpenApp(true);
-          // 1) 커스텀 스킴 우선 시도
-          try { window.location.href = appSchemeAbs } catch {}
-          // 2) 잠시 후 유니버설 링크 절대 URL 시도
-          setTimeout(() => { try { window.location.href = universalAbs } catch {} }, 600);
-          // 3) 폴백: TestFlight
-          setTimeout(() => {
-            const tf = process.env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL;
-            if (isIOS && tf) window.location.href = tf;
-          }, 1400);
-          toast.success('앱으로 열기를 시도했어요. 설치되어 있지 않다면 안내로 이동합니다.');
-          return;
-        } catch {}
-      }
       try { console.log('[CB/discord] success → dashboard') } catch {}
       toast.success("디스코드 계정으로 로그인했습니다.");
       router.replace("/dashboard");
