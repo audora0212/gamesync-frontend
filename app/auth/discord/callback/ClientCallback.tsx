@@ -58,18 +58,18 @@ export default function ClientCallback() {
           clearCookie('oauth_target');
           const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
           const isIOS = /iphone|ipad|ipod/i.test(ua);
-          const isAndroid = /android/i.test(ua);
-          // 우선 유니버설 링크 시도 (앱 설치시 앱으로 이동, 미설치시 현재 페이지 유지)
-          const universal = `/auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
-          // iOS는 사용자 제스처 없이 커스텀 스킴 이동이 제한적일 수 있어서 버튼 안내를 병행
-          // 즉시 한 번 시도 (일부 브라우저에서 무시될 수 있음)
+          const universalAbs = `https://gamesync.cloud/auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
+          const appSchemeAbs = `gamesync:///auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
           setDidAttemptOpenApp(true);
-          window.location.href = universal;
-          // 1.2초 후 테스트플라이트/안내로 폴백
+          // 1) 커스텀 스킴 우선 시도
+          try { window.location.href = appSchemeAbs } catch {}
+          // 2) 잠시 후 유니버설 링크 절대 URL 시도
+          setTimeout(() => { try { window.location.href = universalAbs } catch {} }, 600);
+          // 3) 폴백: TestFlight
           setTimeout(() => {
             const tf = process.env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL;
             if (isIOS && tf) window.location.href = tf;
-          }, 1200);
+          }, 1400);
           toast.success('앱으로 열기를 시도했어요. 설치되어 있지 않다면 안내로 이동합니다.');
           return;
         } catch {}

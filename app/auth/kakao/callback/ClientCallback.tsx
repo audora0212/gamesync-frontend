@@ -52,13 +52,15 @@ export default function ClientCallback() {
           clearCookie('oauth_target');
           const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
           const isIOS = /iphone|ipad|ipod/i.test(ua);
-          const universal = `/auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
+          const universalAbs = `https://gamesync.cloud/auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
+          const appSchemeAbs = `gamesync:///auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
           setDidAttemptOpenApp(true);
-          window.location.href = universal;
+          try { window.location.href = appSchemeAbs } catch {}
+          setTimeout(() => { try { window.location.href = universalAbs } catch {} }, 600);
           setTimeout(() => {
             const tf = process.env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL;
             if (isIOS && tf) window.location.href = tf;
-          }, 1200);
+          }, 1400);
           toast.success('앱으로 열기를 시도했어요. 설치되어 있지 않다면 안내로 이동합니다.');
           return;
         } catch {}
