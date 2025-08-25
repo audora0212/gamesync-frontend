@@ -23,9 +23,13 @@ export async function fetchWithAuth(input: RequestInfo, init: RequestInit = {}) 
     } catch {}
     // 로그인 페이지로 리다이렉트 (현재 위치를 return으로 전달)
     if (typeof window !== "undefined") {
-      const current = window.location.pathname + window.location.search
-      const next = `/auth/login?return=${encodeURIComponent(current)}`
-      window.location.href = next
+      const path = window.location.pathname || ""
+      // 콜백/인증 경로에서는 자동 리다이렉트하지 않음 (콜백 처리 방해 방지)
+      if (!path.startsWith("/auth/")) {
+        const current = path + window.location.search
+        const next = `/auth/login?return=${encodeURIComponent(current)}`
+        window.location.href = next
+      }
     }
     // 이후 코드는 실행되지 않도록
     throw new Error("UNAUTHORIZED")

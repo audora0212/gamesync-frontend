@@ -35,23 +35,62 @@ export default function ClientCallback() {
   const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
 
   useEffect(() => {
-    if (token && userParam) {
+    if (token) {
       try { console.log('[CB/discord] setToken') } catch {}
       authService.setToken(token);
       // 쿠키에도 저장되어 서버 사이드에서 랜딩 접근 시 대시보드로 리다이렉트 가능
       // setToken 내부에서 쿠키도 함께 설정되도록 변경됨
       // Store token securely when native
       (async () => { try { if (await isNative()) await secureSet('auth-token', token) } catch {} })()
-      let userObj;
-      try {
-        try { console.log('[CB/discord] parse userParam len', userParam.length) } catch {}
-        userObj = JSON.parse(decodeURIComponent(userParam));
-      } catch {
-        try { console.error('[CB/discord] parse failed. raw:', userParam) } catch {}
-        router.replace("/auth/login");
-        return;
+      let userObj: any = null;
+      if (userParam) {
+        // 1) 이미 디코드된 문자열일 수 있어 순차적으로 파싱 시도
+        try {
+          try { console.log('[CB/discord] parse userParam len', userParam.length) } catch {}
+          userObj = JSON.parse(userParam);
+        } catch {
+          try { userObj = JSON.parse(decodeURIComponent(userParam)) } catch {}
+        }
       }
-      authService.setCurrentUser(userObj);
+      // 2) 파싱 실패 시 /api/users/me로 프로필 조회 (토큰만으로 진행)
+      ;(async () => {
+        if (!userObj) {
+          try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api'
+            const res = await fetch(`${API_BASE}/users/me`, { headers: authService.getAuthHeaders() })
+            if (res.ok) {
+              const prof = await res.json()
+              userObj = { id: prof?.id ?? prof?.userId, nickname: prof?.nickname ?? prof?.name ?? 'User' }
+            }
+          } catch {}
+        }
+        if (userObj && typeof userObj.id === 'number' && typeof userObj.nickname === 'string') {
+          authService.setCurrentUser(userObj);
+        }
+        // 모바일 웹 → 앱 열기 로직 및 라우팅은 아래로 유지
+        if (oauthTarget === 'mobile-web') {
+          try {
+            clearCookie('oauth_target');
+            const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+            const isIOS = /iphone|ipad|ipod/i.test(ua);
+            const safeUser = typeof userParam === 'string' ? userParam : ''
+            const universalAbs = `https://gamesync.cloud/auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
+            const appSchemeAbs = `gamesync:///auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
+            setDidAttemptOpenApp(true);
+            try { window.location.href = appSchemeAbs } catch {}
+            setTimeout(() => { try { (window as Location).href = universalAbs } catch {} }, 600);
+            setTimeout(() => {
+              const tf = process.env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL as string | undefined;
+              if (isIOS && typeof tf === 'string' && tf.length > 0) (window as Location).href = tf;
+            }, 1400);
+            toast.success('앱으로 열기를 시도했어요. 설치되어 있지 않다면 안내로 이동합니다.');
+            return;
+          } catch {}
+        }
+        try { console.log('[CB/discord] success → dashboard') } catch {}
+        toast.success("디스코드 계정으로 로그인했습니다.");
+        router.replace("/dashboard");
+      })()
       // 모바일 웹 → 앱 열기 시도, 실패 시 안내/폴백
       if (oauthTarget === 'mobile-web') {
         try {

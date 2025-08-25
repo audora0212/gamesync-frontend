@@ -34,19 +34,54 @@ export default function ClientCallback() {
   const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
 
   useEffect(() => {
-    if (token && userParam) {
+    if (token) {
       try { console.log('[CB/kakao] setToken') } catch {}
       authService.setToken(token);
-      let userObj;
-      try {
-        try { console.log('[CB/kakao] parse userParam len', userParam.length) } catch {}
-        userObj = JSON.parse(decodeURIComponent(userParam));
-      } catch {
-        try { console.error('[CB/kakao] parse failed. raw:', userParam) } catch {}
-        router.replace("/auth/login");
-        return;
+      let userObj: any = null;
+      if (userParam) {
+        try {
+          try { console.log('[CB/kakao] parse userParam len', userParam.length) } catch {}
+          userObj = JSON.parse(userParam);
+        } catch {
+          try { userObj = JSON.parse(decodeURIComponent(userParam)) } catch {}
+        }
       }
-      authService.setCurrentUser(userObj);
+      ;(async () => {
+        if (!userObj) {
+          try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api'
+            const res = await fetch(`${API_BASE}/users/me`, { headers: authService.getAuthHeaders() })
+            if (res.ok) {
+              const prof = await res.json()
+              userObj = { id: prof?.id ?? prof?.userId, nickname: prof?.nickname ?? prof?.name ?? 'User' }
+            }
+          } catch {}
+        }
+        if (userObj && typeof userObj.id === 'number' && typeof userObj.nickname === 'string') {
+          authService.setCurrentUser(userObj);
+        }
+        if (oauthTarget === 'mobile-web') {
+          try {
+            clearCookie('oauth_target');
+            const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+            const isIOS = /iphone|ipad|ipod/i.test(ua);
+            const universalAbs = `https://gamesync.cloud/auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam || '')}`;
+            const appSchemeAbs = `gamesync:///auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam || '')}`;
+            setDidAttemptOpenApp(true);
+            try { window.location.href = appSchemeAbs } catch {}
+            setTimeout(() => { try { window.location.href = universalAbs } catch {} }, 600);
+            setTimeout(() => {
+              const tf = process.env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL;
+              if (isIOS && tf) window.location.href = tf;
+            }, 1400);
+            toast.success('앱으로 열기를 시도했어요. 설치되어 있지 않다면 안내로 이동합니다.');
+            return;
+          } catch {}
+        }
+        try { console.log('[CB/kakao] success → dashboard') } catch {}
+        toast.success("카카오 계정으로 로그인했습니다.");
+        router.replace("/dashboard");
+      })()
       if (oauthTarget === 'mobile-web') {
         try {
           clearCookie('oauth_target');
