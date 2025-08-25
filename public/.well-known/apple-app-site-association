@@ -1,5 +1,21 @@
 {
   "applinks": {
+    "details": [
+      {
+        "appID": "F9BCX5LCAW.cloud.gamesync.app",
+        "paths": [
+          "/auth/discord/callback*",
+          "/auth/kakao/callback*",
+          "/oauth/callback*",
+          "/login/oauth2/code/*"
+        ]
+      }
+    ]
+  }
+}
+
+{
+  "applinks": {
     "apps": [],
     "details": [
       {

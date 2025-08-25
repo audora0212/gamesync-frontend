@@ -55,14 +55,47 @@ export default function LoginPage() {
     }
   }
 
+  const setCookie = (name: string, value: string) => {
+    try {
+      const attrs: string[] = ["path=/", "samesite=lax"]
+      if (typeof window !== "undefined" && window.location.protocol === "https:") {
+        attrs.push("secure")
+      }
+      document.cookie = `${name}=${encodeURIComponent(value)}; ${attrs.join("; ")}`
+    } catch {}
+  }
+
+  const isNativeWebView = () => {
+    try {
+      const w = window as any
+      return !!(w?.Capacitor?.isNativePlatform?.() === true)
+    } catch {
+      return false
+    }
+  }
+
+  const isIOSMobileWeb = () => {
+    try {
+      const ua = navigator.userAgent
+      return /iphone|ipad|ipod/i.test(ua)
+    } catch {
+      return false
+    }
+  }
+
   const handleDiscordLogin = () => {
     setIsDiscordLoading(true)
-    // Discord 로그인 페이지로 리다이렉트하기 전에 로딩 상태 표시
+    // 환경별 oauth_target 쿠키 설정
+    if (isNativeWebView()) setCookie("oauth_target", "app")
+    else if (isIOSMobileWeb()) setCookie("oauth_target", "mobile-web")
+    // Discord 인증 시작
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/discord`
   }
 
   const handleKakaoLogin = () => {
     setIsKakaoLoading(true)
+    if (isNativeWebView()) setCookie("oauth_target", "app")
+    else if (isIOSMobileWeb()) setCookie("oauth_target", "mobile-web")
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/kakao`
   }
 

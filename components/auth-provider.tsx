@@ -223,5 +223,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })()
   }, [router])
 
+  // 로그인 전 콜드 스타트 딥링크 처리 (앱이 URL로 런치된 경우)
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!(await isNative())) return
+        const launchUrl = await getLaunchUrl()
+        if (!launchUrl) return
+        try { console.log('[DL] getLaunchUrl (unauth)', launchUrl) } catch {}
+        try {
+          const u = new URL(launchUrl)
+          const isAppScheme = u.protocol.startsWith('gamesync')
+          const isUniversalLink = (u.protocol === 'https:' && u.host.endsWith('gamesync.cloud'))
+          if (!isAppScheme && !isUniversalLink) return
+          const query = u.search || ''
+          if (u.pathname.startsWith('/auth/kakao/callback')) {
+            router.replace(`/auth/kakao/callback${query}`)
+            try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+            return
+          }
+          if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
+            router.replace(`/auth/discord/callback${query}`)
+            try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+            return
+          }
+          if (isAppScheme && (!u.pathname || u.pathname === '')) {
+            const raw = launchUrl.replace('gamesync://', '')
+            const pathAndQuery = raw.startsWith('/') ? raw : `/${raw}`
+            const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
+            if (pathAndQuery.startsWith('/auth/kakao/callback')) {
+              router.replace(`/auth/kakao/callback${q}`)
+              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              return
+            }
+            if (pathAndQuery.startsWith('/auth/discord/callback') || pathAndQuery.startsWith('/oauth/callback')) {
+              router.replace(`/auth/discord/callback${q}`)
+              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              return
+            }
+          }
+        } catch {}
+      } catch {}
+    })()
+  }, [router])
+
   return <AuthContext.Provider value={{ user, isLoading }}>{children}</AuthContext.Provider>
 }
