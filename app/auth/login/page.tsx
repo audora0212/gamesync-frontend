@@ -12,6 +12,7 @@ import { toast } from "sonner"
 import { authService } from "@/lib/auth-service"
 import { Loader2, GamepadIcon } from "lucide-react"
 import { DiscordIcon } from "@/components/icons/discord-icon"
+import { openExternal } from "@/lib/native"
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
@@ -83,19 +84,29 @@ export default function LoginPage() {
     }
   }
 
-  const handleDiscordLogin = () => {
+  const handleDiscordLogin = async () => {
     setIsDiscordLoading(true)
     const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
     const target = isNativeWebView() ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
     // Safari 쿠키 분리 회피를 위해 target 파라미터를 쿼리로 전달 (서버 필터가 쿠키로 저장)
-    window.location.href = `${base}/oauth2/authorization/discord?target=${encodeURIComponent(target)}`
+    const url = `${base}/oauth2/authorization/discord?target=${encodeURIComponent(target)}`
+    if (isNativeWebView()) {
+      try { await openExternal(url) } catch { window.location.href = url }
+    } else {
+      window.location.href = url
+    }
   }
 
-  const handleKakaoLogin = () => {
+  const handleKakaoLogin = async () => {
     setIsKakaoLoading(true)
     const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
     const target = isNativeWebView() ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
-    window.location.href = `${base}/oauth2/authorization/kakao?target=${encodeURIComponent(target)}`
+    const url = `${base}/oauth2/authorization/kakao?target=${encodeURIComponent(target)}`
+    if (isNativeWebView()) {
+      try { await openExternal(url) } catch { window.location.href = url }
+    } else {
+      window.location.href = url
+    }
   }
 
   return (
