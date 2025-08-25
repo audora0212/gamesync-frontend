@@ -138,10 +138,10 @@ class AuthService {
     try {
       // JWT exp 기반 만료 설정 (가능하다면)
       const parts = token.split(".")
-      let attrs: string[] = ["path=/", "samesite=lax"]
+      let attrs: string[] = ["Path=/", "SameSite=None"]
       try {
         if (typeof window !== "undefined" && window.location.protocol === "https:") {
-          attrs.push("secure")
+          attrs.push("Secure")
         }
       } catch {}
 
@@ -163,10 +163,10 @@ class AuthService {
 
   private clearAuthCookie() {
     try {
-      let attrs: string[] = ["path=/", "samesite=lax", "max-age=0"]
+      let attrs: string[] = ["Path=/", "SameSite=None", "Max-Age=0"]
       try {
         if (typeof window !== "undefined" && window.location.protocol === "https:") {
-          attrs.push("secure")
+          attrs.push("Secure")
         }
       } catch {}
       document.cookie = `auth-token=; ${attrs.join("; ")}`
