@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { authService } from "@/lib/auth-service"
 import { requestFcmToken, onForegroundMessage } from "@/lib/fcm"
-import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet } from "@/lib/native"
+import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet, getLaunchUrl } from "@/lib/native"
 import { notificationService } from "@/lib/notification-service"
 import { toast } from "sonner"
 
@@ -89,6 +89,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }
               } catch {}
             })
+
+            // Handle cold-start deep link (app launched via URL)
+            try {
+              const launchUrl = await getLaunchUrl()
+              if (launchUrl) {
+                console.log('[DL] getLaunchUrl (authed)', launchUrl)
+                // 재사용: 위와 동일한 라우팅 로직을 호출
+                try {
+                  const u = new URL(launchUrl)
+                  const isAppScheme = u.protocol.startsWith('gamesync')
+                  const isUniversalLink = (u.protocol === 'https:' && u.host.endsWith('gamesync.cloud'))
+                  if (isAppScheme || isUniversalLink) {
+                    const query = u.search || ''
+                    if (u.pathname.startsWith('/auth/kakao/callback')) {
+                      router.replace(`/auth/kakao/callback${query}`)
+                      try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                    } else if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
+                      router.replace(`/auth/discord/callback${query}`)
+                      try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                    } else if (isAppScheme && (!u.pathname || u.pathname === '')) {
+                      const raw = launchUrl.replace('gamesync://', '')
+                      const pathAndQuery = raw.startsWith('/') ? raw : `/${raw}`
+                      const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
+                      if (pathAndQuery.startsWith('/auth/kakao/callback')) {
+                        router.replace(`/auth/kakao/callback${q}`)
+                        try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                      } else if (pathAndQuery.startsWith('/auth/discord/callback') || pathAndQuery.startsWith('/oauth/callback')) {
+                        router.replace(`/auth/discord/callback${q}`)
+                        try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                      }
+                    }
+                  }
+                } catch {}
+              }
+            } catch {}
           }
 
           const vapidKey = process.env.NEXT_PUBLIC_FCM_VAPID_KEY || "BNPiSmtH-uSrFLgGI-4N75uPFIWsLVxfQgJ6kmm4ixhwc3QjdUbp_qSqHaf0xsLrG3sVNRnqbNmAoi7FAQCk6dk"

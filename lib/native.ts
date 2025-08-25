@@ -36,6 +36,18 @@ export async function onAppUrlOpen(callback: (url: string) => void) {
   return () => sub?.remove?.();
 }
 
+export async function getLaunchUrl(): Promise<string | null> {
+  try {
+    if (!(await isNative())) return null;
+    const App: any = getPlugin('App');
+    if (!App || typeof App.getLaunchUrl !== 'function') return null;
+    const res = await App.getLaunchUrl();
+    return res?.url ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function openExternal(url: string) {
   if (!(await isNative())) {
     window.location.href = url;
