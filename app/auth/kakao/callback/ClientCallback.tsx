@@ -87,8 +87,9 @@ export default function ClientCallback() {
           clearCookie('oauth_target');
           const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
           const isIOS = /iphone|ipad|ipod/i.test(ua);
-          const universalAbs = `https://gamesync.cloud/auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
-          const appSchemeAbs = `gamesync:///auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
+          const safeUser = typeof userParam === 'string' ? userParam : ''
+          const universalAbs = `https://gamesync.cloud/auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
+          const appSchemeAbs = `gamesync:///auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
           setDidAttemptOpenApp(true);
           try { window.location.href = appSchemeAbs } catch {}
           setTimeout(() => { try { window.location.href = universalAbs } catch {} }, 600);
