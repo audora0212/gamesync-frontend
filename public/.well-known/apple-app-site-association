@@ -7,8 +7,7 @@
         "paths": [
           "/auth/discord/callback*",
           "/auth/kakao/callback*",
-          "/oauth/callback*",
-          "/login/oauth2/code/*"
+          "/oauth/callback*"
         ]
       }
     ]
