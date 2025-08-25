@@ -30,11 +30,13 @@ export default function ClientCallback() {
   const params = useSearchParams();
   const token = params.get("token");
   const userParam = params.get("user");
+  try { console.log('[CB/discord] received', { token: token?.slice(0,16)+'...', userLen: userParam?.length }) } catch {}
   const [didAttemptOpenApp, setDidAttemptOpenApp] = useState(false);
   const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
 
   useEffect(() => {
     if (token && userParam) {
+      try { console.log('[CB/discord] setToken') } catch {}
       authService.setToken(token);
       // 쿠키에도 저장되어 서버 사이드에서 랜딩 접근 시 대시보드로 리다이렉트 가능
       // setToken 내부에서 쿠키도 함께 설정되도록 변경됨
@@ -42,8 +44,10 @@ export default function ClientCallback() {
       (async () => { try { if (await isNative()) await secureSet('auth-token', token) } catch {} })()
       let userObj;
       try {
+        try { console.log('[CB/discord] parse userParam len', userParam.length) } catch {}
         userObj = JSON.parse(decodeURIComponent(userParam));
       } catch {
+        try { console.error('[CB/discord] parse failed. raw:', userParam) } catch {}
         router.replace("/auth/login");
         return;
       }
@@ -70,6 +74,7 @@ export default function ClientCallback() {
           return;
         } catch {}
       }
+      try { console.log('[CB/discord] success → dashboard') } catch {}
       toast.success("디스코드 계정으로 로그인했습니다.");
       router.replace("/dashboard");
     } else {

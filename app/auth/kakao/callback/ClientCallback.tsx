@@ -29,16 +29,20 @@ export default function ClientCallback() {
   const params = useSearchParams();
   const token = params.get("token");
   const userParam = params.get("user");
+  try { console.log('[CB/kakao] received', { token: token?.slice(0,16)+'...', userLen: userParam?.length }) } catch {}
   const [didAttemptOpenApp, setDidAttemptOpenApp] = useState(false);
   const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
 
   useEffect(() => {
     if (token && userParam) {
+      try { console.log('[CB/kakao] setToken') } catch {}
       authService.setToken(token);
       let userObj;
       try {
+        try { console.log('[CB/kakao] parse userParam len', userParam.length) } catch {}
         userObj = JSON.parse(decodeURIComponent(userParam));
       } catch {
+        try { console.error('[CB/kakao] parse failed. raw:', userParam) } catch {}
         router.replace("/auth/login");
         return;
       }
@@ -59,6 +63,7 @@ export default function ClientCallback() {
           return;
         } catch {}
       }
+      try { console.log('[CB/kakao] success → dashboard') } catch {}
       toast.success("카카오 계정으로 로그인했습니다.");
       router.replace("/dashboard");
     } else {

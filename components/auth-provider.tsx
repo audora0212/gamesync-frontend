@@ -47,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
             // Listen deep links (e.g., gamesync://oauth/callback?code=...)
             onAppUrlOpen((url) => {
+              try { console.log('[DL] appUrlOpen (authed)', url) } catch {}
               try {
                 const u = new URL(url)
                 const isAppScheme = u.protocol.startsWith('gamesync')
@@ -55,12 +56,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const query = u.search || ''
                 // Kakao
                 if (u.pathname.startsWith('/auth/kakao/callback')) {
+                  try { console.log('[DL] route→ /auth/kakao/callback', query) } catch {}
                   router.replace(`/auth/kakao/callback${query}`)
                   try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
                   return
                 }
                 // Discord
                 if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
+                  try { console.log('[DL] route→ /auth/discord/callback', query) } catch {}
                   router.replace(`/auth/discord/callback${query}`)
                   try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
                   return
@@ -70,12 +73,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   const raw = url.replace('gamesync://', '')
                   const pathAndQuery = raw.startsWith('/') ? raw : `/${raw}`
                   if (pathAndQuery.startsWith('/auth/kakao/callback')) {
+                    try { console.log('[DL] (fallback) route→ /auth/kakao/callback', pathAndQuery) } catch {}
                     const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
                     router.replace(`/auth/kakao/callback${q}`)
                     try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
                     return
                   }
                   if (pathAndQuery.startsWith('/auth/discord/callback') || pathAndQuery.startsWith('/oauth/callback')) {
+                    try { console.log('[DL] (fallback) route→ /auth/discord/callback', pathAndQuery) } catch {}
                     const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
                     router.replace(`/auth/discord/callback${q}`)
                     try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
