@@ -65,6 +65,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
                   return
                 }
+                // 일부 iOS 버전에서 커스텀 스킴이 'gamesync:///auth/..'로 넘어올 때 pathname이 빈 문자열로 파싱될 수 있어 보정
+                if (isAppScheme && (!u.pathname || u.pathname === '')) {
+                  const raw = url.replace('gamesync://', '')
+                  const pathAndQuery = raw.startsWith('/') ? raw : `/${raw}`
+                  if (pathAndQuery.startsWith('/auth/kakao/callback')) {
+                    const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
+                    router.replace(`/auth/kakao/callback${q}`)
+                    try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                    return
+                  }
+                  if (pathAndQuery.startsWith('/auth/discord/callback') || pathAndQuery.startsWith('/oauth/callback')) {
+                    const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
+                    router.replace(`/auth/discord/callback${q}`)
+                    try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                    return
+                  }
+                }
               } catch {}
             })
           }

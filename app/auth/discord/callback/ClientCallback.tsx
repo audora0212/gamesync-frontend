@@ -77,5 +77,19 @@ export default function ClientCallback() {
     }
   }, [token, userParam, router, oauthTarget]);
 
-  return <div>처리 중입니다… {didAttemptOpenApp ? '앱 열기를 시도하는 중입니다.' : ''}</div>;
+  const tf = (process as any).env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL as string | undefined
+  const deeplink = token && userParam ? `gamesync://auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}` : '#'
+  const universal = token && userParam ? `https://gamesync.cloud/auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}` : '#'
+  return (
+    <div style={{padding:16}}>
+      처리 중입니다… {didAttemptOpenApp ? '앱 열기를 시도하는 중입니다.' : ''}
+      {oauthTarget === 'mobile-web' && (
+        <div style={{marginTop:16, display:'flex', gap:12}}>
+          <a href={deeplink} style={{padding:'10px 14px', background:'#0b0e14', color:'#fff', borderRadius:8}}>앱에서 열기</a>
+          <a href={universal} style={{padding:'10px 14px', background:'#222', color:'#fff', borderRadius:8}}>유니버설 링크</a>
+          {tf && <a href={tf} style={{padding:'10px 14px', background:'#444', color:'#fff', borderRadius:8}}>설치/업데이트</a>}
+        </div>
+      )}
+    </div>
+  );
 }
