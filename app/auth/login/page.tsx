@@ -12,7 +12,7 @@ import { toast } from "sonner"
 import { authService } from "@/lib/auth-service"
 import { Loader2, GamepadIcon } from "lucide-react"
 import { DiscordIcon } from "@/components/icons/discord-icon"
-import { isNative } from "@/lib/native"
+// Capacitor 존재 여부를 동기적으로 확인해 네이티브 여부를 판단
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
@@ -36,10 +36,34 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await authService.login({ username, password })
+      const data = await authService.login({ username, password })
       toast.success("로그인 성공", {
         description: "환영합니다!",
       })
+      // 모바일 웹이면, 사용자 제스처 컨텍스트 내에서 앱 열기 시도 → 실패 시 TestFlight로 폴백
+      try {
+        const cookies = typeof document !== 'undefined' ? document.cookie : ''
+        const isMobileWeb = /(?:^|; )oauth_target=mobile-web/.test(cookies)
+        if (isMobileWeb) {
+          const token = data.token
+          const userObj = { id: data.userId, nickname: data.nickname }
+          const user = encodeURIComponent(JSON.stringify(userObj))
+          const appScheme = `gamesync://oauth/callback?token=${encodeURIComponent(token)}&user=${user}`
+          const universal = `https://gamesync.cloud/oauth/callback?token=${encodeURIComponent(token)}&user=${user}`
+          // 우선 커스텀 스킴 시도 (사용자 제스처 컨텍스트)
+          window.location.href = appScheme
+          // 800ms 후 유니버설 링크 시도
+          setTimeout(() => { try { window.location.href = universal } catch {} }, 800)
+          // 1600ms 후 TestFlight 폴백
+          setTimeout(() => {
+            const tf = (process as any).env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL
+            if (tf) {
+              window.location.href = tf
+            }
+          }, 1600)
+          return
+        }
+      } catch {}
       if (returnUrl) {
         router.push(returnUrl)
       } else if (inviteCode) {
@@ -58,17 +82,16 @@ export default function LoginPage() {
 
   const handleDiscordLogin = () => {
     setIsDiscordLoading(true)
-    // 환경에 맞춰 oauth_target 쿠키 설정: app | mobile-web | web
+    // 환경에 맞춰 oauth_target 쿠키 설정: app | mobile-web | web (동기 판별)
     try {
       const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
       const isMobile = /iphone|ipad|ipod|android|mobile/i.test(ua)
-      ;(async () => {
-        let target: 'app' | 'mobile-web' | 'web' = 'web'
-        try { if (await isNative()) target = 'app'; else if (isMobile) target = 'mobile-web' } catch { if (isMobile) target = 'mobile-web' }
-        const attrs: string[] = ["path=/", "samesite=lax", "max-age=300"]
-        try { if (typeof window !== 'undefined' && window.location.protocol === 'https:') attrs.push("secure") } catch {}
-        document.cookie = `oauth_target=${target}; ${attrs.join("; ")}`
-      })()
+      const Cap = (typeof window !== 'undefined' ? (window as any).Capacitor : null)
+      let target: 'app' | 'mobile-web' | 'web' = 'web'
+      try { if (Cap && typeof Cap.isNativePlatform === 'function' && Cap.isNativePlatform()) target = 'app'; else if (isMobile) target = 'mobile-web' } catch { if (isMobile) target = 'mobile-web' }
+      const attrs: string[] = ["path=/", "samesite=lax", "max-age=300"]
+      try { if (typeof window !== 'undefined' && window.location.protocol === 'https:') attrs.push("secure") } catch {}
+      document.cookie = `oauth_target=${target}; ${attrs.join("; ")}`
     } catch {}
     // Discord 로그인 페이지로 이동
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/discord`
@@ -76,17 +99,16 @@ export default function LoginPage() {
 
   const handleKakaoLogin = () => {
     setIsKakaoLoading(true)
-    // 환경에 맞춰 oauth_target 쿠키 설정: app | mobile-web | web
+    // 환경에 맞춰 oauth_target 쿠키 설정: app | mobile-web | web (동기 판별)
     try {
       const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
       const isMobile = /iphone|ipad|ipod|android|mobile/i.test(ua)
-      ;(async () => {
-        let target: 'app' | 'mobile-web' | 'web' = 'web'
-        try { if (await isNative()) target = 'app'; else if (isMobile) target = 'mobile-web' } catch { if (isMobile) target = 'mobile-web' }
-        const attrs: string[] = ["path=/", "samesite=lax", "max-age=300"]
-        try { if (typeof window !== 'undefined' && window.location.protocol === 'https:') attrs.push("secure") } catch {}
-        document.cookie = `oauth_target=${target}; ${attrs.join("; ")}`
-      })()
+      const Cap = (typeof window !== 'undefined' ? (window as any).Capacitor : null)
+      let target: 'app' | 'mobile-web' | 'web' = 'web'
+      try { if (Cap && typeof Cap.isNativePlatform === 'function' && Cap.isNativePlatform()) target = 'app'; else if (isMobile) target = 'mobile-web' } catch { if (isMobile) target = 'mobile-web' }
+      const attrs: string[] = ["path=/", "samesite=lax", "max-age=300"]
+      try { if (typeof window !== 'undefined' && window.location.protocol === 'https:') attrs.push("secure") } catch {}
+      document.cookie = `oauth_target=${target}; ${attrs.join("; ")}`
     } catch {}
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/kakao`
   }
