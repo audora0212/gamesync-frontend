@@ -85,18 +85,17 @@ export default function LoginPage() {
 
   const handleDiscordLogin = () => {
     setIsDiscordLoading(true)
-    // 환경별 oauth_target 쿠키 설정
-    if (isNativeWebView()) setCookie("oauth_target", "app")
-    else if (isIOSMobileWeb()) setCookie("oauth_target", "mobile-web")
-    // Discord 인증 시작
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/discord`
+    const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
+    const target = isNativeWebView() ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    // Safari 쿠키 분리 회피를 위해 target 파라미터를 쿼리로 전달 (서버 필터가 쿠키로 저장)
+    window.location.href = `${base}/oauth2/authorization/discord?target=${encodeURIComponent(target)}`
   }
 
   const handleKakaoLogin = () => {
     setIsKakaoLoading(true)
-    if (isNativeWebView()) setCookie("oauth_target", "app")
-    else if (isIOSMobileWeb()) setCookie("oauth_target", "mobile-web")
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/kakao`
+    const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
+    const target = isNativeWebView() ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    window.location.href = `${base}/oauth2/authorization/kakao?target=${encodeURIComponent(target)}`
   }
 
   return (
