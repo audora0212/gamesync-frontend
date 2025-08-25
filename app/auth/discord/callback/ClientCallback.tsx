@@ -68,7 +68,7 @@ export default function ClientCallback() {
           authService.setCurrentUser(userObj);
         }
         // 모바일 웹 → 앱 열기 로직 및 라우팅은 아래로 유지
-        if (oauthTarget === 'mobile-web') {
+        if (oauthTarget === 'mobile-web' || (await isNative())) {
           try {
             clearCookie('oauth_target');
             const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
