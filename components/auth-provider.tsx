@@ -139,5 +139,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false)
   }, [pathname, router])
 
+  // 로그인 전에도 딥링크를 처리하여 콜백 페이지로 이동할 수 있도록 리스너를 등록
+  useEffect(() => {
+    // 이미 로그인한 경우 위의 리스너가 동작하므로 중복 등록을 피할 필요는 없지만, 안전하게 항상 동작하도록 동일 로직 등록
+    (async () => {
+      try {
+        onAppUrlOpen((url) => {
+          try {
+            const u = new URL(url)
+            const isAppScheme = u.protocol.startsWith('gamesync')
+            const isUniversalLink = (u.protocol === 'https:' && u.host.endsWith('gamesync.cloud'))
+            if (!isAppScheme && !isUniversalLink) return
+            const query = u.search || ''
+            if (u.pathname.startsWith('/auth/kakao/callback')) {
+              router.replace(`/auth/kakao/callback${query}`)
+              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              return
+            }
+            if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
+              router.replace(`/auth/discord/callback${query}`)
+              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              return
+            }
+            if (isAppScheme && (!u.pathname || u.pathname === '')) {
+              const raw = url.replace('gamesync://', '')
+              const pathAndQuery = raw.startsWith('/') ? raw : `/${raw}`
+              if (pathAndQuery.startsWith('/auth/kakao/callback')) {
+                const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
+                router.replace(`/auth/kakao/callback${q}`)
+                try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                return
+              }
+              if (pathAndQuery.startsWith('/auth/discord/callback') || pathAndQuery.startsWith('/oauth/callback')) {
+                const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
+                router.replace(`/auth/discord/callback${q}`)
+                try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                return
+              }
+            }
+          } catch {}
+        })
+      } catch {}
+    })()
+  }, [router])
+
   return <AuthContext.Provider value={{ user, isLoading }}>{children}</AuthContext.Provider>
 }
