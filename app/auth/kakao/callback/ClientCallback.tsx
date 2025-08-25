@@ -32,6 +32,9 @@ export default function ClientCallback() {
   try { console.log('[CB/kakao] received', { token: token?.slice(0,16)+'...', userLen: userParam?.length }) } catch {}
   const [didAttemptOpenApp, setDidAttemptOpenApp] = useState(false);
   const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
+  const [isNativeEnv, setIsNativeEnv] = useState(false);
+
+  useEffect(() => { (async () => { try { setIsNativeEnv(await isNative()) } catch {} })() }, [])
 
   useEffect(() => {
     if (token) {
@@ -60,7 +63,7 @@ export default function ClientCallback() {
         if (userObj && typeof userObj.id === 'number' && typeof userObj.nickname === 'string') {
           authService.setCurrentUser(userObj);
         }
-        if (oauthTarget === 'mobile-web') {
+        if (oauthTarget === 'mobile-web' || isNativeEnv) {
           try {
             clearCookie('oauth_target');
             const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
