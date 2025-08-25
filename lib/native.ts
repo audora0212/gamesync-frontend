@@ -48,6 +48,16 @@ export async function getLaunchUrl(): Promise<string | null> {
   }
 }
 
+export async function onAppStateChange(callback: (isActive: boolean) => void) {
+  if (!(await isNative())) return () => {};
+  const App: any = getPlugin('App');
+  if (!App || typeof App.addListener !== 'function') return () => {};
+  const sub = await App.addListener('appStateChange', (state: any) => {
+    try { callback(!!state?.isActive); } catch {}
+  });
+  return () => sub?.remove?.();
+}
+
 export async function openExternal(url: string) {
   if (!(await isNative())) {
     window.location.href = url;

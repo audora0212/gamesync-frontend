@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { authService } from "@/lib/auth-service"
 import { requestFcmToken, onForegroundMessage } from "@/lib/fcm"
-import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet, getLaunchUrl } from "@/lib/native"
+import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet, getLaunchUrl, onAppStateChange } from "@/lib/native"
 import { notificationService } from "@/lib/notification-service"
 import { toast } from "sonner"
 
@@ -265,6 +265,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch {}
       } catch {}
     })()
+  }, [router])
+
+  // 앱이 백그라운드→포그라운드로 전환될 때, 콜드스타트 딥링크를 한 번 더 체크 (일부 iOS 버전 대응)
+  useEffect(() => {
+    let unsub: (() => void) | undefined
+    ;(async () => {
+      try {
+        if (!(await isNative())) return
+        unsub = await onAppStateChange(async (isActive) => {
+          if (!isActive) return
+          try {
+            const launchUrl = await getLaunchUrl()
+            if (!launchUrl) return
+            try { console.log('[DL] appStateChange (unauth)', launchUrl) } catch {}
+            try {
+              const u = new URL(launchUrl)
+              const isAppScheme = u.protocol.startsWith('gamesync')
+              const isUniversalLink = (u.protocol === 'https:' && u.host.endsWith('gamesync.cloud'))
+              if (!isAppScheme && !isUniversalLink) return
+              const query = u.search || ''
+              if (u.pathname.startsWith('/auth/kakao/callback')) {
+                router.replace(`/auth/kakao/callback${query}`)
+                try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                return
+              }
+              if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
+                router.replace(`/auth/discord/callback${query}`)
+                try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                return
+              }
+            } catch {}
+          } catch {}
+        })
+      } catch {}
+    })()
+    return () => { try { unsub?.() } catch {} }
   }, [router])
 
   return <AuthContext.Provider value={{ user, isLoading }}>{children}</AuthContext.Provider>
