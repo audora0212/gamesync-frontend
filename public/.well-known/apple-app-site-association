@@ -3,12 +3,8 @@
     "apps": [],
     "details": [
       {
-        "appID": "F9BCX5LCAW.cloud.gamesync.app",
-        "paths": [ 
-          "/oauth/*",
-          "/auth/*",
-          "*"
-        ]
+        "appIDs": ["F9BCX5LCAW.cloud.gamesync.app"],
+        "paths": ["/oauth/*", "/auth/*", "*"]
       }
     ]
   }

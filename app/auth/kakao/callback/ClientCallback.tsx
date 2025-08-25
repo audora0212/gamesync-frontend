@@ -1,15 +1,36 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/lib/auth-service";
 import { toast } from "sonner";
+import { isNative } from "@/lib/native";
+
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const parts = document.cookie.split("; ");
+  for (const p of parts) {
+    const [k, v] = p.split("=");
+    if (k === name) return decodeURIComponent(v || "");
+  }
+  return null;
+}
+
+function clearCookie(name: string) {
+  try {
+    const attrs: string[] = ["path=/", "samesite=lax", "max-age=0"];
+    if (typeof window !== "undefined" && window.location.protocol === "https:") attrs.push("secure");
+    document.cookie = `${name}=; ${attrs.join("; ")}`;
+  } catch {}
+}
 
 export default function ClientCallback() {
   const router = useRouter();
   const params = useSearchParams();
   const token = params.get("token");
   const userParam = params.get("user");
+  const [didAttemptOpenApp, setDidAttemptOpenApp] = useState(false);
+  const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
 
   useEffect(() => {
     if (token && userParam) {
@@ -22,14 +43,30 @@ export default function ClientCallback() {
         return;
       }
       authService.setCurrentUser(userObj);
+      if (oauthTarget === 'mobile-web') {
+        try {
+          clearCookie('oauth_target');
+          const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+          const isIOS = /iphone|ipad|ipod/i.test(ua);
+          const universal = `/auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}`;
+          setDidAttemptOpenApp(true);
+          window.location.href = universal;
+          setTimeout(() => {
+            const tf = process.env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL;
+            if (isIOS && tf) window.location.href = tf;
+          }, 1200);
+          toast.success('앱으로 열기를 시도했어요. 설치되어 있지 않다면 안내로 이동합니다.');
+          return;
+        } catch {}
+      }
       toast.success("카카오 계정으로 로그인했습니다.");
       router.replace("/dashboard");
     } else {
       router.replace("/auth/login");
     }
-  }, [token, userParam, router]);
+  }, [token, userParam, router, oauthTarget]);
 
-  return <div>처리 중입니다…</div>;
+  return <div>처리 중입니다… {didAttemptOpenApp ? '앱 열기를 시도하는 중입니다.' : ''}</div>;
 }
 
 

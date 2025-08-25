@@ -12,6 +12,7 @@ import { toast } from "sonner"
 import { authService } from "@/lib/auth-service"
 import { Loader2, GamepadIcon } from "lucide-react"
 import { DiscordIcon } from "@/components/icons/discord-icon"
+import { isNative } from "@/lib/native"
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
@@ -57,12 +58,36 @@ export default function LoginPage() {
 
   const handleDiscordLogin = () => {
     setIsDiscordLoading(true)
-    // Discord 로그인 페이지로 리다이렉트하기 전에 로딩 상태 표시
+    // 환경에 맞춰 oauth_target 쿠키 설정: app | mobile-web | web
+    try {
+      const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
+      const isMobile = /iphone|ipad|ipod|android|mobile/i.test(ua)
+      ;(async () => {
+        let target: 'app' | 'mobile-web' | 'web' = 'web'
+        try { if (await isNative()) target = 'app'; else if (isMobile) target = 'mobile-web' } catch { if (isMobile) target = 'mobile-web' }
+        const attrs: string[] = ["path=/", "samesite=lax", "max-age=300"]
+        try { if (typeof window !== 'undefined' && window.location.protocol === 'https:') attrs.push("secure") } catch {}
+        document.cookie = `oauth_target=${target}; ${attrs.join("; ")}`
+      })()
+    } catch {}
+    // Discord 로그인 페이지로 이동
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/discord`
   }
 
   const handleKakaoLogin = () => {
     setIsKakaoLoading(true)
+    // 환경에 맞춰 oauth_target 쿠키 설정: app | mobile-web | web
+    try {
+      const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
+      const isMobile = /iphone|ipad|ipod|android|mobile/i.test(ua)
+      ;(async () => {
+        let target: 'app' | 'mobile-web' | 'web' = 'web'
+        try { if (await isNative()) target = 'app'; else if (isMobile) target = 'mobile-web' } catch { if (isMobile) target = 'mobile-web' }
+        const attrs: string[] = ["path=/", "samesite=lax", "max-age=300"]
+        try { if (typeof window !== 'undefined' && window.location.protocol === 'https:') attrs.push("secure") } catch {}
+        document.cookie = `oauth_target=${target}; ${attrs.join("; ")}`
+      })()
+    } catch {}
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/kakao`
   }
 
