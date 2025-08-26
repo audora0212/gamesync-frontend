@@ -67,13 +67,21 @@ export default function ClientCallback() {
         const isIOS = /iphone|ipad|ipod/i.test(ua)
         if (isIOS) {
           try {
+            if (isNativeEnv) {
+              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              try { console.log('[CB/kakao] native webview → dashboard') } catch {}
+              toast.success("카카오 계정으로 로그인했습니다.");
+              router.replace("/dashboard");
+              return;
+            }
+
             clearCookie('oauth_target');
             const universalAbs = `https://gamesync.cloud/auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam || '')}`;
             const appSchemeAbs = `gamesync:///auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam || '')}`;
             setDidAttemptOpenApp(true);
             try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
             try { window.location.href = appSchemeAbs } catch {}
-            setTimeout(() => { try { window.location.href = universalAbs } catch {} }, 600);
+            setTimeout(() => { try { window.location.replace(universalAbs) } catch {} }, 600);
             return;
           } catch {}
         }

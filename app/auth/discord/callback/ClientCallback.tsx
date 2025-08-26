@@ -33,6 +33,9 @@ export default function ClientCallback() {
   try { console.log('[CB/discord] received', { token: token?.slice(0,16)+'...', userLen: userParam?.length }) } catch {}
   const [didAttemptOpenApp, setDidAttemptOpenApp] = useState(false);
   const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
+  const [isNativeEnv, setIsNativeEnv] = useState(false);
+
+  useEffect(() => { (async () => { try { setIsNativeEnv(await isNative()) } catch {} })() }, [])
 
   useEffect(() => {
     if (token) {
@@ -72,15 +75,24 @@ export default function ClientCallback() {
         const isIOS = /iphone|ipad|ipod/i.test(ua)
         if (isIOS) {
           try {
+            // 네이티브 WebView(앱 내부)에서는 딥링크 재시도 없이 바로 복귀 처리
+            if (isNativeEnv) {
+              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              try { console.log('[CB/discord] native webview → dashboard') } catch {}
+              toast.success("디스코드 계정으로 로그인했습니다." as string);
+              router.replace("/dashboard");
+              return;
+            }
+
+            // iOS Safari(SFSafariViewController)에서는 앱 딥링크 → 유니버설 링크 폴백 순으로 시도
             clearCookie('oauth_target');
             const safeUser = typeof userParam === 'string' ? userParam : ''
             const universalAbs = `https://gamesync.cloud/auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
             const appSchemeAbs = `gamesync:///auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
             setDidAttemptOpenApp(true);
-            // 앱 내 Browser에서 열렸다면, 바로 WebView로 돌아갈 것이므로 안내 토스트를 띄우지 않음
             try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
             try { window.location.href = appSchemeAbs } catch {}
-            setTimeout(() => { try { window.location.href = universalAbs } catch {} }, 600);
+            setTimeout(() => { try { window.location.replace(universalAbs) } catch {} }, 600);
             return;
           } catch {}
         }
