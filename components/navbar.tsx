@@ -32,7 +32,9 @@ export function Navbar() {
   const handleLogout = async () => {
     try {
       await authService.logout()
-      window.location.href = "/auth/login"
+      // 로그아웃 직후에는 토큰/유저 정보가 모두 제거되므로
+      // 보호 라우팅 훅이 로그인 페이지로 이동시키기 전, 깜빡임을 줄이기 위해 직접 replace
+      window.location.replace("/auth/login")
     } catch {
       console.error("Logout failed")
     }

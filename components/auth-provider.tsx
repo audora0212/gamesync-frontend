@@ -197,7 +197,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch {}
       })()
     } else if (!pathname.startsWith("/auth")) {
-      // router.push("/auth/login")
+      // 비로그인 상태에서는 전역적으로 로그인 페이지로 유도하되,
+      // 보호 라우팅 훅과 중복 이동을 피하기 위해 여기서는 이동하지 않음
     }
 
     setIsLoading(false)
