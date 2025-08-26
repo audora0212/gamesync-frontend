@@ -48,6 +48,22 @@ export async function getLaunchUrl(): Promise<string | null> {
   }
 }
 
+export async function clearLaunchUrl() {
+  try {
+    if (!(await isNative())) return;
+    const App: any = getPlugin('App');
+    // Launch URL을 클리어하는 방법 - 빈 문자열로 설정
+    if (App && typeof App.getLaunchUrl === 'function') {
+      // Capacitor doesn't have a direct clear method, but we can work around it
+      // by setting a flag in storage that the launch URL has been processed
+      const Preferences: any = getPlugin('Preferences');
+      if (Preferences) {
+        await Preferences.set({ key: 'launch_url_processed', value: 'true' });
+      }
+    }
+  } catch {}
+}
+
 export async function onAppStateChange(callback: (isActive: boolean) => void) {
   if (!(await isNative())) return () => {};
   const App: any = getPlugin('App');

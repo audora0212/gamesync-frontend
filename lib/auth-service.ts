@@ -113,11 +113,12 @@ class AuthService {
     // 모든 로컬 데이터 즉시 삭제
     this.clearAllAuthData()
     
-    // 네이티브 앱인 경우 secure storage도 클리어
+    // 네이티브 앱인 경우 secure storage와 launch URL 클리어
     try {
-      const { isNative, secureRemove } = await import("@/lib/native")
+      const { isNative, secureRemove, clearLaunchUrl } = await import("@/lib/native")
       if (await isNative()) {
         await secureRemove("auth-token")
+        await clearLaunchUrl()
       }
     } catch {}
   }

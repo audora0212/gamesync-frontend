@@ -33,15 +33,16 @@ export function Navbar() {
     try {
       // 로그아웃 처리 (localStorage, cookie, secure storage 모두 클리어)
       await authService.logout()
-      // 즉시 로그인 페이지로 이동 (history 스택에 남기지 않음)
+      // 완전히 새로운 페이지로 이동 (기존 라우터 상태/히스토리 모두 클리어)
       setTimeout(() => {
-        window.location.replace("/auth/login")
+        // href를 사용하여 완전히 새로운 페이지 로드
+        window.location.href = "/auth/login"
       }, 100) // 작은 딜레이로 상태 정리 시간 확보
     } catch {
       console.error("Logout failed")
       // 실패해도 강제로 로그인 페이지로 이동
       authService.clearAllAuthData()
-      window.location.replace("/auth/login")
+      window.location.href = "/auth/login"
     }
   }
 

@@ -48,28 +48,34 @@ export default function ClientCallback() {
   useEffect(() => { (async () => { try { if (await isNative()) clearCookie('oauth_target') } catch {} })() }, [])
 
   useEffect(() => {
-    // 이미 처리 중이거나 토큰이 없으면 무시
+    // 이미 처리 중이면 무시
     if (isProcessing) return;
-    if (token) {
-      setIsProcessing(true); // 중복 실행 방지
-      try { console.log('[CB/discord] setToken') } catch {}
-      authService.setToken(token);
-      // 쿠키에도 저장되어 서버 사이드에서 랜딩 접근 시 대시보드로 리다이렉트 가능
-      // setToken 내부에서 쿠키도 함께 설정되도록 변경됨
-      // Store token securely when native
-      (async () => { try { if (await isNative()) await secureSet('auth-token', token) } catch {} })()
-      let userObj: any = null;
-      if (userParam) {
-        // 1) 이미 디코드된 문자열일 수 있어 순차적으로 파싱 시도
-        try {
-          try { console.log('[CB/discord] parse userParam len', userParam.length) } catch {}
-          userObj = JSON.parse(userParam);
-        } catch {
-          try { userObj = JSON.parse(decodeURIComponent(userParam)) } catch {}
-        }
+    
+    // 토큰이 없으면 즉시 로그인 페이지로
+    if (!token) {
+      router.replace("/auth/login");
+      return;
+    }
+    
+    setIsProcessing(true); // 중복 실행 방지
+    try { console.log('[CB/discord] setToken') } catch {}
+    authService.setToken(token);
+    // 쿠키에도 저장되어 서버 사이드에서 랜딩 접근 시 대시보드로 리다이렉트 가능
+    // setToken 내부에서 쿠키도 함께 설정되도록 변경됨
+    // Store token securely when native
+    (async () => { try { if (await isNative()) await secureSet('auth-token', token) } catch {} })()
+    let userObj: any = null;
+    if (userParam) {
+      // 1) 이미 디코드된 문자열일 수 있어 순차적으로 파싱 시도
+      try {
+        try { console.log('[CB/discord] parse userParam len', userParam.length) } catch {}
+        userObj = JSON.parse(userParam);
+      } catch {
+        try { userObj = JSON.parse(decodeURIComponent(userParam)) } catch {}
       }
-      // 2) 파싱 실패 시 /api/users/me로 프로필 조회 (토큰만으로 진행)
-      ;(async () => {
+    }
+    // 2) 파싱 실패 시 /api/users/me로 프로필 조회 (토큰만으로 진행)
+    ;(async () => {
         if (!userObj) {
           try {
             const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api'
@@ -116,11 +122,8 @@ export default function ClientCallback() {
         try { console.log('[CB/discord] success → dashboard') } catch {}
         toast.success("디스코드 계정으로 로그인했습니다." as string);
         router.replace("/dashboard");
-      })()
-      // 위에서 라우팅 처리되므로 중복 호출 제거
-    } else {
-      router.replace("/auth/login");
-    }
+    })()
+    // 위에서 라우팅 처리되므로 중복 호출 제거
   }, [token, userParam, router, oauthTarget]);
 
   const tf = (process as any).env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL as string | undefined

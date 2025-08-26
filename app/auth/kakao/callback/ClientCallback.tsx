@@ -47,22 +47,28 @@ export default function ClientCallback() {
   useEffect(() => { (async () => { try { if (await isNative()) clearCookie('oauth_target') } catch {} })() }, [])
 
   useEffect(() => {
-    // 이미 처리 중이거나 토큰이 없으면 무시
+    // 이미 처리 중이면 무시
     if (isProcessing) return;
-    if (token) {
-      setIsProcessing(true); // 중복 실행 방지
-      try { console.log('[CB/kakao] setToken') } catch {}
-      authService.setToken(token);
-      let userObj: any = null;
-      if (userParam) {
-        try {
-          try { console.log('[CB/kakao] parse userParam len', userParam.length) } catch {}
-          userObj = JSON.parse(userParam);
-        } catch {
-          try { userObj = JSON.parse(decodeURIComponent(userParam)) } catch {}
-        }
+    
+    // 토큰이 없으면 즉시 로그인 페이지로
+    if (!token) {
+      router.replace("/auth/login");
+      return;
+    }
+    
+    setIsProcessing(true); // 중복 실행 방지
+    try { console.log('[CB/kakao] setToken') } catch {}
+    authService.setToken(token);
+    let userObj: any = null;
+    if (userParam) {
+      try {
+        try { console.log('[CB/kakao] parse userParam len', userParam.length) } catch {}
+        userObj = JSON.parse(userParam);
+      } catch {
+        try { userObj = JSON.parse(decodeURIComponent(userParam)) } catch {}
       }
-      ;(async () => {
+    }
+    ;(async () => {
         if (!userObj) {
           try {
             const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api'
@@ -105,32 +111,7 @@ export default function ClientCallback() {
         try { console.log('[CB/kakao] success → dashboard') } catch {}
         toast.success("카카오 계정으로 로그인했습니다.");
         router.replace("/dashboard");
-      })()
-      if (oauthTarget === 'mobile-web') {
-        try {
-          clearCookie('oauth_target');
-          const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-          const isIOS = /iphone|ipad|ipod/i.test(ua);
-          const safeUser = typeof userParam === 'string' ? userParam : ''
-          const universalAbs = `https://gamesync.cloud/auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
-          const appSchemeAbs = `gamesync:///auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
-          setDidAttemptOpenApp(true);
-          try { window.location.href = appSchemeAbs } catch {}
-          setTimeout(() => { try { window.location.href = universalAbs } catch {} }, 600);
-          setTimeout(() => {
-            const tf = process.env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL;
-            if (isIOS && tf) window.location.href = tf;
-          }, 1400);
-          toast.success('앱으로 열기를 시도했어요. 설치되어 있지 않다면 안내로 이동합니다.');
-          return;
-        } catch {}
-      }
-      try { console.log('[CB/kakao] success → dashboard') } catch {}
-      toast.success("카카오 계정으로 로그인했습니다.");
-      router.replace("/dashboard");
-    } else {
-      router.replace("/auth/login");
-    }
+    })()
   }, [token, userParam, router, oauthTarget]);
 
   const tf = (process as any).env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL as string | undefined
