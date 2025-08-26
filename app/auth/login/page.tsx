@@ -24,12 +24,23 @@ export default function LoginPage() {
   const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
   const inviteCode = params?.get("code") || null
   const returnUrl = params?.get("return") || null
+  const error = params?.get("error") || null
+  const existingProvider = params?.get("existingProvider") || null
 
   useEffect(() => {
     if (authService.isAuthenticated()) {
       router.replace("/dashboard")
     }
-  }, [router])
+    if (error === 'oauth_email_linked') {
+      if (existingProvider === 'kakao') {
+        toast.error('이미 카카오 계정으로 가입된 이메일입니다. 카카오로 로그인해 주세요.')
+      } else if (existingProvider === 'discord') {
+        toast.error('이미 디스코드 계정으로 가입된 이메일입니다. 디스코드로 로그인해 주세요.')
+      } else {
+        toast.error('이미 가입된 이메일입니다. 해당 소셜로 로그인해 주세요.')
+      }
+    }
+  }, [router, error, existingProvider])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
