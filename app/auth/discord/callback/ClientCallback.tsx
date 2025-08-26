@@ -68,7 +68,7 @@ export default function ClientCallback() {
           authService.setCurrentUser(userObj);
         }
         // 모바일 웹 → 앱 열기 로직 및 라우팅은 아래로 유지
-        if (oauthTarget === 'mobile-web' || (await isNative())) {
+        if (await isNative()) {
           try {
             clearCookie('oauth_target');
             const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
@@ -77,13 +77,10 @@ export default function ClientCallback() {
             const universalAbs = `https://gamesync.cloud/auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
             const appSchemeAbs = `gamesync:///auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
             setDidAttemptOpenApp(true);
+            // 앱 내 Browser에서 열렸다면, 바로 WebView로 돌아갈 것이므로 안내 토스트를 띄우지 않음
+            try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
             try { window.location.href = appSchemeAbs } catch {}
             setTimeout(() => { try { window.location.href = universalAbs } catch {} }, 600);
-            setTimeout(() => {
-              const tf = process.env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL as string | undefined;
-              if (isIOS && typeof tf === 'string' && tf.length > 0) window.location.href = tf;
-            }, 1400);
-            toast.success('앱으로 열기를 시도했어요. 설치되어 있지 않다면 안내로 이동합니다.' as string);
             return;
           } catch {}
         }
@@ -91,9 +88,7 @@ export default function ClientCallback() {
         toast.success("디스코드 계정으로 로그인했습니다." as string);
         router.replace("/dashboard");
       })()
-      try { console.log('[CB/discord] success → dashboard') } catch {}
-      toast.success("디스코드 계정으로 로그인했습니다.");
-      router.replace("/dashboard");
+      // 위에서 라우팅 처리되므로 중복 호출 제거
     } else {
       router.replace("/auth/login");
     }

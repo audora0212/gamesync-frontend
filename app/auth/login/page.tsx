@@ -87,7 +87,8 @@ export default function LoginPage() {
   const handleDiscordLogin = async () => {
     setIsDiscordLoading(true)
     const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
-    const target = isNativeWebView() ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    // 인앱 브라우저(SFSafariViewController)에서는 콜백 페이지에서 Browser.close()로 복귀하므로 웹 콜백을 사용
+    const target = isNativeWebView() ? "web" : (isIOSMobileWeb() ? "mobile-web" : "web")
     // Safari 쿠키 분리 회피를 위해 target 파라미터를 쿼리로 전달 (서버 필터가 쿠키로 저장)
     const url = `${base}/oauth2/authorization/discord?target=${encodeURIComponent(target)}`
     if (isNativeWebView()) {
@@ -100,7 +101,7 @@ export default function LoginPage() {
   const handleKakaoLogin = async () => {
     setIsKakaoLoading(true)
     const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
-    const target = isNativeWebView() ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    const target = isNativeWebView() ? "web" : (isIOSMobileWeb() ? "mobile-web" : "web")
     const url = `${base}/oauth2/authorization/kakao?target=${encodeURIComponent(target)}`
     if (isNativeWebView()) {
       try { await openExternal(url) } catch { window.location.href = url }
