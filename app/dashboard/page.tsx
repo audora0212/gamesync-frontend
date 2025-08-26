@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,9 +21,11 @@ import { JoinByCodeModal } from "@/components/join-by-code-modal";
 import { Navbar } from "@/components/navbar";
 import { Plus, Users, Clock, Flame, Star } from "lucide-react";
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute";
+import { useAuth } from "@/components/auth-provider";
 
 export default function DashboardPage() {
   useProtectedRoute();
+  const { user: authUser, isLoading: authLoading } = useAuth();
 
   const [servers, setServers] = useState<IServer[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set());
@@ -32,40 +34,78 @@ export default function DashboardPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const router = useRouter();
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    loadServersAndFavorites();
-  }, []);
+    // 인증이 완료되고 user가 있을 때만 API 호출
+    if (!authLoading && authUser) {
+      loadServersAndFavorites();
+    } else if (!authLoading && !authUser) {
+      // 인증이 없으면 로딩 상태를 false로 설정
+      setIsLoading(false);
+    }
+    
+    // cleanup: 컴포넌트 unmount 시 진행 중인 API 호출 취소
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [authLoading, authUser]);
 
   const loadServers = async () => {
+    // AuthProvider 상태 확인
+    if (!authUser) return;
+    
     setIsLoading(true);
     try {
       const data = await serverService.getMyServers();
       setServers(data);
       await buildFriendSummaries(data);
-    } catch {
-      toast.error("서버 로드 실패", {
-        description: "내 서버 정보를 불러오는데 실패했습니다.",
-      });
+    } catch (error: any) {
+      // 취소된 요청은 무시
+      if (error?.name !== 'AbortError') {
+        toast.error("서버 로드 실패", {
+          description: "내 서버 정보를 불러오는데 실패했습니다.",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   const loadServersAndFavorites = async () => {
+    // AuthProvider 상태 확인
+    if (!authUser) return;
+    
+    // 이전 요청 취소
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // 새 AbortController 생성
+    abortControllerRef.current = new AbortController();
+    
     setIsLoading(true);
     try {
       const [data, favs] = await Promise.all([
         serverService.getMyServers(),
         serverService.getMyFavorites(),
       ]);
-      setServers(data);
-      setFavoriteIds(new Set(favs.map((s) => s.id)));
-      await buildFriendSummaries(data);
-    } catch {
-      toast.error("서버 로드 실패", {
-        description: "내 서버 정보를 불러오는데 실패했습니다.",
-      });
+      
+      // 취소되지 않았다면 상태 업데이트
+      if (!abortControllerRef.current.signal.aborted) {
+        setServers(data);
+        setFavoriteIds(new Set(favs.map((s) => s.id)));
+        await buildFriendSummaries(data);
+      }
+    } catch (error: any) {
+      // 취소된 요청은 무시
+      if (error?.name !== 'AbortError') {
+        toast.error("서버 로드 실패", {
+          description: "내 서버 정보를 불러오는데 실패했습니다.",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -139,7 +179,8 @@ export default function DashboardPage() {
     });
   };
 
-  if (isLoading) {
+  // AuthProvider가 로딩 중이거나 user가 없으면 로딩 표시
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen">
         <Navbar />
@@ -150,6 +191,11 @@ export default function DashboardPage() {
         </div>
       </div>
     );
+  }
+  
+  // 인증되지 않은 상태
+  if (!authUser) {
+    return null; // useProtectedRoute가 리다이렉트 처리
   }
 
   const currentUserId = authService.getCurrentUserId();

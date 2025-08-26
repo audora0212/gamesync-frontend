@@ -23,12 +23,16 @@ export function Navbar() {
     // 클라이언트에서만 실행
     const nickname = authService.getCurrentUser()
     setUser(nickname)
-    ;(async () => {
-      try {
-        const data = await notificationService.getNotifications()
-        setUnread(data.unreadCount)
-      } catch {}
-    })()
+    
+    // 인증된 사용자만 알림 API 호출
+    if (nickname) {
+      ;(async () => {
+        try {
+          const data = await notificationService.getNotifications()
+          setUnread(data.unreadCount)
+        } catch {}
+      })()
+    }
   }, [])
 
   const handleLogout = async () => {

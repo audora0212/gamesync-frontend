@@ -146,6 +146,20 @@ class AuthService {
       localStorage.removeItem(this.userKey)
       localStorage.removeItem(this.userIdKey)
       localStorage.removeItem(this.fcmTokenKey)
+      // 추가로 가능한 모든 auth 관련 키 제거
+      const keysToRemove = []
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && (key.includes('auth') || key.includes('token') || key.includes('user'))) {
+          keysToRemove.push(key)
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key))
+    } catch {}
+    
+    // sessionStorage도 클리어
+    try {
+      sessionStorage.clear()
     } catch {}
     
     // 쿠키 클리어
@@ -203,13 +217,41 @@ class AuthService {
 
   private clearAuthCookie() {
     try {
-      let attrs: string[] = ["Path=/", "SameSite=None", "Max-Age=0"]
-      try {
-        if (typeof window !== "undefined" && window.location.protocol === "https:") {
-          attrs.push("Secure")
+      // 모든 경로와 도메인에서 쿠키 삭제 시도
+      const domains = [
+        window.location.hostname,
+        `.${window.location.hostname}`,
+        ''
+      ]
+      
+      const paths = ['/', '/auth', '/dashboard', '']
+      
+      domains.forEach(domain => {
+        paths.forEach(path => {
+          let attrs: string[] = ["Max-Age=0", "expires=Thu, 01 Jan 1970 00:00:00 GMT"]
+          
+          if (path) attrs.push(`Path=${path}`)
+          if (domain) attrs.push(`Domain=${domain}`)
+          
+          attrs.push("SameSite=None")
+          
+          if (typeof window !== "undefined" && window.location.protocol === "https:") {
+            attrs.push("Secure")
+          }
+          
+          document.cookie = `auth-token=; ${attrs.join("; ")}`
+        })
+      })
+      
+      // 추가로 다른 가능한 auth 관련 쿠키들도 삭제
+      const cookies = document.cookie.split(';')
+      cookies.forEach(cookie => {
+        const eqPos = cookie.indexOf('=')
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim()
+        if (name.includes('auth') || name.includes('token') || name.includes('session')) {
+          document.cookie = `${name}=; Max-Age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/`
         }
-      } catch {}
-      document.cookie = `auth-token=; ${attrs.join("; ")}`
+      })
     } catch {}
   }
 }

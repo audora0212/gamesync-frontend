@@ -69,19 +69,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // 2. 상태를 즉시 초기화
       setUser(null)
       
-      // 3. authService로 백엔드 로그아웃 및 로컬 데이터 정리
+      // 3. 모든 진행 중인 네트워크 요청 취소 시도
+      try {
+        // 모든 fetch 요청에 AbortController 신호 전달하여 취소
+        const abortController = new AbortController()
+        abortController.abort()
+      } catch {}
+      
+      // 4. authService로 백엔드 로그아웃 및 로컬 데이터 정리
       await authService.logout()
       
-      // 4. 완전한 페이지 새로고침으로 모든 상태 초기화
-      window.location.href = "/auth/login"
+      // 5. replace를 사용하여 히스토리 스택에서 현재 페이지 제거
+      // 이렇게 하면 뒤로가기로 대시보드로 돌아갈 수 없음
+      window.location.replace("/auth/login")
     } catch (error) {
       console.error("Logout error:", error)
-      // 실패해도 강제로 로그인 페이지로 이동
+      // 실패해도 강제로 로그인 페이지로 이동 (히스토리 제거)
       authService.clearAllAuthData()
-      window.location.href = "/auth/login"
-    } finally {
-      setIsLoggingOut(false)
+      window.location.replace("/auth/login")
     }
+    // finally 블록 제거 - 페이지가 이동되므로 상태 업데이트 불필요
   }
 
   useEffect(() => {
@@ -114,8 +121,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
             // Listen deep links (e.g., gamesync://oauth/callback?code=...)
             const unsub = await onAppUrlOpen((url) => {
-              // 토큰이 없으면 리스너가 동작하지 않도록  
-              if (!authService.getToken()) return;
+              // 로그아웃 중이거나 토큰이 없으면 리스너가 동작하지 않도록  
+              if (isLoggingOut || !authService.getToken()) return;
               try { console.log('[DL] appUrlOpen (authed)', url) } catch {}
               try {
                 const u = new URL(url)
@@ -264,7 +271,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cleanupDeepLinkListeners()
     }
-  }, [pathname, router])
+  }, [pathname, router, isLoggingOut])
 
   // 로그인 전에도 딥링크를 처리하여 콜백 페이지로 이동할 수 있도록 리스너를 등록
   useEffect(() => {
@@ -273,6 +280,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ;(async () => {
       try {
         unsub = await onAppUrlOpen((url) => {
+          // 로그아웃 중이면 동작하지 않음
+          if (isLoggingOut) return;
           try {
             const u = new URL(url)
             const isAppScheme = u.protocol.startsWith('gamesync')
@@ -314,7 +323,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch {}
     })()
     return () => { try { unsub?.() } catch {} }
-  }, [router])
+  }, [router, isLoggingOut])
 
   // 로그인 전 콜드 스타트 딥링크 처리 (앱이 URL로 런치된 경우)
   useEffect(() => {
@@ -362,7 +371,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch {}
       } catch {}
     })()
-  }, [router])
+  }, [router, isLoggingOut])
 
   // 앱이 백그라운드→포그라운드로 전환될 때, 콜드스타트 딥링크를 한 번 더 체크 (일부 iOS 버전 대응)
   useEffect(() => {
@@ -400,7 +409,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch {}
     })()
     return () => { try { unsub?.() } catch {} }
-  }, [router])
+  }, [router, isLoggingOut])
 
   return <AuthContext.Provider value={{ user, isLoading, logout }}>{children}</AuthContext.Provider>
 }
