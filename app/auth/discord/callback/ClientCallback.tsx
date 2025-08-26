@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/lib/auth-service";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { toast } from "sonner";
-import { secureSet, isNative, closeBrowser } from "@/lib/native";
+import { secureSet, isNative, closeBrowser, markLaunchUrlProcessed } from "@/lib/native";
 
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
@@ -111,6 +111,8 @@ export default function ClientCallback() {
             if (await isNative()) {
               // Capacitor Browser 플러그인으로 브라우저 닫기
               await closeBrowser();
+              // 런치 URL 처리 완료 마킹 (iOS에서 재실행 방지)
+              try { await markLaunchUrlProcessed(`gamesync:///auth/discord/callback`) } catch {}
               try { console.log('[CB/discord] native webview → dashboard') } catch {}
               toast.success("디스코드 계정으로 로그인했습니다." as string);
               router.replace("/dashboard");

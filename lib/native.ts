@@ -42,7 +42,19 @@ export async function getLaunchUrl(): Promise<string | null> {
     const App: any = getPlugin('App');
     if (!App || typeof App.getLaunchUrl !== 'function') return null;
     const res = await App.getLaunchUrl();
-    return res?.url ?? null;
+    const url: string | null = res?.url ?? null;
+    if (!url) return null;
+    // 이미 처리한 런치 URL이면 무시 (Preferences에 최종 처리된 값 저장)
+    const Preferences: any = getPlugin('Preferences');
+    if (Preferences && typeof Preferences.get === 'function') {
+      try {
+        const prev = await Preferences.get({ key: 'last_launch_url_processed' });
+        if (prev?.value && prev.value === url) {
+          return null;
+        }
+      } catch {}
+    }
+    return url;
   } catch {
     return null;
   }
@@ -58,8 +70,18 @@ export async function clearLaunchUrl() {
       // by setting a flag in storage that the launch URL has been processed
       const Preferences: any = getPlugin('Preferences');
       if (Preferences) {
-        await Preferences.set({ key: 'launch_url_processed', value: 'true' });
+        await Preferences.set({ key: 'last_launch_url_processed', value: 'CLEARED' });
       }
+    }
+  } catch {}
+}
+
+export async function markLaunchUrlProcessed(url: string) {
+  try {
+    if (!(await isNative())) return;
+    const Preferences: any = getPlugin('Preferences');
+    if (Preferences && typeof Preferences.set === 'function') {
+      await Preferences.set({ key: 'last_launch_url_processed', value: url || 'CLEARED' });
     }
   } catch {}
 }
