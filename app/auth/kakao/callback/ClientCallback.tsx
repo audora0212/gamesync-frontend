@@ -63,11 +63,11 @@ export default function ClientCallback() {
         if (userObj && typeof userObj.id === 'number' && typeof userObj.nickname === 'string') {
           authService.setCurrentUser(userObj);
         }
-        if (isNativeEnv) {
+        const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
+        const isIOS = /iphone|ipad|ipod/i.test(ua)
+        if (isIOS) {
           try {
             clearCookie('oauth_target');
-            const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-            const isIOS = /iphone|ipad|ipod/i.test(ua);
             const universalAbs = `https://gamesync.cloud/auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam || '')}`;
             const appSchemeAbs = `gamesync:///auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam || '')}`;
             setDidAttemptOpenApp(true);

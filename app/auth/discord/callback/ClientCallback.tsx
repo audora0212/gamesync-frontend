@@ -68,11 +68,11 @@ export default function ClientCallback() {
           authService.setCurrentUser(userObj);
         }
         // 모바일 웹 → 앱 열기 로직 및 라우팅은 아래로 유지
-        if (await isNative()) {
+        const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
+        const isIOS = /iphone|ipad|ipod/i.test(ua)
+        if (isIOS) {
           try {
             clearCookie('oauth_target');
-            const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-            const isIOS = /iphone|ipad|ipod/i.test(ua);
             const safeUser = typeof userParam === 'string' ? userParam : ''
             const universalAbs = `https://gamesync.cloud/auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
             const appSchemeAbs = `gamesync:///auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
