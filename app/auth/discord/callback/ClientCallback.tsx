@@ -43,6 +43,8 @@ export default function ClientCallback() {
   })()
 
   useEffect(() => { (async () => { try { setIsNativeEnv(await isNative()) } catch {} })() }, [])
+  // 네이티브 앱 환경에서는 oauth_target 쿠키가 남아 메시지가 보이지 않도록 초기화
+  useEffect(() => { (async () => { try { if (await isNative()) clearCookie('oauth_target') } catch {} })() }, [])
 
   useEffect(() => {
     if (token) {
@@ -83,12 +85,13 @@ export default function ClientCallback() {
         if (isIOS) {
           try {
             // 네이티브 WebView(앱 내부)에서는 딥링크 재시도 없이 바로 복귀 처리
-            if (isNativeEnv) {
+            if (await isNative()) {
               // Capacitor Browser 플러그인으로 브라우저 닫기
               await closeBrowser();
               try { console.log('[CB/discord] native webview → dashboard') } catch {}
               toast.success("디스코드 계정으로 로그인했습니다." as string);
               router.replace("/dashboard");
+              setDidAttemptOpenApp(false);
               return;
             }
 
@@ -122,7 +125,7 @@ export default function ClientCallback() {
   return (
     <div style={{padding:16}}>
       처리 중입니다… {didAttemptOpenApp ? '앱 열기를 시도하는 중입니다.' : ''}
-      {oauthTarget === 'mobile-web' && (
+      {oauthTarget === 'mobile-web' && !isNativeEnv && (
         <div style={{marginTop:16, display:'flex', gap:12}}>
           <a href={deeplink} style={{padding:'10px 14px', background:'#0b0e14', color:'#fff', borderRadius:8}}>앱에서 열기</a>
           <a href={universal} style={{padding:'10px 14px', background:'#222', color:'#fff', borderRadius:8}}>유니버설 링크</a>
