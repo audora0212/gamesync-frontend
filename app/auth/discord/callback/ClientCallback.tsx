@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/lib/auth-service";
+import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { toast } from "sonner";
 import { secureSet, isNative, closeBrowser } from "@/lib/native";
 
@@ -48,6 +49,17 @@ export default function ClientCallback() {
   useEffect(() => { (async () => { try { if (await isNative()) clearCookie('oauth_target') } catch {} })() }, [])
 
   useEffect(() => {
+    // 재실행 방지: 세션 플래그 확인
+    const processedKey = 'oauth_discord_processed'
+    try {
+      const already = typeof window !== 'undefined' ? sessionStorage.getItem(processedKey) === '1' : false
+      if (already) {
+        ;(async () => { try { if (await isNative()) await closeBrowser() } catch {} })()
+        router.replace('/auth/login')
+        return
+      }
+    } catch {}
+
     // 이미 처리 중이면 무시
     if (isProcessing) return;
     
@@ -58,6 +70,7 @@ export default function ClientCallback() {
     }
     
     setIsProcessing(true); // 중복 실행 방지
+    try { if (typeof window !== 'undefined') sessionStorage.setItem('oauth_discord_processed', '1') } catch {}
     try { console.log('[CB/discord] setToken') } catch {}
     authService.setToken(token);
     // 쿠키에도 저장되어 서버 사이드에서 랜딩 접근 시 대시보드로 리다이렉트 가능
@@ -79,7 +92,7 @@ export default function ClientCallback() {
         if (!userObj) {
           try {
             const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api'
-            const res = await fetch(`${API_BASE}/users/me`, { headers: authService.getAuthHeaders() })
+            const res = await fetchWithAuth(`${API_BASE}/users/me`)
             if (res.ok) {
               const prof = await res.json()
               userObj = { id: prof?.id ?? prof?.userId, nickname: prof?.nickname ?? prof?.name ?? 'User' }

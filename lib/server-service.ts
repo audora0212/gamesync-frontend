@@ -136,13 +136,12 @@ class ServerService {
   }
 
   async joinByCode(code: string): Promise<Server> {
-  const res = await fetch(`${API_BASE}/servers/join?code=${code}`, {
-    method: "POST",
-    headers: authService.getAuthHeaders(),
-  })
-  if (!res.ok) throw new Error("Invalid code")
-  return res.json()
-}
+    const res = await fetchWithAuth(`${API_BASE}/servers/join?code=${code}`, {
+      method: "POST",
+    })
+    if (!res.ok) throw new Error("Invalid code")
+    return res.json()
+  }
 
   async lookupByCode(code: string): Promise<Server> {
     const res = await fetchWithAuth(`${API_BASE}/servers/lookup?code=${code}`)
@@ -155,9 +154,7 @@ class ServerService {
     qs.append("page", params.page.toString());
     qs.append("size", params.size.toString());
     if (params.q) qs.append("q", params.q);
-    const res = await fetchWithAuth(`${API_BASE}/servers/search?${qs}`, {
-      headers: authService.getAuthHeaders(),
-    });
+    const res = await fetchWithAuth(`${API_BASE}/servers/search?${qs}`);
     if (!res.ok) throw new Error("Failed to search servers");
     return res.json();
   }
@@ -165,7 +162,6 @@ class ServerService {
   async joinServer(id: number): Promise<Server> {
     const res = await fetchWithAuth(`${API_BASE}/servers/${id}/join`, {
       method: "POST",
-      headers: authService.getAuthHeaders(),
     });
     if (!res.ok) throw new Error("Failed to join server");
     return res.json();

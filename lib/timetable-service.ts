@@ -1,4 +1,5 @@
 import { authService } from "./auth-service"
+import { fetchWithAuth } from "./fetch-with-auth"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api"
 
@@ -31,9 +32,7 @@ class TimetableService {
     if (game) params.append("game", game)
     if (sortByGame) params.append("sortByGame", "true")
 
-    const response = await fetch(`${API_BASE}/servers/${serverId}/timetable?${params}`, {
-      headers: authService.getAuthHeaders(),
-    })
+    const response = await fetchWithAuth(`${API_BASE}/servers/${serverId}/timetable?${params}`)
 
     if (!response.ok) {
       throw new Error("Failed to fetch timetable")
@@ -43,11 +42,10 @@ class TimetableService {
   }
 
   async addEntry(data: TimetableEntryRequest): Promise<TimetableEntry> {
-    const response = await fetch(`${API_BASE}/servers/${data.serverId}/timetable`, {
+    const response = await fetchWithAuth(`${API_BASE}/servers/${data.serverId}/timetable`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...authService.getAuthHeaders(),
       },
       body: JSON.stringify(data),
     })
@@ -60,9 +58,7 @@ class TimetableService {
   }
 
   async getStats(serverId: number): Promise<TimetableStats> {
-    const response = await fetch(`${API_BASE}/servers/${serverId}/timetable/stats`, {
-      headers: authService.getAuthHeaders(),
-    })
+    const response = await fetchWithAuth(`${API_BASE}/servers/${serverId}/timetable/stats`)
 
     if (!response.ok) {
       throw new Error("Failed to fetch stats")
@@ -72,9 +68,8 @@ class TimetableService {
   }
 
   async deleteMyEntry(serverId: number): Promise<void> {
-    const response = await fetch(`${API_BASE}/servers/${serverId}/timetable`, {
+    const response = await fetchWithAuth(`${API_BASE}/servers/${serverId}/timetable`, {
       method: "DELETE",
-      headers: authService.getAuthHeaders(),
     })
     if (!response.ok) {
       throw new Error("Failed to delete timetable entry")
