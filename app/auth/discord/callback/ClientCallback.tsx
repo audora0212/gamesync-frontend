@@ -34,6 +34,13 @@ export default function ClientCallback() {
   const [didAttemptOpenApp, setDidAttemptOpenApp] = useState(false);
   const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
   const [isNativeEnv, setIsNativeEnv] = useState(false);
+  const isDebug = (() => {
+    try {
+      if (typeof window === 'undefined') return false
+      const usp = new URLSearchParams(window.location.search)
+      return usp.get('debug') === '1'
+    } catch { return false }
+  })()
 
   useEffect(() => { (async () => { try { setIsNativeEnv(await isNative()) } catch {} })() }, [])
 
@@ -90,9 +97,11 @@ export default function ClientCallback() {
             const universalAbs = `https://gamesync.cloud/auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
             const appSchemeAbs = `gamesync:///auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(safeUser)}`;
             setDidAttemptOpenApp(true);
+            if (isDebug) { try { (window as any).console?.log?.('[CB/discord] try deep link & universal') } catch {} }
             try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
             try { window.location.href = appSchemeAbs } catch {}
             setTimeout(() => { try { window.location.replace(universalAbs) } catch {} }, 600);
+            setTimeout(() => { try { (window as any)?.Capacitor?.Browser?.close?.() } catch {} }, 900);
             return;
           } catch {}
         }

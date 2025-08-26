@@ -28,6 +28,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
+  const isDebug = (() => {
+    try {
+      if (typeof window === 'undefined') return false
+      const usp = new URLSearchParams(window.location.search)
+      return usp.get('debug') === '1'
+    } catch { return false }
+  })()
+
+  const closeBrowserWithRetries = (label?: string) => {
+    try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+    setTimeout(() => { try { (window as any)?.Capacitor?.Browser?.close?.() } catch {} }, 350)
+    setTimeout(() => { try { (window as any)?.Capacitor?.Browser?.close?.() } catch {} }, 1000)
+  }
+
   useEffect(() => {
     const token = authService.getToken()
     const currentUser = authService.getCurrentUser()
@@ -58,14 +72,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (u.pathname.startsWith('/auth/kakao/callback')) {
                   try { console.log('[DL] route→ /auth/kakao/callback', query) } catch {}
                   router.replace(`/auth/kakao/callback${query}`)
-                  try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                  if (isDebug) { try { toast('DL route: kakao', { description: 'closing browser (authed)' }) } catch {} }
+                  closeBrowserWithRetries('authed/kakao')
                   return
                 }
                 // Discord
                 if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
                   try { console.log('[DL] route→ /auth/discord/callback', query) } catch {}
                   router.replace(`/auth/discord/callback${query}`)
-                  try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                  if (isDebug) { try { toast('DL route: discord', { description: 'closing browser (authed)' }) } catch {} }
+                  closeBrowserWithRetries('authed/discord')
                   return
                 }
                 // 일부 iOS 버전에서 커스텀 스킴이 'gamesync:///auth/..'로 넘어올 때 pathname이 빈 문자열로 파싱될 수 있어 보정
@@ -76,14 +92,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     try { console.log('[DL] (fallback) route→ /auth/kakao/callback', pathAndQuery) } catch {}
                     const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
                     router.replace(`/auth/kakao/callback${q}`)
-                    try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                    if (isDebug) { try { toast('DL route: kakao(fallback)', { description: 'closing browser (authed)' }) } catch {} }
+                    closeBrowserWithRetries('authed/kakao/fallback')
                     return
                   }
                   if (pathAndQuery.startsWith('/auth/discord/callback') || pathAndQuery.startsWith('/oauth/callback')) {
                     try { console.log('[DL] (fallback) route→ /auth/discord/callback', pathAndQuery) } catch {}
                     const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
                     router.replace(`/auth/discord/callback${q}`)
-                    try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                    if (isDebug) { try { toast('DL route: discord(fallback)', { description: 'closing browser (authed)' }) } catch {} }
+                    closeBrowserWithRetries('authed/discord/fallback')
                     return
                   }
                 }
@@ -104,20 +122,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     const query = u.search || ''
                     if (u.pathname.startsWith('/auth/kakao/callback')) {
                       router.replace(`/auth/kakao/callback${query}`)
-                      try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                      if (isDebug) { try { toast('DL cold: kakao', { description: 'closing browser (authed)' }) } catch {} }
+                      closeBrowserWithRetries('authed/kakao/cold')
                     } else if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
                       router.replace(`/auth/discord/callback${query}`)
-                      try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                      if (isDebug) { try { toast('DL cold: discord', { description: 'closing browser (authed)' }) } catch {} }
+                      closeBrowserWithRetries('authed/discord/cold')
                     } else if (isAppScheme && (!u.pathname || u.pathname === '')) {
                       const raw = launchUrl.replace('gamesync://', '')
                       const pathAndQuery = raw.startsWith('/') ? raw : `/${raw}`
                       const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
                       if (pathAndQuery.startsWith('/auth/kakao/callback')) {
                         router.replace(`/auth/kakao/callback${q}`)
-                        try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                        if (isDebug) { try { toast('DL cold: kakao(fallback)', { description: 'closing browser (authed)' }) } catch {} }
+                        closeBrowserWithRetries('authed/kakao/cold/fallback')
                       } else if (pathAndQuery.startsWith('/auth/discord/callback') || pathAndQuery.startsWith('/oauth/callback')) {
                         router.replace(`/auth/discord/callback${q}`)
-                        try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                        if (isDebug) { try { toast('DL cold: discord(fallback)', { description: 'closing browser (authed)' }) } catch {} }
+                        closeBrowserWithRetries('authed/discord/cold/fallback')
                       }
                     }
                   }
@@ -193,12 +215,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const query = u.search || ''
             if (u.pathname.startsWith('/auth/kakao/callback')) {
               router.replace(`/auth/kakao/callback${query}`)
-              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              if (isDebug) { try { toast('DL route: kakao', { description: 'closing browser (unauth)' }) } catch {} }
+              closeBrowserWithRetries('unauth/kakao')
               return
             }
             if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
               router.replace(`/auth/discord/callback${query}`)
-              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              if (isDebug) { try { toast('DL route: discord', { description: 'closing browser (unauth)' }) } catch {} }
+              closeBrowserWithRetries('unauth/discord')
               return
             }
             if (isAppScheme && (!u.pathname || u.pathname === '')) {
@@ -207,13 +231,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (pathAndQuery.startsWith('/auth/kakao/callback')) {
                 const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
                 router.replace(`/auth/kakao/callback${q}`)
-                try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                if (isDebug) { try { toast('DL route: kakao(fallback)', { description: 'closing browser (unauth)' }) } catch {} }
+                closeBrowserWithRetries('unauth/kakao/fallback')
                 return
               }
               if (pathAndQuery.startsWith('/auth/discord/callback') || pathAndQuery.startsWith('/oauth/callback')) {
                 const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
                 router.replace(`/auth/discord/callback${q}`)
-                try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                if (isDebug) { try { toast('DL route: discord(fallback)', { description: 'closing browser (unauth)' }) } catch {} }
+                closeBrowserWithRetries('unauth/discord/fallback')
                 return
               }
             }
@@ -239,12 +265,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const query = u.search || ''
           if (u.pathname.startsWith('/auth/kakao/callback')) {
             router.replace(`/auth/kakao/callback${query}`)
-            try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+            if (isDebug) { try { toast('DL cold: kakao', { description: 'closing browser (unauth)' }) } catch {} }
+            closeBrowserWithRetries('unauth/kakao/cold')
             return
           }
           if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
             router.replace(`/auth/discord/callback${query}`)
-            try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+            if (isDebug) { try { toast('DL cold: discord', { description: 'closing browser (unauth)' }) } catch {} }
+            closeBrowserWithRetries('unauth/discord/cold')
             return
           }
           if (isAppScheme && (!u.pathname || u.pathname === '')) {
@@ -253,12 +281,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const q = pathAndQuery.includes('?') ? pathAndQuery.substring(pathAndQuery.indexOf('?')) : ''
             if (pathAndQuery.startsWith('/auth/kakao/callback')) {
               router.replace(`/auth/kakao/callback${q}`)
-              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              if (isDebug) { try { toast('DL cold: kakao(fallback)', { description: 'closing browser (unauth)' }) } catch {} }
+              closeBrowserWithRetries('unauth/kakao/cold/fallback')
               return
             }
             if (pathAndQuery.startsWith('/auth/discord/callback') || pathAndQuery.startsWith('/oauth/callback')) {
               router.replace(`/auth/discord/callback${q}`)
-              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              if (isDebug) { try { toast('DL cold: discord(fallback)', { description: 'closing browser (unauth)' }) } catch {} }
+              closeBrowserWithRetries('unauth/discord/cold/fallback')
               return
             }
           }
@@ -287,12 +317,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               const query = u.search || ''
               if (u.pathname.startsWith('/auth/kakao/callback')) {
                 router.replace(`/auth/kakao/callback${query}`)
-                try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                if (isDebug) { try { toast('DL foreground: kakao', { description: 'closing browser' }) } catch {} }
+                closeBrowserWithRetries('unauth/kakao/fg')
                 return
               }
               if (u.pathname.startsWith('/auth/discord/callback') || u.pathname.startsWith('/oauth/callback')) {
                 router.replace(`/auth/discord/callback${query}`)
-                try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+                if (isDebug) { try { toast('DL foreground: discord', { description: 'closing browser' }) } catch {} }
+                closeBrowserWithRetries('unauth/discord/fg')
                 return
               }
             } catch {}
