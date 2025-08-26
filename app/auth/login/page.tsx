@@ -12,7 +12,7 @@ import { toast } from "sonner"
 import { authService } from "@/lib/auth-service"
 import { Loader2, GamepadIcon } from "lucide-react"
 import { DiscordIcon } from "@/components/icons/discord-icon"
-import { openExternal } from "@/lib/native"
+import { openOAuthInBrowser, isNative } from "@/lib/native"
 
 export default function LoginPage() {
   const [username, setUsername] = useState("")
@@ -98,13 +98,23 @@ export default function LoginPage() {
   const handleDiscordLogin = async () => {
     setIsDiscordLoading(true)
     const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
-    // 인앱 브라우저(SFSafariViewController)에서는 콜백 페이지에서 Browser.close()로 복귀하므로 웹 콜백을 사용
-    const target = isNativeWebView() ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    
+    // 네이티브 앱인지 확인
+    const isNativeApp = await isNative()
+    const target = isNativeApp ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    
     // Safari 쿠키 분리 회피를 위해 target 파라미터를 쿼리로 전달 (서버 필터가 쿠키로 저장)
     const url = `${base}/oauth2/authorization/discord?target=${encodeURIComponent(target)}`
-    if (isNativeWebView()) {
-      try { await openExternal(url) } catch { window.location.href = url }
+    
+    if (isNativeApp) {
+      // 네이티브 앱에서는 Capacitor Browser 플러그인 사용
+      const opened = await openOAuthInBrowser(url)
+      if (!opened) {
+        // 브라우저 플러그인이 없으면 일반 웹뷰로 열기
+        window.location.href = url
+      }
     } else {
+      // 웹에서는 일반 리다이렉트
       window.location.href = url
     }
   }
@@ -112,11 +122,22 @@ export default function LoginPage() {
   const handleKakaoLogin = async () => {
     setIsKakaoLoading(true)
     const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
-    const target = isNativeWebView() ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    
+    // 네이티브 앱인지 확인
+    const isNativeApp = await isNative()
+    const target = isNativeApp ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    
     const url = `${base}/oauth2/authorization/kakao?target=${encodeURIComponent(target)}`
-    if (isNativeWebView()) {
-      try { await openExternal(url) } catch { window.location.href = url }
+    
+    if (isNativeApp) {
+      // 네이티브 앱에서는 Capacitor Browser 플러그인 사용
+      const opened = await openOAuthInBrowser(url)
+      if (!opened) {
+        // 브라우저 플러그인이 없으면 일반 웹뷰로 열기
+        window.location.href = url
+      }
     } else {
+      // 웹에서는 일반 리다이렉트
       window.location.href = url
     }
   }

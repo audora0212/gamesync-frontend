@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { authService } from "@/lib/auth-service"
 import { requestFcmToken, onForegroundMessage } from "@/lib/fcm"
-import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet, getLaunchUrl, onAppStateChange } from "@/lib/native"
+import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet, getLaunchUrl, onAppStateChange, closeBrowser } from "@/lib/native"
 import { notificationService } from "@/lib/notification-service"
 import { toast } from "sonner"
 
@@ -36,10 +36,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch { return false }
   })()
 
-  const closeBrowserWithRetries = (label?: string) => {
-    try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
-    setTimeout(() => { try { (window as any)?.Capacitor?.Browser?.close?.() } catch {} }, 350)
-    setTimeout(() => { try { (window as any)?.Capacitor?.Browser?.close?.() } catch {} }, 1000)
+  const closeBrowserWithRetries = async (label?: string) => {
+    // Capacitor Browser 플러그인으로 브라우저 닫기 시도
+    await closeBrowser();
+    // 안전을 위해 재시도
+    setTimeout(async () => { await closeBrowser(); }, 350)
+    setTimeout(async () => { await closeBrowser(); }, 1000)
   }
 
   useEffect(() => {

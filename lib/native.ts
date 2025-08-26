@@ -71,6 +71,35 @@ export async function openExternal(url: string) {
   }
 }
 
+// OAuth 로그인을 위한 인앱 브라우저 열기
+export async function openOAuthInBrowser(url: string) {
+  const Browser: any = getPlugin('Browser');
+  if (Browser && typeof Browser.open === 'function') {
+    // OAuth 로그인용 인앱 브라우저 열기
+    await Browser.open({ 
+      url, 
+      presentationStyle: 'pagesheet', // iOS에서 모달 스타일로 열기
+      windowName: '_self' // 같은 창에서 열기
+    });
+    return true;
+  }
+  return false;
+}
+
+// 인앱 브라우저 닫기
+export async function closeBrowser() {
+  const Browser: any = getPlugin('Browser');
+  if (Browser && typeof Browser.close === 'function') {
+    try {
+      await Browser.close();
+      return true;
+    } catch (err) {
+      console.error('Failed to close browser:', err);
+    }
+  }
+  return false;
+}
+
 export async function registerNativePush(): Promise<string | null> {
   if (!(await isNative())) return null;
   // Prefer Firebase Messaging for FCM registration token on iOS/Android

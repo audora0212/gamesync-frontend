@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/lib/auth-service";
 import { toast } from "sonner";
-import { isNative } from "@/lib/native";
+import { isNative, closeBrowser } from "@/lib/native";
 
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
@@ -75,7 +75,8 @@ export default function ClientCallback() {
         if (isIOS) {
           try {
             if (isNativeEnv) {
-              try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+              // Capacitor Browser 플러그인으로 브라우저 닫기
+              await closeBrowser();
               try { console.log('[CB/kakao] native webview → dashboard') } catch {}
               toast.success("카카오 계정으로 로그인했습니다.");
               router.replace("/dashboard");
@@ -87,10 +88,10 @@ export default function ClientCallback() {
             const appSchemeAbs = `gamesync:///auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam || '')}`;
             setDidAttemptOpenApp(true);
             if (isDebug) { try { (window as any).console?.log?.('[CB/kakao] try deep link & universal') } catch {} }
-            try { (window as any)?.Capacitor?.Browser?.close?.() } catch {}
+            await closeBrowser();
             try { window.location.href = appSchemeAbs } catch {}
             setTimeout(() => { try { window.location.replace(universalAbs) } catch {} }, 600);
-            setTimeout(() => { try { (window as any)?.Capacitor?.Browser?.close?.() } catch {} }, 900);
+            setTimeout(async () => { await closeBrowser(); }, 900);
             return;
           } catch {}
         }
