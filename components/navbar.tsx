@@ -31,12 +31,17 @@ export function Navbar() {
 
   const handleLogout = async () => {
     try {
+      // 로그아웃 처리 (localStorage, cookie, secure storage 모두 클리어)
       await authService.logout()
-      // 로그아웃 직후에는 토큰/유저 정보가 모두 제거되므로
-      // 보호 라우팅 훅이 로그인 페이지로 이동시키기 전, 깜빡임을 줄이기 위해 직접 replace
-      window.location.replace("/auth/login")
+      // 즉시 로그인 페이지로 이동 (history 스택에 남기지 않음)
+      setTimeout(() => {
+        window.location.replace("/auth/login")
+      }, 100) // 작은 딜레이로 상태 정리 시간 확보
     } catch {
       console.error("Logout failed")
+      // 실패해도 강제로 로그인 페이지로 이동
+      authService.clearAllAuthData()
+      window.location.replace("/auth/login")
     }
   }
 

@@ -88,6 +88,8 @@ class AuthService {
   async logout(): Promise<void> {
     const token = this.getToken()
     const fcmToken = this.getFcmToken()
+    
+    // 백엔드 로그아웃 API 호출 (실패해도 계속 진행)
     if (token) {
       try {
         await fetch(`${API_BASE}/auth/logout`, {
@@ -98,6 +100,8 @@ class AuthService {
         // 무시
       }
     }
+    
+    // FCM 토큰 삭제
     if (fcmToken) {
       try {
         const url = new URL(`${API_BASE}/push-tokens`)
@@ -105,10 +109,29 @@ class AuthService {
         await fetch(url, { method: "DELETE", headers: this.getAuthHeaders() })
       } catch {}
     }
-    localStorage.removeItem(this.tokenKey)
-    localStorage.removeItem(this.userKey)
-    localStorage.removeItem(this.userIdKey)
-    localStorage.removeItem(this.fcmTokenKey)
+    
+    // 모든 로컬 데이터 즉시 삭제
+    this.clearAllAuthData()
+    
+    // 네이티브 앱인 경우 secure storage도 클리어
+    try {
+      const { isNative, secureRemove } = await import("@/lib/native")
+      if (await isNative()) {
+        await secureRemove("auth-token")
+      }
+    } catch {}
+  }
+  
+  clearAllAuthData() {
+    // localStorage 전체 클리어
+    try {
+      localStorage.removeItem(this.tokenKey)
+      localStorage.removeItem(this.userKey)
+      localStorage.removeItem(this.userIdKey)
+      localStorage.removeItem(this.fcmTokenKey)
+    } catch {}
+    
+    // 쿠키 클리어
     this.clearAuthCookie()
   }
 

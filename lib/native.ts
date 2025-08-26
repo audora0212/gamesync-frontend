@@ -154,4 +154,10 @@ export async function secureGet(key: string): Promise<string | null> {
   }
 }
 
+export async function secureRemove(key: string) {
+  const S: any = getPlugin('SecureStoragePlugin');
+  if (!S) return;
+  try { await S.remove({ key }); } catch {}
+}
+
 

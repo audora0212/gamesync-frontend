@@ -10,17 +10,9 @@ export async function fetchWithAuth(input: RequestInfo, init: RequestInit = {}) 
   const res = await fetch(input, { ...init, headers })
 
   if (res.status === 401 || res.status === 403) {
-    // 인증 만료
-    // 토큰만 제거(푸시 토큰 등은 유지). 강제 로그아웃 호출은 생략해 루프 방지
-    try { localStorage.removeItem("auth-token") } catch {}
-    // 서버 사이드 리다이렉트를 위해 쿠키도 제거
-    try {
-      let attrs: string[] = ["path=/", "samesite=lax", "max-age=0"]
-      if (typeof window !== "undefined" && window.location.protocol === "https:") {
-        attrs.push("secure")
-      }
-      document.cookie = `auth-token=; ${attrs.join("; ")}`
-    } catch {}
+    // 인증 만료 - 모든 인증 데이터 클리어
+    authService.clearAllAuthData()
+    
     // 로그인 페이지로 리다이렉트 (현재 위치를 return으로 전달)
     if (typeof window !== "undefined") {
       const path = window.location.pathname || ""
@@ -28,7 +20,7 @@ export async function fetchWithAuth(input: RequestInfo, init: RequestInit = {}) 
       if (!path.startsWith("/auth/")) {
         const current = path + window.location.search
         const next = `/auth/login?return=${encodeURIComponent(current)}`
-        window.location.href = next
+        window.location.replace(next) // href 대신 replace 사용
       }
     }
     // 이후 코드는 실행되지 않도록

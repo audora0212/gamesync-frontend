@@ -28,15 +28,25 @@ export default function LoginPage() {
   const existingProvider = params?.get("existingProvider") || null
 
   useEffect(() => {
-    // 토큰과 사용자 정보가 모두 있을 때만 자동 리다이렉트
-    try {
-      const token = authService.getToken()
-      const user = authService.getCurrentUser()
-      if (token && user) {
-        router.replace("/dashboard")
-      }
-    } catch {}
-    if (error === 'oauth_email_linked') {
+    // 로그인 페이지에서는 인증 확인을 한 번만 수행
+    const checkAuth = () => {
+      try {
+        const token = authService.getToken()
+        const user = authService.getCurrentUser()
+        // 토큰과 사용자 정보가 모두 있고, 유효한 경우만 대시보드로 이동
+        if (token && token.length > 20 && user && user.length > 0) {
+          router.replace("/dashboard")
+          return true
+        }
+      } catch {}
+      return false
+    }
+    
+    // 마운트 시 한 번만 체크
+    const isAuthed = checkAuth()
+    
+    // OAuth 에러 처리는 인증되지 않은 경우에만
+    if (!isAuthed && error === 'oauth_email_linked') {
       if (existingProvider === 'kakao') {
         toast.error('이미 카카오 계정으로 가입된 이메일입니다. 카카오로 로그인해 주세요.')
       } else if (existingProvider === 'discord') {
@@ -45,7 +55,7 @@ export default function LoginPage() {
         toast.error('이미 가입된 이메일입니다. 해당 소셜로 로그인해 주세요.')
       }
     }
-  }, [router, error, existingProvider])
+  }, []) // router 의존성 제거하여 무한 루프 방지
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
