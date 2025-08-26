@@ -117,8 +117,24 @@ class AuthService {
     try {
       const { isNative, secureRemove, clearLaunchUrl } = await import("@/lib/native")
       if (await isNative()) {
+        // secure storage에서 모든 인증 관련 데이터 삭제
         await secureRemove("auth-token")
+        await secureRemove("current-user")
+        await secureRemove("current-user-id")
+        await secureRemove("fcm-token")
         await clearLaunchUrl()
+        
+        // Preferences에도 저장된 데이터가 있을 수 있으므로 클리어
+        try {
+          const w = window as any
+          const Preferences = w?.Capacitor?.Plugins?.Preferences
+          if (Preferences) {
+            await Preferences.remove({ key: "auth-token" })
+            await Preferences.remove({ key: "current-user" })
+            await Preferences.remove({ key: "current-user-id" })
+            await Preferences.remove({ key: "fcm-token" })
+          }
+        } catch {}
       }
     } catch {}
   }

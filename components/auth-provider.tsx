@@ -13,11 +13,13 @@ import { toast } from "sonner"
 interface AuthContextType {
   user: string | null
   isLoading: boolean
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
+  logout: async () => {},
 })
 
 export const useAuth = () => useContext(AuthContext)
@@ -25,6 +27,7 @@ export const useAuth = () => useContext(AuthContext)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoggingOut, setIsLoggingOut] = useState(false) // 로그아웃 중 상태 추가
   const router = useRouter()
   const pathname = usePathname()
   const [deepLinkListeners, setDeepLinkListeners] = useState<(() => void)[]>([]) // 리스너 관리
@@ -53,7 +56,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setDeepLinkListeners([])
   }
 
+  // 로그아웃 함수
+  const logout = async () => {
+    if (isLoggingOut) return // 중복 실행 방지
+    
+    try {
+      setIsLoggingOut(true)
+      
+      // 1. 모든 딥링크 리스너 즉시 해제
+      cleanupDeepLinkListeners()
+      
+      // 2. 상태를 즉시 초기화
+      setUser(null)
+      
+      // 3. authService로 백엔드 로그아웃 및 로컬 데이터 정리
+      await authService.logout()
+      
+      // 4. 완전한 페이지 새로고침으로 모든 상태 초기화
+      window.location.href = "/auth/login"
+    } catch (error) {
+      console.error("Logout error:", error)
+      // 실패해도 강제로 로그인 페이지로 이동
+      authService.clearAllAuthData()
+      window.location.href = "/auth/login"
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+
   useEffect(() => {
+    // 로그아웃 중이면 처리 스킵
+    if (isLoggingOut) return
+    
     const token = authService.getToken()
     const currentUser = authService.getCurrentUser()
 
@@ -368,5 +402,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => { try { unsub?.() } catch {} }
   }, [router])
 
-  return <AuthContext.Provider value={{ user, isLoading }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, isLoading, logout }}>{children}</AuthContext.Provider>
 }

@@ -13,8 +13,10 @@ import { authService } from "@/lib/auth-service"
 import { Loader2, GamepadIcon } from "lucide-react"
 import { DiscordIcon } from "@/components/icons/discord-icon"
 import { openOAuthInBrowser, isNative } from "@/lib/native"
+import { useAuth } from "@/components/auth-provider"
 
 export default function LoginPage() {
+  const { user: authUser, isLoading: authLoading } = useAuth() // AuthProvider 상태 사용
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -28,25 +30,15 @@ export default function LoginPage() {
   const existingProvider = params?.get("existingProvider") || null
 
   useEffect(() => {
-    // 로그인 페이지에서는 인증 확인을 한 번만 수행
-    const checkAuth = () => {
-      try {
-        const token = authService.getToken()
-        const user = authService.getCurrentUser()
-        // 토큰과 사용자 정보가 모두 있고, 유효한 경우만 대시보드로 이동
-        if (token && token.length > 20 && user && user.length > 0) {
-          router.replace("/dashboard")
-          return true
-        }
-      } catch {}
-      return false
+    // AuthProvider의 상태를 통해 인증 확인
+    if (!authLoading && authUser) {
+      // 이미 로그인 되어 있으면 대시보드로 이동
+      router.replace("/dashboard")
+      return
     }
     
-    // 마운트 시 한 번만 체크
-    const isAuthed = checkAuth()
-    
-    // OAuth 에러 처리는 인증되지 않은 경우에만
-    if (!isAuthed && error === 'oauth_email_linked') {
+    // OAuth 에러 처리
+    if (!authLoading && !authUser && error === 'oauth_email_linked') {
       if (existingProvider === 'kakao') {
         toast.error('이미 카카오 계정으로 가입된 이메일입니다. 카카오로 로그인해 주세요.')
       } else if (existingProvider === 'discord') {
@@ -55,7 +47,7 @@ export default function LoginPage() {
         toast.error('이미 가입된 이메일입니다. 해당 소셜로 로그인해 주세요.')
       }
     }
-  }, []) // router 의존성 제거하여 무한 루프 방지
+  }, [authLoading, authUser, router, error, existingProvider]) // AuthProvider 상태 기반으로 체크
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -155,6 +147,15 @@ export default function LoginPage() {
       // 웹에서는 일반 리다이렉트
       window.location.href = url
     }
+  }
+
+  // 로딩 중이면 로딩 표시
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white">처리 중입니다...</div>
+      </div>
+    )
   }
 
   return (

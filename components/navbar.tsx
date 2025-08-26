@@ -10,8 +10,10 @@ import { FriendDrawer } from "@/components/friend-drawer"
 import { NotificationPanel } from "@/components/notification-panel"
 import { serverService } from "@/lib/server-service"
 import { notificationService } from "@/lib/notification-service"
+import { useAuth } from "@/components/auth-provider"
 
 export function Navbar() {
+  const { logout: authLogout } = useAuth() // AuthProvider의 logout 함수 사용
   const [user, setUser] = useState<string | null>(null)
   const [friendOpen, setFriendOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
@@ -30,20 +32,8 @@ export function Navbar() {
   }, [])
 
   const handleLogout = async () => {
-    try {
-      // 로그아웃 처리 (localStorage, cookie, secure storage 모두 클리어)
-      await authService.logout()
-      // 완전히 새로운 페이지로 이동 (기존 라우터 상태/히스토리 모두 클리어)
-      setTimeout(() => {
-        // href를 사용하여 완전히 새로운 페이지 로드
-        window.location.href = "/auth/login"
-      }, 100) // 작은 딜레이로 상태 정리 시간 확보
-    } catch {
-      console.error("Logout failed")
-      // 실패해도 강제로 로그인 페이지로 이동
-      authService.clearAllAuthData()
-      window.location.href = "/auth/login"
-    }
+    // AuthProvider의 logout 함수를 사용하여 상태와 데이터를 함께 정리
+    await authLogout()
   }
 
   return (
