@@ -12,6 +12,7 @@ import { toast } from "sonner"
 import { authService } from "@/lib/auth-service"
 import { Loader2, GamepadIcon } from "lucide-react"
 import { DiscordIcon } from "@/components/icons/discord-icon"
+import { openExternal } from "@/lib/native"
 
 export default function SignupPage() {
   const [username, setUsername] = useState("")
@@ -87,14 +88,46 @@ export default function SignupPage() {
     }
   }
 
-  const handleDiscordSignup = () => {
-    setIsDiscordLoading(true)
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/discord`
+  const isNativeWebView = () => {
+    try {
+      const w = window as any
+      return !!(w?.Capacitor?.isNativePlatform?.() === true)
+    } catch {
+      return false
+    }
   }
 
-  const handleKakaoSignup = () => {
+  const isIOSMobileWeb = () => {
+    try {
+      const ua = navigator.userAgent
+      return /iphone|ipad|ipod/i.test(ua)
+    } catch {
+      return false
+    }
+  }
+
+  const handleDiscordSignup = async () => {
+    setIsDiscordLoading(true)
+    const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
+    const target = isNativeWebView() ? "web" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    const url = `${base}/oauth2/authorization/discord?target=${encodeURIComponent(target)}`
+    if (isNativeWebView()) {
+      try { await openExternal(url) } catch { window.location.href = url }
+    } else {
+      window.location.href = url
+    }
+  }
+
+  const handleKakaoSignup = async () => {
     setIsKakaoLoading(true)
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")}/oauth2/authorization/kakao`
+    const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
+    const target = isNativeWebView() ? "web" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    const url = `${base}/oauth2/authorization/kakao?target=${encodeURIComponent(target)}`
+    if (isNativeWebView()) {
+      try { await openExternal(url) } catch { window.location.href = url }
+    } else {
+      window.location.href = url
+    }
   }
 
   return (
