@@ -2,6 +2,11 @@
 import { authService } from "./auth-service"
 
 export async function fetchWithAuth(input: RequestInfo, init: RequestInit = {}) {
+  // 로그아웃 중이면 모든 API 호출 차단
+  if (authService.isLoggingOut()) {
+    throw new Error("LOGOUT_IN_PROGRESS")
+  }
+  
   const headers = {
     ...init.headers,
     ...authService.getAuthHeaders(),

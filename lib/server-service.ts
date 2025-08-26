@@ -37,9 +37,7 @@ export interface AggregatedStatsResponse {
 
 export async function getAggregatedStats(serverId: number, range: "weekly" = "weekly"): Promise<AggregatedStatsResponse> {
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api"
-  const res = await fetch(`${API_BASE}/servers/${serverId}/stats?range=${range}`, {
-    headers: authService.getAuthHeaders?.() || {},
-  })
+  const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/stats?range=${range}`)
   if (!res.ok) throw new Error("Failed to fetch aggregated stats")
   return res.json()
 }
@@ -75,17 +73,13 @@ export interface WeeklyStatsResponse {
 }
 
 export async function getTodayStats(serverId: number): Promise<TodayStatsResponse> {
-  const res = await fetch(`${API_BASE}/servers/${serverId}/stats/today`, {
-    headers: authService.getAuthHeaders?.() || {},
-  })
+  const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/stats/today`)
   if (!res.ok) throw new Error("Failed to fetch today stats")
   return res.json()
 }
 
 export async function getWeeklyStats(serverId: number): Promise<WeeklyStatsResponse> {
-  const res = await fetch(`${API_BASE}/servers/${serverId}/stats/weekly`, {
-    headers: authService.getAuthHeaders?.() || {},
-  })
+  const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/stats/weekly`)
   if (!res.ok) throw new Error("Failed to fetch weekly stats")
   return res.json()
 }
@@ -98,9 +92,9 @@ interface SearchParams {
 
 class ServerService {
   async createServer(data: { name: string; resetTime: string }): Promise<Server> {
-    const res = await fetch(`${API_BASE}/servers`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error("Failed to create server");
@@ -108,13 +102,13 @@ class ServerService {
   }
 
   async getServers(): Promise<Server[]> {
-    const res = await fetch(`${API_BASE}/servers`, { headers: authService.getAuthHeaders() });
+    const res = await fetchWithAuth(`${API_BASE}/servers`);
     if (!res.ok) throw new Error("Failed to fetch servers");
     return res.json();
   }
 
   async getServer(id: number): Promise<Server> {
-    const res = await fetch(`${API_BASE}/servers/${id}`, { headers: authService.getAuthHeaders() });
+    const res = await fetchWithAuth(`${API_BASE}/servers/${id}`);
     if (!res.ok) throw new Error("Failed to fetch server");
     return res.json();
   }
@@ -161,7 +155,7 @@ class ServerService {
     qs.append("page", params.page.toString());
     qs.append("size", params.size.toString());
     if (params.q) qs.append("q", params.q);
-    const res = await fetch(`${API_BASE}/servers/search?${qs}`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers/search?${qs}`, {
       headers: authService.getAuthHeaders(),
     });
     if (!res.ok) throw new Error("Failed to search servers");
@@ -169,7 +163,7 @@ class ServerService {
   }
 
   async joinServer(id: number): Promise<Server> {
-    const res = await fetch(`${API_BASE}/servers/${id}/join`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers/${id}/join`, {
       method: "POST",
       headers: authService.getAuthHeaders(),
     });
@@ -178,18 +172,18 @@ class ServerService {
   }
 
   async kickMember(serverId: number, userId: number): Promise<void> {
-    const res = await fetch(`${API_BASE}/servers/${serverId}/kick`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/kick`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId }),
     });
     if (!res.ok) throw new Error("Failed to kick member");
   }
 
   async renameServer(serverId: number, name: string): Promise<Server> {
-    const res = await fetch(`${API_BASE}/servers/${serverId}/name`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/name`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
     });
     if (!res.ok) throw new Error("Failed to rename server");
@@ -197,9 +191,9 @@ class ServerService {
   }
 
   async updateResetTime(serverId: number, resetTime: string): Promise<Server> {
-    const res = await fetch(`${API_BASE}/servers/${serverId}/reset-time`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/reset-time`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resetTime }),
     });
     if (!res.ok) throw new Error("Failed to update reset time");
@@ -207,9 +201,9 @@ class ServerService {
   }
 
   async updateAdmin(serverId: number, userId: number, grant: boolean): Promise<Server> {
-    const res = await fetch(`${API_BASE}/servers/${serverId}/admins`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/admins`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId, grant }),
     });
     if (!res.ok) throw new Error("Failed to update admin");
@@ -227,18 +221,18 @@ class ServerService {
   }
 
   async inviteUser(serverId: number, receiverUserId: number): Promise<void> {
-    const res = await fetch(`${API_BASE}/servers/invites`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers/invites`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ serverId, receiverUserId }),
     })
     if (!res.ok) throw new Error("Failed to send invite")
   }
 
   async updateDescription(serverId: number, description: string): Promise<Server> {
-    const res = await fetch(`${API_BASE}/servers/${serverId}/description`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/description`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ description }),
     })
     if (!res.ok) throw new Error("Failed to update description")
@@ -246,9 +240,9 @@ class ServerService {
   }
 
   async updateMaxMembers(serverId: number, maxMembers: number | null): Promise<Server> {
-    const res = await fetch(`${API_BASE}/servers/${serverId}/max-members`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/max-members`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ maxMembers }),
     })
     if (!res.ok) throw new Error("Failed to update max members")
@@ -256,9 +250,9 @@ class ServerService {
   }
 
   async toggleResetPaused(serverId: number, paused: boolean): Promise<Server> {
-    const res = await fetch(`${API_BASE}/servers/${serverId}/reset-paused`, {
+    const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/reset-paused`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", ...authService.getAuthHeaders() },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ paused }),
     })
     if (!res.ok) throw new Error("Failed to toggle reset pause")

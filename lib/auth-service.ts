@@ -31,6 +31,7 @@ class AuthService {
   private userKey = "current-user"
   private userIdKey = "current-user-id"
   private fcmTokenKey = "fcm-token"
+  private _isLoggingOut = false // 전역 로그아웃 플래그
 
   setToken(token: string) {
     localStorage.setItem(this.tokenKey, token)
@@ -86,6 +87,12 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
+    // 이미 로그아웃 중이면 리턴
+    if (this._isLoggingOut) return
+    
+    // 로그아웃 플래그 설정
+    this._isLoggingOut = true
+    
     const token = this.getToken()
     const fcmToken = this.getFcmToken()
     
@@ -186,6 +193,10 @@ class AuthService {
   getAuthHeaders(): Record<string, string> {
     const token = this.getToken()
     return token ? { Authorization: `Bearer ${token}` } : {}
+  }
+  
+  isLoggingOut(): boolean {
+    return this._isLoggingOut
   }
 
   private setAuthCookie(token: string) {
