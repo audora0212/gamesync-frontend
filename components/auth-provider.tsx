@@ -27,6 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
+  const [deepLinkListeners, setDeepLinkListeners] = useState<(() => void)[]>([]) // 리스너 관리
 
   const isDebug = (() => {
     try {
@@ -43,10 +44,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setTimeout(async () => { await closeBrowser(); }, 350)
     setTimeout(async () => { await closeBrowser(); }, 1000)
   }
+  
+  // 모든 딥링크 리스너 해제 함수
+  const cleanupDeepLinkListeners = () => {
+    deepLinkListeners.forEach(unsub => {
+      try { unsub() } catch {}
+    })
+    setDeepLinkListeners([])
+  }
 
   useEffect(() => {
     const token = authService.getToken()
     const currentUser = authService.getCurrentUser()
+
+    // 토큰이 없으면 모든 딥링크 리스너 해제
+    if (!token || !currentUser) {
+      cleanupDeepLinkListeners()
+      setUser(null)
+      setIsLoading(false)
+      return
+    }
 
     if (token && currentUser) {
       setUser(currentUser)
@@ -62,7 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               authService.setFcmToken(nativeToken)
             }
             // Listen deep links (e.g., gamesync://oauth/callback?code=...)
-            onAppUrlOpen((url) => {
+            const unsub = await onAppUrlOpen((url) => {
+              // 토큰이 없으면 리스너가 동작하지 않도록  
+              if (!authService.getToken()) return;
               try { console.log('[DL] appUrlOpen (authed)', url) } catch {}
               try {
                 const u = new URL(url)
@@ -109,6 +128,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }
               } catch {}
             })
+            // 리스너를 배열에 추가하여 나중에 해제할 수 있도록
+            if (unsub) {
+              setDeepLinkListeners(prev => [...prev, unsub])
+            }
 
             // Handle cold-start deep link (app launched via URL)
             try {
@@ -202,14 +225,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setIsLoading(false)
+    
+    // cleanup: 컴포넌트 unmount 시 또는 인증 상태 변경 시 모든 리스너 해제
+    return () => {
+      cleanupDeepLinkListeners()
+    }
   }, [pathname, router])
 
   // 로그인 전에도 딥링크를 처리하여 콜백 페이지로 이동할 수 있도록 리스너를 등록
   useEffect(() => {
+    let unsub: (() => void) | undefined
     // 이미 로그인한 경우 위의 리스너가 동작하므로 중복 등록을 피할 필요는 없지만, 안전하게 항상 동작하도록 동일 로직 등록
-    (async () => {
+    ;(async () => {
       try {
-        onAppUrlOpen((url) => {
+        unsub = await onAppUrlOpen((url) => {
           try {
             const u = new URL(url)
             const isAppScheme = u.protocol.startsWith('gamesync')
@@ -250,6 +279,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
       } catch {}
     })()
+    return () => { try { unsub?.() } catch {} }
   }, [router])
 
   // 로그인 전 콜드 스타트 딥링크 처리 (앱이 URL로 런치된 경우)

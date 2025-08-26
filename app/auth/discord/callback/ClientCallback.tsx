@@ -32,6 +32,7 @@ export default function ClientCallback() {
   const userParam = params.get("user");
   try { console.log('[CB/discord] received', { token: token?.slice(0,16)+'...', userLen: userParam?.length }) } catch {}
   const [didAttemptOpenApp, setDidAttemptOpenApp] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false); // 중복 처리 방지
   const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
   const [isNativeEnv, setIsNativeEnv] = useState(false);
   const isDebug = (() => {
@@ -47,7 +48,10 @@ export default function ClientCallback() {
   useEffect(() => { (async () => { try { if (await isNative()) clearCookie('oauth_target') } catch {} })() }, [])
 
   useEffect(() => {
+    // 이미 처리 중이거나 토큰이 없으면 무시
+    if (isProcessing) return;
     if (token) {
+      setIsProcessing(true); // 중복 실행 방지
       try { console.log('[CB/discord] setToken') } catch {}
       authService.setToken(token);
       // 쿠키에도 저장되어 서버 사이드에서 랜딩 접근 시 대시보드로 리다이렉트 가능
