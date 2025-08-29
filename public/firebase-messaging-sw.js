@@ -50,21 +50,42 @@ self.addEventListener('push', (event) => {
   const options = {
     body,
     data: dataObj || {},
-    icon: '/favicon.ico'
+    icon: '/logo_round.png'
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
+  // 초대/친구요청 감지 시 열린 클라이언트에 메시지 전송 (모바일 앱에서 새로고침 유도)
+  try {
+    const raw = (dataObj && dataObj.payload) || undefined;
+    let kind = undefined;
+    if (typeof raw === 'string' && raw.trim().startsWith('{')) {
+      try { kind = JSON.parse(raw).kind } catch {}
+    }
+    if (kind === 'server_invite' || kind === 'friend_request') {
+      event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+          clientList.forEach((client) => {
+            try { client.postMessage({ type: 'REFRESH_ON_INVITE' }) } catch {}
+          })
+        })
+      )
+    }
+  } catch {}
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = '/dashboard';
+  const targetUrl = (event.notification && event.notification.data && event.notification.data.url) || '/notifications';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
-        if ('focus' in client) return client.focus();
+        if ('focus' in client) {
+          client.focus();
+          if ('navigate' in client) return client.navigate(targetUrl);
+          return;
+        }
       }
-      if (clients.openWindow) return clients.openWindow(url);
+      if (clients.openWindow) return clients.openWindow(targetUrl);
     })
   );
 });

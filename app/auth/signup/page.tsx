@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
 import { authService } from "@/lib/auth-service"
-import { Loader2, GamepadIcon } from "lucide-react"
+import { Loader2 } from "lucide-react"
+import Image from "next/image"
 import { DiscordIcon } from "@/components/icons/discord-icon"
 import { openOAuthInBrowser, isNative } from "@/lib/native"
 
@@ -156,8 +157,8 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 glass rounded-2xl mb-4">
-            <GamepadIcon className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 glass rounded-2xl mb-4 overflow-hidden mx-auto">
+            <Image src="/logo_round.png" alt="GameSync" width={64} height={64} className="w-16 h-16" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-2">GameSync</h1>
           <p className="text-muted-foreground">게임 스케줄링 플랫폼에 가입하세요</p>

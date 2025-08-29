@@ -213,7 +213,7 @@ export function SettingModal() {
                   value={myTTMinutes}
                   onChange={(e) => setMyTTMinutes(Number(e.target.value))}
                   disabled={!pushMyTT}
-                  className="glass border-white/30 text-white h-6 w-14 text-center text-xs px-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="glass border-white/30 text-white h-6 w-14 text-center text-base sm:text-xs px-0 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
               <span className="text-white/50">분</span>

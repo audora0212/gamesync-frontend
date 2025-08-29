@@ -234,7 +234,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               }
             }
             // Foreground push handling: show toast (page가 포커스일 때 OS 알림은 표시되지 않을 수 있음)
-            onForegroundMessage((payload) => {
+            onForegroundMessage(async (payload) => {
               const dataTitle = (payload?.data?.title as string) || undefined
               const notifTitle = (payload?.notification?.title as string) || undefined
               const title = dataTitle || notifTitle || '알림'
@@ -242,11 +242,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               const raw = payload?.data?.payload as string | undefined
               const bodyFromData = (payload?.data?.body as string) || ''
               let description = bodyFromData
+              let shouldRefreshOnMobile = false
               if (type === 'INVITE') {
                 try {
                   const p = raw ? JSON.parse(raw) : undefined
                   if (p && p.serverName && p.fromNickname) {
                     description = `${p.fromNickname} → ${p.serverName}`
+                  }
+                  // 서버 초대 수신 시 모바일 앱에서는 자동 새로고침
+                  if (p && p.kind === 'server_invite') {
+                    shouldRefreshOnMobile = true
                   }
                 } catch {}
               } else if (type === 'GENERIC') {
@@ -255,6 +260,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   if (p && p.kind === 'friend_request' && p.fromNickname) {
                     description = `알림 패널에서 수락/거절할 수 있어요`
                   }
+                  // 친구 초대(요청) 수신 시 모바일 앱에서는 자동 새로고침
+                  if (p && p.kind === 'friend_request') {
+                    shouldRefreshOnMobile = true
+                  }
                 } catch {}
               }
               toast(title, { description })
@@ -262,6 +271,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               try {
                 if (Notification.permission === 'granted') {
                   new Notification(title, { body: description })
+                }
+              } catch {}
+
+              // 모바일 네이티브 앱에서 초대/친구요청 수신 시 자동 새로고침
+              try {
+                if (shouldRefreshOnMobile && (await isNative())) {
+                  router.refresh()
                 }
               } catch {}
             })
@@ -280,6 +296,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       cleanupDeepLinkListeners()
     }
   }, [pathname, router, isLoggingOut])
+
+  // 서비스워커로부터 초대 관련 메시지 수신 시 모바일 앱에서 새로고침
+  useEffect(() => {
+    function handleSwMessage(e: MessageEvent) {
+      try {
+        const data: any = e?.data
+        if (data && data.type === 'REFRESH_ON_INVITE') {
+          ;(async () => {
+            try {
+              if (await isNative()) {
+                router.refresh()
+              }
+            } catch {}
+          })()
+        }
+      } catch {}
+    }
+    if (typeof window !== 'undefined' && navigator?.serviceWorker) {
+      try { navigator.serviceWorker.addEventListener('message', handleSwMessage) } catch {}
+      return () => { try { navigator.serviceWorker.removeEventListener('message', handleSwMessage) } catch {} }
+    }
+  }, [router])
 
   // 로그인 전에도 딥링크를 처리하여 콜백 페이지로 이동할 수 있도록 리스너를 등록
   useEffect(() => {

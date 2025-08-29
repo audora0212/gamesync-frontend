@@ -139,7 +139,7 @@ export function NewPartyModal({
           </Select>
           <div className="space-y-2">
             <label className="text-white text-sm">정원</label>
-            <Input type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="glass border-white/30 text-white text-sm" />
+            <Input type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="glass border-white/30 text-white text-base sm:text-sm" />
           </div>
           <div className="flex justify-end space-x-2 pt-4">
             <DialogClose asChild>
