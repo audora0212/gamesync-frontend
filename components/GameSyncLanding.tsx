@@ -59,11 +59,11 @@ export default function GameSyncLanding() {
                 GameSync
               </span>
             </h1>
-            <p className="text-base sm:text-lg md:text-2xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
-              매번 단톡방에서 &quot;몇 시에 할까요?&quot; 물어보기 지치셨나요?
-              <br className="hidden sm:block" />
-              GameSync로 한 번에 정리하고, 자동으로 관리하세요.
-              <br className="hidden sm:block" />
+            <p className="text-[15px] sm:text-lg md:text-2xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
+              매번 단톡방에서 &quot;몇 시에 할까?&quot; 물어보기 지치셨나요?
+              <br />
+              GameSync로 한 번에 정리하고, 자동으로 관리하세요
+              <br />
               <span className="text-primary font-semibold">5분이면 충분합니다.</span>
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-0">
@@ -87,9 +87,9 @@ export default function GameSyncLanding() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-balance">
               이제 이런 고민은 안 해도 돼요
             </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-              복잡한 기능은 빼고, 정말 필요한 것만 담았어요.
-              <br className="hidden sm:block" />
+            <p className="text-[15px] sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              복잡한 기능은 빼고, 정말 필요한 것만 담았어요
+              <br />
               <span className="text-primary">직관적이고 간단합니다.</span>
             </p>
           </div>
@@ -151,14 +151,14 @@ export default function GameSyncLanding() {
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-foreground text-balance">
                 오늘부터 달라져요
               </h2>
-              <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              <p className="text-[15px] sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
                 더 이상 단톡방에서 시간 조율하느라
-                <br className="hidden sm:block" />
-                스트레스받지 마세요.
-                <br className="hidden sm:block" />
-                <span className="text-primary font-semibold">
-                  지금 바로 시작하면 5분 후에 첫 약속을 만들 수 있어요.
-                </span>
+                <br />
+                스트레스 받지 마세요.
+                <br />
+                지금 바로 시작하면
+                <br />
+                <span className="text-primary font-semibold">5분내로 첫 약속을 만들 수 있어요</span>
               </p>
               <Link href="/auth/signup" passHref>
                 <Button
