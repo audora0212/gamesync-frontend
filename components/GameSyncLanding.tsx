@@ -50,7 +50,7 @@ export default function GameSyncLanding() {
             className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
           >
             <Badge className="mb-6 bg-white/5 backdrop-blur-sm border border-white/10 text-foreground hover:bg-white/10">
-              <Zap className="w-4 h-4 mr-2" />더 이상 "언제 할래?" 묻지 마세요
+              <Zap className="w-4 h-4 mr-2" />더 이상 &quot;언제 할래?&quot; 묻지 마세요
             </Badge>
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight text-balance">
               게임 약속,
@@ -60,7 +60,7 @@ export default function GameSyncLanding() {
               </span>
             </h1>
             <p className="text-base sm:text-lg md:text-2xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
-              매번 단톡방에서 "몇 시에 할까요?" 물어보기 지치셨나요?
+              매번 단톡방에서 &quot;몇 시에 할까요?&quot; 물어보기 지치셨나요?
               <br className="hidden sm:block" />
               GameSync로 한 번에 정리하고, 자동으로 관리하세요.
               <br className="hidden sm:block" />
