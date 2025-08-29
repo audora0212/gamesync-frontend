@@ -59,14 +59,16 @@ export default function GameSyncLanding() {
               게임 약속, 쉽게 모아요
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-balance">
-              같이 하는 시간
+              함께할 타이밍
               <br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-                GameSync와 함께
-              </span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">GameSync</span>
             </h1>
             <p className="text-base sm:text-lg md:text-2xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed break-words">
-              GameSync는 약속 공유, 초대 코드, 자동 초기화를 지원해요.  번거로운 조율 없이 바로 모일 수 있어요.
+              GameSync는 약속 공유, 초대 코드,
+              <br />
+              자동 초기화를 지원해요.
+              <br />
+              번거로운 조율 없이 바로 모일 수 있어요.
             </p>
             <div className="flex items-center justify-center">
               <Link href="/auth/signup" passHref>
@@ -89,7 +91,9 @@ export default function GameSyncLanding() {
           <div className={`text-center mb-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-balance">GameSync로 할 수 있는 것들</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              필요한 기능만 담았어요. 가볍게 시작해보세요.
+              필요한 기능만 담았어요.
+              <br />
+              가볍게 시작해보세요.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -151,7 +155,11 @@ export default function GameSyncLanding() {
             <CardContent className="p-12">
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground text-balance">지금 시작하세요</h2>
               <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                GameSync로 팀의 게임 일정을 체계적으로 운영하세요. 지금 바로 시작할 수 있습니다.
+                GameSync로 팀의 게임 일정을
+                <br />
+                체계적으로 운영하세요.
+                <br />
+                지금 바로 시작할 수 있습니다.
               </p>
               <Link href="/auth/signup" passHref>
                 <Button
