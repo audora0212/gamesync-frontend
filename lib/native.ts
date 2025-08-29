@@ -157,28 +157,18 @@ export async function registerNativePush(): Promise<string | null> {
       }
     } catch {}
   }
-  const Push: any = getPlugin('PushNotifications');
-  if (!Push) return null;
+  // FCM 플러그인이 없으면 APNs/FCM 브릿지가 없어 서버에 등록해도 푸시가 실패하므로 토큰을 등록하지 않습니다.
+  // 단, 권한 요청은 수행하여 이후 FCM 플러그인 추가 시 원활히 동작하도록 합니다.
   try {
-    const perm = await Push.checkPermissions();
-    if (perm?.receive === 'denied') {
-      const req = await Push.requestPermissions();
-      if (req?.receive !== 'granted') return null;
+    const Push: any = getPlugin('PushNotifications');
+    if (Push) {
+      const perm = await Push.checkPermissions();
+      if (perm?.receive !== 'granted') {
+        await Push.requestPermissions();
+      }
     }
-    return await new Promise<string | null>(async (resolve) => {
-      const regSub = await Push.addListener('registration', (token: any) => {
-        resolve(token?.value ?? null);
-        regSub?.remove?.();
-      });
-      const errSub = await Push.addListener('registrationError', () => {
-        resolve(null);
-        errSub?.remove?.();
-      });
-      await Push.register();
-    });
-  } catch {
-    return null;
-  }
+  } catch {}
+  return null;
 }
 
 export async function secureSet(key: string, value: string) {
