@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className="min-h-screen dark">
       <head>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo_round.png" />
         <link rel="manifest" href="/manifest.json" />
         {/* iOS safe-area 및 테마 컬러 설정 */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />

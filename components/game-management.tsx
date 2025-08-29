@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { gameService } from "@/lib/game-service"
-import { Plus, Trash2, Gamepad2 } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
+import Image from "next/image"
 import {
   Dialog,
   DialogContent,
@@ -137,7 +138,7 @@ export function GameManagement({ serverId }: GameManagementProps) {
       <Card className="glass border-white/20 h-full">
         <CardHeader>
           <CardTitle className="text-black flex items-center">
-            <Gamepad2 className="mr-2 h-5 w-5" /> 게임 관리
+            <Image src="/logo_round.png" alt="게임" width={20} height={20} className="mr-2 h-5 w-5" /> 게임 관리
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -152,7 +153,7 @@ export function GameManagement({ serverId }: GameManagementProps) {
       <Card className="glass border-white/20 h-full flex flex-col">
         <CardHeader>
           <CardTitle className="text-white flex items-center">
-            <Gamepad2 className="mr-2 h-5 w-5" /> 게임 관리
+            <Image src="/logo_round.png" alt="게임" width={20} height={20} className="mr-2 h-5 w-5" /> 게임 관리
           </CardTitle>
           <CardDescription className="text-white/70">
             기본 게임과 커스텀 게임을 관리하세요

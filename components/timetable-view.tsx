@@ -19,7 +19,8 @@ import { toast } from "sonner"
 import { timetableService } from "@/lib/timetable-service"
 import { gameService } from "@/lib/game-service"
 import { serverService } from "@/lib/server-service"
-import { Calendar, Clock, Filter, Users, GamepadIcon, Plus, PartyPopper } from "lucide-react"
+import { Calendar, Clock, Filter, Users, Plus, PartyPopper } from "lucide-react"
+import Image from "next/image"
 import { NewTimetableEntryModal } from "@/components/new-timetable-entry-modal"
 import { NewPartyModal } from "@/components/new-party-modal"
 import { Dialog as ConfirmDialog, DialogContent as ConfirmContent, DialogHeader as ConfirmHeader, DialogFooter as ConfirmFooter, DialogTitle as ConfirmTitle, DialogClose as ConfirmClose } from "@/components/ui/dialog"
@@ -334,7 +335,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                         {schedule.user}
                       </div>
                       <div className="flex items-center gap-1">
-                        <GamepadIcon className="h-3 w-3 text-white/60" />
+                        <Image src="/logo_round.png" alt="게임 아이콘" width={12} height={12} className="h-3 w-3 opacity-60" />
                         <span className="text-[10px] text-white/70 truncate">
                           {schedule.gameName}
                         </span>

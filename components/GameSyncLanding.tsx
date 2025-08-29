@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 // Demo image section removed; no Image import needed
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -29,8 +30,8 @@ export default function GameSyncLanding() {
       <header className="relative z-50 px-4 py-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <Gamepad2 className="w-6 h-6 text-muted-foreground" />
+            <div className="w-10 h-10 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 overflow-hidden">
+              <Image src="/logo_round.png" alt="GameSync" width={40} height={40} className="w-full h-full" />
             </div>
             <span className="text-2xl font-bold">GameSync</span>
           </div>
