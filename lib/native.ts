@@ -146,19 +146,28 @@ export async function closeBrowser() {
 
 export async function registerNativePush(): Promise<string | null> {
   if (!(await isNative())) return null;
-  // Prefer Firebase Messaging for FCM registration token on iOS/Android
-  const FCM: any = getPlugin('FirebaseMessaging') || getPlugin('CapacitorFirebaseMessaging');
+  
+  // Use @capacitor-firebase/messaging plugin
+  const FCM: any = getPlugin('FirebaseMessaging');
   if (FCM && typeof FCM.requestPermissions === 'function') {
     try {
-      await FCM.requestPermissions();
-      const res = await FCM.getToken();
-      if (res && typeof res.token === 'string' && res.token.length > 0) {
-        return res.token as string; // FCM token
+      // Request permissions first
+      const permissionResult = await FCM.requestPermissions();
+      console.log('FCM permission result:', permissionResult);
+      
+      // Get FCM token
+      const tokenResult = await FCM.getToken();
+      console.log('FCM token result:', tokenResult);
+      
+      if (tokenResult && typeof tokenResult.token === 'string' && tokenResult.token.length > 0) {
+        return tokenResult.token as string; // FCM token
       }
-    } catch {}
+    } catch (error) {
+      console.error('FCM registration error:', error);
+    }
   }
-  // FCM 플러그인이 없으면 APNs/FCM 브릿지가 없어 서버에 등록해도 푸시가 실패하므로 토큰을 등록하지 않습니다.
-  // 단, 권한 요청은 수행하여 이후 FCM 플러그인 추가 시 원활히 동작하도록 합니다.
+  
+  // Fallback to PushNotifications for permission request only
   try {
     const Push: any = getPlugin('PushNotifications');
     if (Push) {
@@ -167,7 +176,10 @@ export async function registerNativePush(): Promise<string | null> {
         await Push.requestPermissions();
       }
     }
-  } catch {}
+  } catch (error) {
+    console.error('Push permission error:', error);
+  }
+  
   return null;
 }
 
