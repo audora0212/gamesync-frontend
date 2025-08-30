@@ -147,7 +147,7 @@ export async function closeBrowser() {
 export async function registerNativePush(): Promise<string | null> {
   if (!(await isNative())) return null;
   // Prefer Firebase Messaging for FCM registration token on iOS/Android
-  const FCM: any = getPlugin('FirebaseMessaging');
+  const FCM: any = getPlugin('FirebaseMessaging') || getPlugin('CapacitorFirebaseMessaging');
   if (FCM && typeof FCM.requestPermissions === 'function') {
     try {
       await FCM.requestPermissions();

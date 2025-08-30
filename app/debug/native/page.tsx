@@ -12,6 +12,7 @@ export default function NativeDebugPage() {
   const [platform, setPlatform] = useState<string>("unknown")
   const [hasCapacitor, setHasCapacitor] = useState<boolean>(false)
   const [hasFirebaseMessaging, setHasFirebaseMessaging] = useState<boolean>(false)
+  const [pluginKeys, setPluginKeys] = useState<string[]>([])
   const [fcmToken, setFcmToken] = useState<string | null>(null)
   const [lastAction, setLastAction] = useState<string>("")
 
@@ -25,8 +26,12 @@ export default function NativeDebugPage() {
       setHasCapacitor(!!Cap)
       setIsNative(!!(Cap && typeof Cap.isNativePlatform === 'function' && Cap.isNativePlatform()))
       setPlatform(Cap && typeof Cap.getPlatform === 'function' ? (Cap.getPlatform() as string) : 'web')
-      const FM = (Cap?.FirebaseMessaging) || (Cap?.Plugins?.FirebaseMessaging)
+      const FM = (Cap?.FirebaseMessaging) || (Cap?.Plugins?.FirebaseMessaging) || (Cap?.Plugins?.CapacitorFirebaseMessaging) || (Cap?.CapacitorFirebaseMessaging)
       setHasFirebaseMessaging(!!FM)
+      try {
+        const keys = Cap?.Plugins ? Object.keys(Cap.Plugins) : []
+        setPluginKeys(keys)
+      } catch { setPluginKeys([]) }
       const saved = authService.getFcmToken()
       if (saved) setFcmToken(saved)
     } catch {}
@@ -37,7 +42,7 @@ export default function NativeDebugPage() {
     try {
       const w: any = typeof window !== 'undefined' ? window : null
       const Cap = w?.Capacitor || null
-      const FM = (Cap?.FirebaseMessaging) || (Cap?.Plugins?.FirebaseMessaging)
+      const FM = (Cap?.FirebaseMessaging) || (Cap?.Plugins?.FirebaseMessaging) || (Cap?.Plugins?.CapacitorFirebaseMessaging) || (Cap?.CapacitorFirebaseMessaging)
       if (!FM || typeof FM.getToken !== 'function') {
         setLastAction("FirebaseMessaging 플러그인 없음")
         toast.error("FirebaseMessaging 플러그인을 찾을 수 없습니다")
@@ -96,6 +101,7 @@ export default function NativeDebugPage() {
             <div>네이티브 실행: {isNative ? '예' : '아니오'}</div>
             <div>플랫폼: {platform}</div>
             <div>FirebaseMessaging 플러그인: {hasFirebaseMessaging ? '감지됨' : '없음'}</div>
+            <div>등록된 플러그인 키: {pluginKeys.length > 0 ? pluginKeys.join(', ') : '(없음)'}</div>
             <div>저장된 FCM 토큰: {fcmToken ? (fcmToken.slice(0, 20) + '...') : '(없음)'}</div>
             <div>최근 동작: {lastAction || '-'}</div>
             <div className="flex gap-2 mt-3">
