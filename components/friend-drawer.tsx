@@ -165,9 +165,15 @@ export function FriendDrawer({ open, onClose }: FriendDrawerProps) {
             <div className="flex gap-2">
               <Input
                 value={friendCode}
-                onChange={(e) => setFriendCode(e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D+/g, '')
+                  setFriendCode(v)
+                }}
                 placeholder="친구 코드 입력 (예: 123456)"
                 className="bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={6}
               />
               <Button onClick={handleSendByCode} disabled={isLoading} className="whitespace-nowrap">
                 <UserPlus className="w-4 h-4 mr-1" />추가

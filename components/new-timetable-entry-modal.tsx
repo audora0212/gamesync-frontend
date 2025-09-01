@@ -94,9 +94,9 @@ export function NewTimetableEntryModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <Input type="date" value={selectedDate} disabled className="glass border-white/30 text-white text-sm" />
+            <Input type="date" value={selectedDate} disabled className="glass border-white/30 text-white text-sm w-full" />
             <Select value={selectedTime} onValueChange={setSelectedTime} required>
-              <SelectTrigger className="glass border-white/30 text-white text-sm">
+              <SelectTrigger className="glass border-white/30 text-white text-sm w-full">
                 <SelectValue placeholder="시간 선택" />
               </SelectTrigger>
               <SelectContent className="glass border-white/20 text-white text-sm max-h-60 overflow-y-auto">

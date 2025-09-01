@@ -170,6 +170,8 @@ export function GameManagement({ serverId }: GameManagementProps) {
               onChange={(e) => setNewGameName(e.target.value)}
               placeholder="게임 이름"
               className="glass border-white/30 text-white placeholder:text-white/50 text-sm"
+              inputMode="text"
+              style={{ fontSize: 16 }}
             />
             <Button
               type="submit"

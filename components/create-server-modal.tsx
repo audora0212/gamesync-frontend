@@ -59,7 +59,7 @@ export function CreateServerModal({ open, onClose, onServerCreated }: CreateServ
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="glass border-white/30 text-white placeholder:text-white/50"
+              className="glass border-white/30 text-white placeholder:text-white/50 w-full"
               placeholder="서버 이름을 입력하세요"
               required
             />
@@ -73,7 +73,7 @@ export function CreateServerModal({ open, onClose, onServerCreated }: CreateServ
               type="time"
               value={resetTime}
               onChange={(e) => setResetTime(e.target.value)}
-              className="glass border-white/30 text-white"
+              className="glass border-white/30 text-white w-full"
               required
             />
           </div>

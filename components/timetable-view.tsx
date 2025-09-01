@@ -582,6 +582,9 @@ export function TimetableView({ serverId }: TimetableViewProps) {
             value={gameFilter}
             onChange={(e) => setGameFilter(e.target.value)}
             className="glass border-white/30 text-white placeholder:text-white/50 text-sm"
+            inputMode="search"
+            // 모바일 확대 방지: iOS에서 폰트 16px 이상이면 확대 방지
+            style={{ fontSize: 16 }}
           />
           <Button
             onClick={() => setSortByGame(!sortByGame)}
