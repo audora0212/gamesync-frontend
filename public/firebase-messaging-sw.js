@@ -75,7 +75,19 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl = (event.notification && event.notification.data && event.notification.data.url) || '/notifications';
+  // 우선순위: payload.data.url → notification.data.url → 기본 경로
+  let targetUrl = '/notifications';
+  try {
+    const d = event.notification && event.notification.data || {};
+    if (d && typeof d.url === 'string' && d.url.length > 0) {
+      targetUrl = d.url;
+    }
+  } catch {}
+  try {
+    if (event && event.notification && event.notification.data && event.notification.data.url) {
+      targetUrl = event.notification.data.url;
+    }
+  } catch {}
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {

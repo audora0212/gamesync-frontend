@@ -207,3 +207,30 @@ export async function secureRemove(key: string) {
 }
 
 
+// Listen when a native notification is tapped by the user
+export async function onNativeNotificationOpen(callback: (data: any) => void) {
+  if (!(await isNative())) return () => {};
+  // Prefer FirebaseMessaging plugin if available
+  const FM: any = getPlugin('FirebaseMessaging');
+  if (FM && typeof FM.addListener === 'function') {
+    try {
+      const sub = await FM.addListener('notificationOpened', (event: any) => {
+        try { callback(event?.notification?.data) } catch {}
+      });
+      return () => { try { sub?.remove?.() } catch {} };
+    } catch {}
+  }
+  // Fallback to PushNotifications plugin
+  const Push: any = getPlugin('PushNotifications');
+  if (Push && typeof Push.addListener === 'function') {
+    try {
+      const sub = await Push.addListener('pushNotificationActionPerformed', (action: any) => {
+        try { callback(action?.notification?.data) } catch {}
+      });
+      return () => { try { sub?.remove?.() } catch {} };
+    } catch {}
+  }
+  return () => {};
+}
+
+

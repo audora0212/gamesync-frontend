@@ -223,13 +223,7 @@ export default function DashboardPage() {
             >
               초대 코드로 참가
             </Button>
-            <Button
-              onClick={() => router.push('/debug/native')}
-              className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
-              variant="secondary"
-            >
-              디버그
-            </Button>
+            {/* 디버그 버튼 제거 (링크 직접 접근 허용) */}
             <Button
               onClick={() => setShowCreateModal(true)}
               className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"

@@ -170,15 +170,23 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
                   </div>
                   <div className="flex items-center gap-1" />
                 </div>
-                {/* 서버 초대 알림이면 수락/거절 버튼 */}
-                {onInviteAction && inviteId && (
+                {/* 서버 초대 알림이면 확인 페이지로 이동 및 거절 제공 */}
+                {inviteId && (
                   <div className="mt-2 flex gap-2">
-                    <Button size="sm" className="glass-button" onClick={() => handleInviteDecision(n, true, inviteId)}>
-                      수락
+                    <Button
+                      size="sm"
+                      className="glass-button"
+                      onClick={() => {
+                        try { window.location.href = `/invite/by-id?inviteId=${inviteId}` } catch {}
+                      }}
+                    >
+                      확인
                     </Button>
-                    <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={() => handleInviteDecision(n, false, inviteId)}>
-                      거절
-                    </Button>
+                    {onInviteAction && (
+                      <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={() => handleInviteDecision(n, false, inviteId)}>
+                        거절
+                      </Button>
+                    )}
                   </div>
                 )}
                 {/* 친구 요청 알림이면 수락/거절 버튼 */}

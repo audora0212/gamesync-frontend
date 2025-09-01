@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { authService } from "@/lib/auth-service"
 import { requestFcmToken, onForegroundMessage } from "@/lib/fcm"
-import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet, getLaunchUrl, onAppStateChange, closeBrowser, markLaunchUrlProcessed } from "@/lib/native"
+import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet, getLaunchUrl, onAppStateChange, closeBrowser, markLaunchUrlProcessed, onNativeNotificationOpen } from "@/lib/native"
 import { notificationService } from "@/lib/notification-service"
 import { toast } from "sonner"
 
@@ -119,6 +119,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               await notificationService.registerPushToken(nativeToken, platform)
               authService.setFcmToken(nativeToken)
             }
+            // Listen notification open to route using embedded url
+            try {
+              const unsubNotif = await onNativeNotificationOpen((data: any) => {
+                try {
+                  const url = (data && typeof data.url === 'string') ? data.url : null
+                  if (!url) return
+                  // 친구 패널 오픈 플래그 지원
+                  if (url === '/dashboard?friends=1') {
+                    router.replace('/dashboard?friends=1')
+                    return
+                  }
+                  router.replace(url)
+                } catch {}
+              })
+              if (unsubNotif) setDeepLinkListeners(prev => [...prev, unsubNotif])
+            } catch {}
             // Listen deep links (e.g., gamesync://oauth/callback?code=...)
             const unsub = await onAppUrlOpen((url) => {
               // 로그아웃 중이거나 토큰이 없으면 리스너가 동작하지 않도록  

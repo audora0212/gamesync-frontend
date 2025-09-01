@@ -225,6 +225,12 @@ class ServerService {
     if (!res.ok) throw new Error("Failed to send invite")
   }
 
+  async listMyInvites(): Promise<Array<{ id: number; serverId: number; serverName: string }>> {
+    const res = await fetchWithAuth(`${API_BASE}/servers/invites/me`)
+    if (!res.ok) throw new Error("Failed to fetch my invites")
+    return res.json()
+  }
+
   async updateDescription(serverId: number, description: string): Promise<Server> {
     const res = await fetchWithAuth(`${API_BASE}/servers/${serverId}/description`, {
       method: "PUT",

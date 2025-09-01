@@ -34,6 +34,18 @@ export function Navbar() {
         } catch {}
       })()
     }
+    // 쿼리 friends=1 이면 친구 패널 자동 오픈
+    try {
+      const usp = new URLSearchParams(window.location.search)
+      if (usp.get('friends') === '1') {
+        setFriendOpen(true)
+        // URL 정리 (히스토리 유지)
+        usp.delete('friends')
+        const qs = usp.toString()
+        const clean = window.location.pathname + (qs ? `?${qs}` : '')
+        window.history.replaceState({}, '', clean)
+      }
+    } catch {}
   }, [])
 
   const handleLogout = async () => {
