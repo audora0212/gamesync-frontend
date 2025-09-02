@@ -16,6 +16,7 @@ import { useAuth } from "@/components/auth-provider"
 export function Navbar() {
   const { logout: authLogout } = useAuth() // AuthProvider의 logout 함수 사용
   const [user, setUser] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState<boolean>(false)
   const [friendOpen, setFriendOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [unread, setUnread] = useState(0)
@@ -31,6 +32,14 @@ export function Navbar() {
         try {
           const data = await notificationService.getNotifications()
           setUnread(data.unreadCount)
+          // 관리자 여부 로드
+          try {
+            const meRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, { headers: authService.getAuthHeaders() })
+            if (meRes.ok) {
+              const me = await meRes.json()
+              setIsAdmin(!!me?.admin)
+            }
+          } catch {}
         } catch {}
       })()
     }
@@ -71,6 +80,16 @@ export function Navbar() {
               <span className="max-w-[30vw] truncate text-xs sm:text-sm md:text-base text-foreground font-medium whitespace-nowrap">
                 {user}
               </span>
+            )}
+            {isAdmin && (
+              <Link href="/admin" className="hidden sm:inline-block">
+                <Button
+                  variant="ghost"
+                  className="text-xs sm:text-sm md:text-base text-muted-foreground hover:bg-white/10 hover:text-foreground whitespace-nowrap"
+                >
+                  관리
+                </Button>
+              </Link>
             )}
             <Button
               variant="ghost"
