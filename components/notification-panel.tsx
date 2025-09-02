@@ -156,16 +156,15 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
               <Card key={n.id} className="glass border-white/10 p-3 mb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <div className="text-sm text-white font-medium">{n.title}</div>
-                    {/* JSON payload가 아니면 원문 출력 (친구요청/초대 JSON은 숨김) */}
+                    {/* 제목은 표시하지 않고, 본문만 노출 */}
                     {!payload && n.message && !(isFriendRequest || (isInvite && inviteMarker)) && (
-                      <div className="text-xs text-white/70 mt-1 whitespace-pre-line">{n.message}</div>
+                      <div className="text-sm text-white mt-0.5 whitespace-pre-line">{n.message}</div>
                     )}
                     {isFriendRequest && (
-                      <div className="text-xs text-white/70 mt-1">{fromNickname ?? '상대방'} 님이 친구 요청을 보냈습니다.</div>
+                      <div className="text-sm text-white mt-0.5">{fromNickname ?? '상대방'} 님이 친구 요청을 보냈습니다.</div>
                     )}
                     {isInvite && ((payload?.kind === 'server_invite') || inviteMarker) && (
-                      <div className="text-xs text-white/70 mt-1">{payload?.fromNickname ?? '상대방'} → {payload?.serverName ?? ''}</div>
+                      <div className="text-sm text-white mt-0.5">{payload?.fromNickname ?? '상대방'} 님이 {payload?.serverName ?? '서버'} 서버에 초대했어요</div>
                     )}
                   </div>
                   <div className="flex items-center gap-1" />
