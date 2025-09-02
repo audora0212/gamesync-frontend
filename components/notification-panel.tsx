@@ -146,7 +146,7 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
             .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
             .map((n) => {
             const isInvite = n.type === "INVITE"
-            const payload = parseMessage<{ kind?: string, inviteId?: number, requestId?: number, serverName?: string, fromNickname?: string, userNickname?: string, nickname?: string, reservationName?: string, slotName?: string, title?: string, name?: string }>(n.message)
+            const payload = parseMessage<{ kind?: string, inviteId?: number, requestId?: number, serverName?: string, fromNickname?: string, userNickname?: string, nickname?: string, reservationName?: string, slotName?: string, title?: string, name?: string, partyName?: string, gameName?: string, description?: string }>(n.message)
             const friendMarker = n.message?.includes('"kind":"friend_request"')
             const inviteMarker = n.message?.includes('"kind":"server_invite"')
             const isFriendRequest = (payload?.kind === 'friend_request' && typeof payload.requestId === 'number') || !!friendMarker
@@ -166,6 +166,17 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
               if (actor) {
                 displayText = `${actor} 님이 ${serverName} 서버에 ${what} 예약을 등록했습니다.`
               }
+            } else if (n.type === 'PARTY' || payload?.kind === 'party') {
+              const actor = payload?.fromNickname || payload?.userNickname || payload?.nickname
+              const serverName = payload?.serverName || '서버'
+              const partyName = payload?.partyName || payload?.title || payload?.name || payload?.gameName
+              if (actor && partyName) {
+                displayText = `${actor} 님이 ${serverName} 서버에서 ${partyName} 파티를 모집했어요`
+              } else if (actor) {
+                displayText = `${actor} 님이 ${serverName} 서버에서 파티를 모집했어요`
+              } else {
+                displayText = '새 파티 모집 알림이 도착했습니다.'
+              }
             }
             if (!displayText) {
               displayText = (n.message && !(isFriendRequest || (isInvite && inviteMarker)) ? n.message : '') || n.title || ''
@@ -174,8 +185,8 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
               <Card key={n.id} className="glass border-white/10 p-3 mb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    {/* 제목은 숨기고, 최종 본문만 표시 */}
-                    <div className="text-sm text-white mt-0.5 whitespace-pre-line">{displayText}</div>
+                    {/* 제목은 숨기고, 최종 본문만 표시 (길면 말줄임) */}
+                    <div className="text-sm text-white mt-0.5 whitespace-nowrap truncate max-w-[280px]">{displayText}</div>
                   </div>
                   <div className="flex items-center gap-1" />
                 </div>

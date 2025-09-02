@@ -38,6 +38,14 @@ self.addEventListener('push', (event) => {
         const serverName = p.serverName || '';
         if (!titleFromPayload && !dataObj.title) title = '서버 초대';
         body = `${fromNickname} → ${serverName}`;
+      } else if (kind === 'party') {
+        const fromNickname = p.fromNickname || p.userNickname || p.nickname || '상대방';
+        const serverName = p.serverName || '서버';
+        const partyName = p.partyName || p.title || p.name || p.gameName || '';
+        if (!titleFromPayload && !dataObj.title) title = '파티 모집';
+        body = partyName
+          ? `${fromNickname} 님이 ${serverName} 서버에서 ${partyName} 파티를 모집했어요`
+          : `${fromNickname} 님이 ${serverName} 서버에서 파티를 모집했어요`;
       }
     }
   } catch {}
