@@ -146,26 +146,36 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
             .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
             .map((n) => {
             const isInvite = n.type === "INVITE"
-            const payload = parseMessage<{ kind?: string, inviteId?: number, requestId?: number, serverName?: string, fromNickname?: string }>(n.message)
+            const payload = parseMessage<{ kind?: string, inviteId?: number, requestId?: number, serverName?: string, fromNickname?: string, userNickname?: string, nickname?: string, reservationName?: string, slotName?: string, title?: string, name?: string }>(n.message)
             const friendMarker = n.message?.includes('"kind":"friend_request"')
             const inviteMarker = n.message?.includes('"kind":"server_invite"')
             const isFriendRequest = (payload?.kind === 'friend_request' && typeof payload.requestId === 'number') || !!friendMarker
             const inviteId = payload?.kind === 'server_invite' && typeof payload.inviteId === 'number' ? payload.inviteId : undefined
             const fromNickname = payload?.fromNickname || (n.message && (n.message.match(/\"fromNickname\":\"([^\"]+)\"/)?.[1])) || undefined
+            // 표시할 본문 생성 로직 (메시지 우선, 없으면 종류별 구성)
+            let displayText: string = ''
+            if (isFriendRequest) {
+              displayText = `${fromNickname ?? '상대방'} 님이 친구 요청을 보냈습니다.`
+            } else if (isInvite && ((payload?.kind === 'server_invite') || inviteMarker)) {
+              const serverName = payload?.serverName ?? '서버'
+              displayText = `${fromNickname ?? '상대방'} 님이 ${serverName} 서버에 초대했어요`
+            } else if (n.type === 'TIMETABLE') {
+              const actor = payload?.userNickname || payload?.fromNickname || payload?.nickname
+              const serverName = payload?.serverName || '서버'
+              const what = payload?.reservationName || payload?.slotName || payload?.title || payload?.name || '스케줄'
+              if (actor) {
+                displayText = `${actor} 님이 ${serverName} 서버에 ${what} 예약을 등록했습니다.`
+              }
+            }
+            if (!displayText) {
+              displayText = (n.message && !(isFriendRequest || (isInvite && inviteMarker)) ? n.message : '') || n.title || ''
+            }
             return (
               <Card key={n.id} className="glass border-white/10 p-3 mb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    {/* 제목은 표시하지 않고, 본문만 노출 */}
-                    {!payload && n.message && !(isFriendRequest || (isInvite && inviteMarker)) && (
-                      <div className="text-sm text-white mt-0.5 whitespace-pre-line">{n.message}</div>
-                    )}
-                    {isFriendRequest && (
-                      <div className="text-sm text-white mt-0.5">{fromNickname ?? '상대방'} 님이 친구 요청을 보냈습니다.</div>
-                    )}
-                    {isInvite && ((payload?.kind === 'server_invite') || inviteMarker) && (
-                      <div className="text-sm text-white mt-0.5">{payload?.fromNickname ?? '상대방'} 님이 {payload?.serverName ?? '서버'} 서버에 초대했어요</div>
-                    )}
+                    {/* 제목은 숨기고, 최종 본문만 표시 */}
+                    <div className="text-sm text-white mt-0.5 whitespace-pre-line">{displayText}</div>
                   </div>
                   <div className="flex items-center gap-1" />
                 </div>
