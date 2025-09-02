@@ -19,7 +19,7 @@ import { authService } from "@/lib/auth-service";
 import { CreateServerModal } from "@/components/create-server-modal";
 import { JoinByCodeModal } from "@/components/join-by-code-modal";
 import { Navbar } from "@/components/navbar";
-import { Plus, Users, Clock, Flame, Star } from "lucide-react";
+import { Plus, Users, Clock, Flame, Star, Bug } from "lucide-react";
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute";
 import { useAuth } from "@/components/auth-provider";
 
@@ -202,6 +202,10 @@ export default function DashboardPage() {
   const favoriteServers = servers.filter((s) => favoriteIds.has(s.id));
   const otherServers = servers.filter((s) => !favoriteIds.has(s.id));
 
+  const handleDebugClick = () => {
+    router.push('/debug/native');
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -217,6 +221,13 @@ export default function DashboardPage() {
             <p className="text-white/70">내가 참여한 서버를 한눈에 모아보세요</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button
+              onClick={handleDebugClick}
+              className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
+              variant="secondary"
+            >
+              <Bug className="mr-2 h-4 w-4" />디버그
+            </Button>
             <Button
               onClick={() => setShowJoinModal(true)}
               className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
