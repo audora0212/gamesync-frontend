@@ -163,27 +163,29 @@ export function SettingModal() {
                 setPushInvite(v)
                 setPushFriendReq(v)
                 setPushFriendSchedule(v)
+                setPushParty(v)
+                setPushMyTT(v)
               }}>
                 <span className="knob" />
               </button>
             </div>
 
             <div className="flex items-center justify-between text-white/70 text-xs">
-              <span>친구 추가 FCM 알림</span>
+              <span>친구 추가 알림</span>
               <button type="button" className={`toggle ${pushFriendReq ? 'on' : ''}`} onClick={() => setPushFriendReq(!pushFriendReq)}>
                 <span className="knob" />
               </button>
             </div>
 
             <div className="flex items-center justify-between text-white/70 text-xs">
-              <span>서버 초대 FCM 알림</span>
+              <span>서버 초대 알림</span>
               <button type="button" className={`toggle ${pushInvite ? 'on' : ''}`} onClick={() => setPushInvite(!pushInvite)}>
                 <span className="knob" />
               </button>
             </div>
 
             <div className="flex items-center justify-between text-white/70 text-xs">
-              <span>친구 스케줄 등록 알림 (FCM + 패널)</span>
+              <span>친구 스케줄 등록 알림</span>
               <button type="button" className={`toggle ${pushFriendSchedule ? 'on' : ''}`} onClick={() => setPushFriendSchedule(!pushFriendSchedule)}>
                 <span className="knob" />
               </button>
