@@ -23,6 +23,22 @@ export default function AdminPage() {
   const [servers, setServers] = useState<Server[]>([])
   const [timetables, setTimetables] = useState<Timetable[]>([])
   const [parties, setParties] = useState<Party[]>([])
+  // 간단한 수정 모달 상태 (Hooks는 모든 early return보다 위에 있어야 함)
+  const [editing, setEditing] = useState<{ type: 'server'|'timetable'|'party'; data: any }|null>(null)
+  const openEdit = (type: 'server'|'timetable'|'party', data: any) => setEditing({ type, data })
+  const closeEdit = () => setEditing(null)
+  const saveEdit = async () => {
+    if (!editing) return
+    const { type, data } = editing
+    const path = type === 'server' ? '/admin/servers' : type === 'timetable' ? '/admin/timetables' : '/admin/parties'
+    const res = await fetch(`${API}${path}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...authService.getAuthHeaders() }, body: JSON.stringify(data) })
+    if (res.ok) {
+      if (type==='server') setServers(prev => prev.map(s => s.id===data.id ? { ...s, ...data } : s))
+      if (type==='timetable') setTimetables(prev => prev.map(t => t.id===data.id ? { ...t, ...data } : t))
+      if (type==='party') setParties(prev => prev.map(p => p.id===data.id ? { ...p, ...data } : p))
+      closeEdit()
+    }
+  }
 
   useEffect(() => {
     ;(async () => {
@@ -72,22 +88,6 @@ export default function AdminPage() {
     await fetch(`${API}${path}`, { method: 'DELETE', headers: authService.getAuthHeaders() })
   }
 
-  // 간단한 수정 모달 상태
-  const [editing, setEditing] = useState<{ type: 'server'|'timetable'|'party'; data: any }|null>(null)
-  const openEdit = (type: 'server'|'timetable'|'party', data: any) => setEditing({ type, data })
-  const closeEdit = () => setEditing(null)
-  const saveEdit = async () => {
-    if (!editing) return
-    const { type, data } = editing
-    const path = type === 'server' ? '/admin/servers' : type === 'timetable' ? '/admin/timetables' : '/admin/parties'
-    const res = await fetch(`${API}${path}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...authService.getAuthHeaders() }, body: JSON.stringify(data) })
-    if (res.ok) {
-      if (type==='server') setServers(prev => prev.map(s => s.id===data.id ? { ...s, ...data } : s))
-      if (type==='timetable') setTimetables(prev => prev.map(t => t.id===data.id ? { ...t, ...data } : t))
-      if (type==='party') setParties(prev => prev.map(p => p.id===data.id ? { ...p, ...data } : p))
-      closeEdit()
-    }
-  }
 
   return (
     <div className="min-h-screen">
