@@ -37,6 +37,12 @@ export default function ClientCallback() {
   const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
   const [isNativeEnv, setIsNativeEnv] = useState(false);
   const isDebug = false
+  const [showRebootHint, setShowRebootHint] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowRebootHint(true), 8000);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => { (async () => { try { setIsNativeEnv(await isNative()) } catch {} })() }, [])
   // 네이티브 앱 환경에서는 oauth_target 쿠키가 남아 메시지가 보이지 않도록 초기화
@@ -141,6 +147,11 @@ export default function ClientCallback() {
   return (
     <div style={{padding:16}}>
       처리 중입니다… {didAttemptOpenApp ? '앱 열기를 시도하는 중입니다.' : ''}
+      {showRebootHint && (
+        <div style={{marginTop:12, color:'#bbb', fontSize:13}}>
+          오래 걸리면 앱을 완전히 종료 후 다시 열어주세요.
+        </div>
+      )}
       {oauthTarget === 'mobile-web' && !isNativeEnv && (
         <div style={{marginTop:16, display:'flex', gap:12}}>
           <a href={deeplink} style={{padding:'10px 14px', background:'#0b0e14', color:'#fff', borderRadius:8}}>앱에서 열기</a>

@@ -34,7 +34,13 @@ export default function ClientCallback() {
   const [isProcessing, setIsProcessing] = useState(false); // 중복 처리 방지
   const oauthTarget = useMemo(() => getCookie("oauth_target") || "web", []);
   const [isNativeEnv, setIsNativeEnv] = useState(false);
-  const isDebug = false
+  const isDebug = (() => {
+    try {
+      if (typeof window === 'undefined') return false
+      const usp = new URLSearchParams(window.location.search)
+      return usp.get('debug') === '1'
+    } catch { return false }
+  })()
 
   useEffect(() => { (async () => { try { setIsNativeEnv(await isNative()) } catch {} })() }, [])
   // 네이티브 앱 환경에서는 oauth_target 쿠키가 남아 메시지가 보이지 않도록 초기화

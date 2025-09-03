@@ -23,12 +23,22 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isDiscordLoading, setIsDiscordLoading] = useState(false)
   const [isKakaoLoading, setIsKakaoLoading] = useState(false)
+  const [showRebootHint, setShowRebootHint] = useState(false)
   const router = useRouter()
   const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null
   const inviteCode = params?.get("code") || null
   const returnUrl = params?.get("return") || null
   const error = params?.get("error") || null
   const existingProvider = params?.get("existingProvider") || null
+
+  useEffect(() => {
+    if (!authLoading) {
+      setShowRebootHint(false)
+      return
+    }
+    const t = setTimeout(() => setShowRebootHint(true), 8000)
+    return () => clearTimeout(t)
+  }, [authLoading])
 
   useEffect(() => {
     // AuthProvider의 상태를 통해 인증 확인
@@ -154,7 +164,12 @@ export default function LoginPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white">처리 중입니다...</div>
+        <div className="text-white text-center">
+          <div>처리 중입니다...</div>
+          {showRebootHint && (
+            <div className="text-white/70 text-sm mt-2">오래 걸리면 앱을 완전히 종료 후 다시 열어주세요.</div>
+          )}
+        </div>
       </div>
     )
   }

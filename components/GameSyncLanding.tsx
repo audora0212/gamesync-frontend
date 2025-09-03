@@ -8,9 +8,31 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, RefreshCw, BarChart3, ArrowRight, Zap, Megaphone } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function GameSyncLanding() {
   const [isVisible, setIsVisible] = useState(false)
+  const router = useRouter()
+  const isIOSMobileWeb = () => {
+    try { return /iphone|ipad|ipod/i.test(navigator.userAgent) } catch { return false }
+  }
+  const isNativeWebView = () => {
+    try { const w: any = window; return !!(w?.Capacitor?.isNativePlatform?.() === true) } catch { return false }
+  }
+
+  const goLogin = () => {
+    if (!isNativeWebView() && isIOSMobileWeb()) router.push('/continue?return=%2Fauth%2Flogin')
+    else router.push('/auth/login')
+  }
+  const goSignup = () => {
+    if (!isNativeWebView() && isIOSMobileWeb()) router.push('/continue?return=%2Fauth%2Fsignup')
+    else router.push('/auth/signup')
+  }
+  const goStart = () => {
+    // 시작하기는 회원가입으로 가정
+    if (!isNativeWebView() && isIOSMobileWeb()) router.push('/continue?return=%2Fauth%2Fsignup')
+    else router.push('/auth/signup')
+  }
 
   useEffect(() => {
     setIsVisible(true)
@@ -28,17 +50,13 @@ export default function GameSyncLanding() {
             <span className="text-2xl font-bold">GameSync</span>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/auth/login" passHref>
-              <Button
-                variant="ghost"
-                className="text-muted-foreground hover:bg-white/10 backdrop-blur-sm border border-white/10"
-              >
-                로그인
-              </Button>
-            </Link>
-            <Link href="/auth/signup" passHref>
-              <Button>회원가입</Button>
-            </Link>
+            <Button onClick={goLogin}
+              variant="ghost"
+              className="text-muted-foreground hover:bg-white/10 backdrop-blur-sm border border-white/10"
+            >
+              로그인
+            </Button>
+            <Button onClick={goSignup}>회원가입</Button>
           </div>
         </div>
       </header>
@@ -67,12 +85,10 @@ export default function GameSyncLanding() {
               <span className="text-primary font-semibold">5분이면 충분합니다.</span>
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-0">
-              <Link href="/auth/signup" passHref>
-                <Button size="lg" className="w-full sm:w-auto px-8 py-4 text-lg font-semibold rounded-xl">
-                  시작하기
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
+              <Button onClick={goStart} size="lg" className="w-full sm:w-auto px-8 py-4 text-lg font-semibold rounded-xl">
+                시작하기
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
             </div>
           </div>
         </div>
@@ -160,15 +176,14 @@ export default function GameSyncLanding() {
                 <br />
                 <span className="text-primary font-semibold">5분내로 첫 약속을 만들 수 있어요</span>
               </p>
-              <Link href="/auth/signup" passHref>
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto px-8 sm:px-12 py-4 text-lg sm:text-xl font-semibold rounded-xl"
-                >
-                  시작하기
-                  <ArrowRight className="w-5 sm:w-6 h-5 sm:h-6 ml-2" />
-                </Button>
-              </Link>
+              <Button
+                onClick={goStart}
+                size="lg"
+                className="w-full sm:w-auto px-8 sm:px-12 py-4 text-lg sm:text-xl font-semibold rounded-xl"
+              >
+                시작하기
+                <ArrowRight className="w-5 sm:w-6 h-5 sm:h-6 ml-2" />
+              </Button>
             </CardContent>
           </Card>
         </div>
