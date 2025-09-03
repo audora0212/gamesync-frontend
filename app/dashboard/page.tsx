@@ -202,9 +202,7 @@ export default function DashboardPage() {
   const favoriteServers = servers.filter((s) => favoriteIds.has(s.id));
   const otherServers = servers.filter((s) => !favoriteIds.has(s.id));
 
-  const handleDebugClick = () => {
-    router.push('/debug/native');
-  };
+  // 디버그 버튼 제거: 페이지는 /debug/native 로 직접 접근 가능
 
   return (
     <div className="min-h-screen">
@@ -221,13 +219,6 @@ export default function DashboardPage() {
             <p className="text-white/70">내가 참여한 서버를 한눈에 모아보세요</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button
-              onClick={handleDebugClick}
-              className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
-              variant="secondary"
-            >
-              <Bug className="mr-2 h-4 w-4" />디버그
-            </Button>
             <Button
               onClick={() => setShowJoinModal(true)}
               className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
