@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select"
 import { toast } from "sonner"
 import { partyService } from "@/lib/party-service"
+import { isNative } from "@/lib/native"
 
 interface Game {
   id: number
@@ -49,6 +50,14 @@ export function NewPartyModal({
   timeOptions,
   onCreated,
 }: NewPartyModalProps) {
+  const [isNativeApp, setIsNativeApp] = useState<boolean>(false)
+
+  React.useEffect(() => {
+    let mounted = true
+    isNative().then((v) => { if (mounted) setIsNativeApp(!!v) })
+    return () => { mounted = false }
+  }, [])
+
   const [selectedTime, setSelectedTime] = useState<string>("")
   const [selectedGame, setSelectedGame] = useState<string>("")
   const [capacity, setCapacity] = useState<string>("4")
@@ -97,7 +106,14 @@ export function NewPartyModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <Input type="date" value={selectedDate} disabled className="glass border-white/30 text-white text-sm w-full" />
+            <div className={isNativeApp ? "w-full flex justify-center" : "w-full"}>
+              <Input
+                type="date"
+                value={selectedDate}
+                disabled
+                className={"glass border-white/30 text-white text-sm " + (isNativeApp ? "w-[40%] text-center" : "w-full")}
+              />
+            </div>
             <Select value={selectedTime} onValueChange={setSelectedTime} required>
               <SelectTrigger className="glass border-white/30 text-white text-sm w-full">
                 <SelectValue placeholder="시간 선택" />
