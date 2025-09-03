@@ -341,6 +341,9 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                         </span>
                       </div>
                     </div>
+                    <div className="w-12 text-[10px] text-white/70 text-center">
+                      {new Date(schedule.entry.slot).toLocaleTimeString("ko-KR", { hour: '2-digit', minute: '2-digit' })}
+                    </div>
                     <div className="flex-1 flex h-6 sm:h-8 gap-px">
                       {hours.map((hour) => (
                         <div
@@ -353,9 +356,9 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                               : "bg-white/5 border border-white/10"
                           } ${
                             hour === schedule.joinTime
-                              ? "rounded-l-sm border-l-2"
+                              ? "border-l-2"
                               : hour === 23 && isUserOnlineAtHour(schedule, hour)
-                              ? "rounded-r-sm border-r-2"
+                              ? "border-r-2"
                               : ""
                           }`}
                         >
