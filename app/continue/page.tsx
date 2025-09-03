@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Smartphone, ExternalLink, Download } from "lucide-react"
 
-export default function ContinueInAppPage() {
+function ContinueInAppClient() {
   const params = useSearchParams()
   const returnPath = params.get("return") || "/auth/login"
   const [didAttemptOpenApp, setDidAttemptOpenApp] = useState(false)
@@ -20,12 +20,10 @@ export default function ContinueInAppPage() {
   }, [])
 
   const appScheme = useMemo(() => {
-    // 일반 진입: 앱만 열고, 내부에서 라우팅하도록
     return "gamesync:///"
   }, [])
 
   const universal = useMemo(() => {
-    // 유니버설 링크: 사이트 루트로 복귀
     return "https://gamesync.cloud/"
   }, [])
 
@@ -33,7 +31,6 @@ export default function ContinueInAppPage() {
   const androidInstallUrl = (process as any).env.NEXT_PUBLIC_ANDROID_DOWNLOAD_URL as string | undefined
 
   useEffect(() => {
-    // 모바일 웹 진입 시 자동으로 앱 열기 시도 → 실패하면 유니버설 링크 폴백
     setDidAttemptOpenApp(true)
     try { window.location.href = appScheme } catch {}
     const t1 = setTimeout(() => { try { window.location.replace(universal) } catch {} }, 600)
@@ -91,5 +88,13 @@ export default function ContinueInAppPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function ContinueInAppPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center p-4"><div className="text-white/80">처리 중입니다...</div></div>}>
+      <ContinueInAppClient />
+    </Suspense>
   )
 }
