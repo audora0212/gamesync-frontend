@@ -334,15 +334,15 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                       <div className="text-white font-medium text-[12px] truncate">
                         {schedule.user}
                       </div>
+                      <div className="text-[10px] text-white/70 leading-4">
+                        {new Date(schedule.entry.slot).toLocaleTimeString("ko-KR", { hour: '2-digit', minute: '2-digit' })}
+                      </div>
                       <div className="flex items-center gap-1">
                         <Image src="/logo_round.png" alt="게임 아이콘" width={12} height={12} className="h-3 w-3 opacity-60" />
                         <span className="text-[10px] text-white/70 truncate">
                           {schedule.gameName}
                         </span>
                       </div>
-                    </div>
-                    <div className="w-12 text-[10px] text-white/70 text-center">
-                      {new Date(schedule.entry.slot).toLocaleTimeString("ko-KR", { hour: '2-digit', minute: '2-digit' })}
                     </div>
                     <div className="flex-1 flex h-6 sm:h-8 gap-px">
                       {hours.map((hour) => (
