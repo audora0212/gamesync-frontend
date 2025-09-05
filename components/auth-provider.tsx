@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       try {
         if (await isNative()) {
-          await setStatusBarOverlay(false)
+          await setStatusBarOverlay(true)
           await setStatusBarStyle('LIGHT')
         }
       } catch {}
