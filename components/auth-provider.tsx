@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { authService } from "@/lib/auth-service"
 import { requestFcmToken, onForegroundMessage } from "@/lib/fcm"
-import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet, getLaunchUrl, onAppStateChange, closeBrowser, markLaunchUrlProcessed, onNativeNotificationOpen, setStatusBarOverlay, setStatusBarStyle, setStatusBarBackground } from "@/lib/native"
+import { isNative, registerNativePush, onAppUrlOpen, getPlatform, secureSet, getLaunchUrl, onAppStateChange, closeBrowser, markLaunchUrlProcessed, onNativeNotificationOpen } from "@/lib/native"
 import { notificationService } from "@/lib/notification-service"
 import { toast } from "sonner"
 
@@ -39,38 +39,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return usp.get('debug') === '1'
     } catch { return false }
   })()
-
-  // 네이티브에서 상태바 오버레이/스타일을 보정 (노치 영역 블러/배경 연속성)
-  useEffect(() => {
-    (async () => {
-      try {
-        if (await isNative()) {
-          await setStatusBarOverlay(true)
-          await setStatusBarStyle('LIGHT')
-          await setStatusBarBackground('#0b0e14')
-        }
-      } catch {}
-    })()
-  }, [])
-
-  // 포그라운드 전환 시에도 재적용 (일부 iOS 버전에서 스타일이 풀리는 경우 대응)
-  useEffect(() => {
-    let unsub: (() => void) | undefined
-    ;(async () => {
-      try {
-        if (!(await isNative())) return
-        unsub = await onAppStateChange(async (isActive) => {
-          if (!isActive) return
-          try {
-            await setStatusBarOverlay(true)
-            await setStatusBarStyle('LIGHT')
-            await setStatusBarBackground('#0b0e14')
-          } catch {}
-        })
-      } catch {}
-    })()
-    return () => { try { unsub?.() } catch {} }
-  }, [])
 
   const closeBrowserWithRetries = async (label?: string) => {
     // Capacitor Browser 플러그인으로 브라우저 닫기 시도
