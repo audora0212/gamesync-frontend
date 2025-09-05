@@ -34,8 +34,8 @@ export default function RootLayout({
         suppressHydrationWarning={true}
         className={`${inter.className} flex flex-col min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 selection:text-foreground`}
       >
-        {/* 상단 노치(safe-area) 필러: 페이지 배경색과 완전히 동일한 불투명 레이어 */}
-        <div aria-hidden className="fixed top-0 left-0 right-0 h-[env(safe-area-inset-top)] bg-background z-[999] pointer-events-none" />
+        {/* 상단 노치(safe-area) 필러: 페이지 배경색과 동일한 불투명 레이어 (헤더 아래 레벨) */}
+        <div aria-hidden className="fixed top-0 left-0 right-0 h-[env(safe-area-inset-top)] bg-background z-[80] pointer-events-none" />
         <AuthProvider>
           {children}
           <Toaster
