@@ -254,4 +254,14 @@ export async function setStatusBarStyle(style: 'DARK' | 'LIGHT') {
   } catch {}
 }
 
+export async function setStatusBarBackground(color: string) {
+  try {
+    if (!(await isNative())) return;
+    const SB: any = getPlugin('StatusBar');
+    if (SB && typeof SB.setBackgroundColor === 'function') {
+      await SB.setBackgroundColor({ color });
+    }
+  } catch {}
+}
+
 

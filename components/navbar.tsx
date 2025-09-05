@@ -65,7 +65,7 @@ export function Navbar() {
   return (
     <>
       {/* 모바일 상단 고정 네비게이션 + 노치 safe-area 필러 */}
-      <nav className="fixed top-0 left-0 right-0 sm:relative z-[100] glass border-b border-white/10/60">
+      <nav className="fixed top-0 left-0 right-0 sm:relative z-[100] bg-background sm:glass border-b border-white/10/60">
         <div className="sm:hidden pt-[env(safe-area-inset-top)]" />
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 space-x-4">
