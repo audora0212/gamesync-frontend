@@ -67,7 +67,7 @@ export function Navbar() {
       {/* 모바일 상단 고정 네비게이션 + 노치 safe-area 필러 */}
       <nav className="fixed top-0 left-0 right-0 sm:relative z-[100] glass border-b border-white/10/60">
         {/* 노치 영역을 배경색으로 채우는 상단 필러 (모바일 전용) */}
-        <div className="sm:hidden h-[env(safe-area-inset-top)] bg-background" />
+        <div className="sm:hidden h-[env(safe-area-inset-top)] bg-background z-[100]" />
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 space-x-4">
             {/* 로고 및 타이틀 */}
