@@ -63,87 +63,94 @@ export function Navbar() {
   }
 
   return (
-    <nav className="glass border-b border-white/10/60">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 space-x-4">
-          {/* 로고 및 타이틀 */}
-          <Link href="/dashboard" className="flex items-center space-x-2">
-            <Image src="/logo_round.png" alt="GameSync" width={24} height={24} className="h-6 w-6" />
-            <span className="hidden sm:inline text-xs sm:text-sm md:text-base lg:text-lg font-bold text-foreground whitespace-nowrap">
-              GameSync
-            </span>
-          </Link>
-
-          {/* 사용자 정보 및 액션 */}
-          <div className="flex items-center space-x-3">
-            {user && (
-              <span className="max-w-[30vw] truncate text-xs sm:text-sm md:text-base text-foreground font-medium whitespace-nowrap">
-                {user}
+    <>
+      {/* 모바일 상단 고정 네비게이션 + 노치 safe-area 필러 */}
+      <nav className="fixed top-0 left-0 right-0 sm:relative z-[100] glass border-b border-white/10/60">
+        {/* 노치 영역을 배경색으로 채우는 상단 필러 (모바일 전용) */}
+        <div className="sm:hidden h-[env(safe-area-inset-top)] bg-background" />
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16 space-x-4">
+            {/* 로고 및 타이틀 */}
+            <Link href="/dashboard" className="flex items-center space-x-2">
+              <Image src="/logo_round.png" alt="GameSync" width={24} height={24} className="h-6 w-6" />
+              <span className="hidden sm:inline text-xs sm:text-sm md:text-base lg:text-lg font-bold text-foreground whitespace-nowrap">
+                GameSync
               </span>
-            )}
-            {isAdmin && (
-              <Link href="/admin" className="hidden sm:inline-block">
-                <Button
-                  variant="ghost"
-                  className="text-xs sm:text-sm md:text-base text-muted-foreground hover:bg-white/10 hover:text-foreground whitespace-nowrap"
-                >
-                  관리
-                </Button>
-              </Link>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative text-muted-foreground hover:bg-white/10 hover:text-foreground"
-              onClick={() => setFriendOpen(true)}
-              aria-label="친구 열기"
-            >
-              <Users className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative text-muted-foreground hover:bg-white/10 hover:text-foreground"
-              onClick={() => setNotifOpen(v => !v)}
-            >
-              <Bell className="h-5 w-5" />
-              {unread > 0 && (
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
+            </Link>
+
+            {/* 사용자 정보 및 액션 */}
+            <div className="flex items-center space-x-3">
+              {user && (
+                <span className="max-w-[30vw] truncate text-xs sm:text-sm md:text-base text-foreground font-medium whitespace-nowrap">
+                  {user}
+                </span>
               )}
-            </Button>
-            <SettingModal />
-            <Button
-              onClick={handleLogout}
-              variant="ghost"
-              className="flex items-center text-xs sm:text-sm md:text-base text-muted-foreground hover:bg-white/10 hover:text-foreground whitespace-nowrap"
-            >
-              <LogOut className="mr-1 h-4 w-4" />
-              로그아웃
-            </Button>
+              {isAdmin && (
+                <Link href="/admin" className="hidden sm:inline-block">
+                  <Button
+                    variant="ghost"
+                    className="text-xs sm:text-sm md:text-base text-muted-foreground hover:bg-white/10 hover:text-foreground whitespace-nowrap"
+                  >
+                    관리
+                  </Button>
+                </Link>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                onClick={() => setFriendOpen(true)}
+                aria-label="친구 열기"
+              >
+                <Users className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                onClick={() => setNotifOpen(v => !v)}
+              >
+                <Bell className="h-5 w-5" />
+                {unread > 0 && (
+                  <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
+                )}
+              </Button>
+              <SettingModal />
+              <Button
+                onClick={handleLogout}
+                variant="ghost"
+                className="flex items-center text-xs sm:text-sm md:text-base text-muted-foreground hover:bg-white/10 hover:text-foreground whitespace-nowrap"
+              >
+                <LogOut className="mr-1 h-4 w-4" />
+                로그아웃
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-      {/* 친구/알림 패널이 항상 최상단에 오도록 nav 내부의 맨 마지막에 두고, 고정 z-index 사용 */}
-      <FriendDrawer open={friendOpen} onClose={() => setFriendOpen(false)} />
-      <NotificationPanel
-        open={notifOpen}
-        onClose={() => setNotifOpen(false)}
-        onUnreadChange={setUnread}
-        onInviteAction={async (inviteId, accept) => {
-          try {
-            // 초대 응답 API
-            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api"
-            await fetch(`${API_BASE}/servers/invites/${inviteId}/respond`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', ...authService.getAuthHeaders() },
-              body: JSON.stringify({ accept })
-            })
-            // 수락이면 대시보드/서버 목록 새로고침은 사용자가 수동으로 함. 여기선 토스트만 처리
-          } catch {
-            console.error('초대 응답 실패')
-          }
-        }}
-      />
-    </nav>
+        {/* 친구/알림 패널이 항상 최상단에 오도록 nav 내부의 맨 마지막에 두고, 고정 z-index 사용 */}
+        <FriendDrawer open={friendOpen} onClose={() => setFriendOpen(false)} />
+        <NotificationPanel
+          open={notifOpen}
+          onClose={() => setNotifOpen(false)}
+          onUnreadChange={setUnread}
+          onInviteAction={async (inviteId, accept) => {
+            try {
+              // 초대 응답 API
+              const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api"
+              await fetch(`${API_BASE}/servers/invites/${inviteId}/respond`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authService.getAuthHeaders() },
+                body: JSON.stringify({ accept })
+              })
+              // 수락이면 대시보드/서버 목록 새로고침은 사용자가 수동으로 함. 여기선 토스트만 처리
+            } catch {
+              console.error('초대 응답 실패')
+            }
+          }}
+        />
+      </nav>
+      {/* 모바일에서 고정 네비 높이만큼 콘텐츠를 밀어주는 spacer (노치 패딩은 globals.css에서 처리됨) */}
+      <div className="sm:hidden" style={{ height: '64px' }} />
+    </>
   )
 }
