@@ -105,14 +105,13 @@ export function NewPartyModal({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className={isNativeApp ? "w-full flex justify-center" : "w-full"}>
               <Input
                 type="date"
                 value={selectedDate}
                 disabled
-                className={"glass border-white/30 text-white text-sm inline-block py-0 h-10 leading-[2.5rem] " + (isNativeApp ? "w-auto text-center" : "w-auto")}
-                style={{ width: 'auto' }}
+                className={"glass border-white/30 text-white text-sm " + (isNativeApp ? "inline-block w-auto text-center px-1" : "w-full")}
               />
             </div>
             <Select value={selectedTime} onValueChange={setSelectedTime} required>

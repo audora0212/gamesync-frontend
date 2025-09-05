@@ -21,7 +21,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm pt-[env(safe-area-inset-top)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -34,8 +34,6 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DialogPortal>
-    {/* iOS 노치 영역 전용 블러/딤 (상단 safe-area만 별도 오버레이) */}
-    <div className="fixed top-0 left-0 right-0 h-[env(safe-area-inset-top)] z-[60] bg-black/40 backdrop-blur-xl pointer-events-none" style={{ WebkitBackdropFilter: 'blur(18px)' }} />
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
