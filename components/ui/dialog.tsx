@@ -34,6 +34,8 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DialogPortal>
+    {/* iOS 노치 영역 전용 블러/딤 (상단 safe-area만 별도 오버레이) */}
+    <div className="fixed top-0 left-0 right-0 h-[env(safe-area-inset-top)] z-[60] bg-black/40 backdrop-blur-xl pointer-events-none" style={{ WebkitBackdropFilter: 'blur(18px)' }} />
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
