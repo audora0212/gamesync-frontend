@@ -233,4 +233,25 @@ export async function onNativeNotificationOpen(callback: (data: any) => void) {
   return () => {};
 }
 
+// ----- StatusBar helpers -----
+export async function setStatusBarOverlay(overlay: boolean) {
+  try {
+    if (!(await isNative())) return;
+    const SB: any = getPlugin('StatusBar');
+    if (SB && typeof SB.setOverlaysWebView === 'function') {
+      await SB.setOverlaysWebView({ overlay });
+    }
+  } catch {}
+}
+
+export async function setStatusBarStyle(style: 'DARK' | 'LIGHT') {
+  try {
+    if (!(await isNative())) return;
+    const SB: any = getPlugin('StatusBar');
+    if (SB && typeof SB.setStyle === 'function') {
+      await SB.setStyle({ style });
+    }
+  } catch {}
+}
+
 
