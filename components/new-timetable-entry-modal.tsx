@@ -108,7 +108,8 @@ export function NewTimetableEntryModal({
                 type="date"
                 value={selectedDate}
                 disabled
-                className={"glass border-white/30 text-white text-sm " + (isNativeApp ? "w-[40%] text-center" : "w-full")}
+                className={"glass border-white/30 text-white text-sm inline-block " + (isNativeApp ? "w-auto text-center" : "w-auto")}
+                style={{ width: 'auto' }}
               />
             </div>
             <Select value={selectedTime} onValueChange={setSelectedTime} required>

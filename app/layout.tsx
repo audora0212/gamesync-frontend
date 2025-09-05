@@ -34,6 +34,12 @@ export default function RootLayout({
         suppressHydrationWarning={true}
         className={`${inter.className} flex flex-col min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 selection:text-foreground`}
       >
+        {/* 상단 노치(safe-area) 필러: 배경색/블러를 동일하게 유지 */}
+        <div
+          aria-hidden
+          className="fixed top-0 left-0 right-0 h-[env(safe-area-inset-top)] bg-background/95 backdrop-blur-xl z-[45]"
+          style={{ WebkitBackdropFilter: 'blur(20px)' }}
+        />
         <AuthProvider>
           {children}
           <Toaster
