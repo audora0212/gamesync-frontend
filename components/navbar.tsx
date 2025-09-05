@@ -12,6 +12,7 @@ import { NotificationPanel } from "@/components/notification-panel"
 import { serverService } from "@/lib/server-service"
 import { notificationService } from "@/lib/notification-service"
 import { useAuth } from "@/components/auth-provider"
+import { isNative } from "@/lib/native"
 
 export function Navbar() {
   const { logout: authLogout } = useAuth() // AuthProvider의 logout 함수 사용
@@ -20,11 +21,13 @@ export function Navbar() {
   const [friendOpen, setFriendOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [unread, setUnread] = useState(0)
+  const [isNativeApp, setIsNativeApp] = useState(false)
 
   useEffect(() => {
     // 클라이언트에서만 실행
     const nickname = authService.getCurrentUser()
     setUser(nickname)
+    ;(async () => { try { setIsNativeApp(await isNative()) } catch {} })()
     
     // 인증된 사용자만 알림 API 호출
     if (nickname) {
@@ -63,7 +66,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="glass border-b border-white/10/60">
+    <nav className={`glass border-b border-white/10/60 ${isNativeApp ? 'sticky top-0 z-50 pt-[env(safe-area-inset-top)]' : ''}`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 space-x-4">
           {/* 로고 및 타이틀 */}
@@ -85,7 +88,7 @@ export function Navbar() {
               <Link href="/admin" className="hidden sm:inline-block">
                 <Button
                   variant="ghost"
-                  className="text-xs sm:text-sm md:text-base text-muted-foreground hover:bg-white/10 hover:text-foreground whitespace-nowrap"
+                  className="text-xs sm:text-sm md:text-base text-muted-foreground hover:bg:white/10 hover:text-foreground whitespace-nowrap"
                 >
                   관리
                 </Button>
