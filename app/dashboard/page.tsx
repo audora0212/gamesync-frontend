@@ -20,6 +20,7 @@ import { CreateServerModal } from "@/components/create-server-modal";
 import { JoinByCodeModal } from "@/components/join-by-code-modal";
 import { Navbar } from "@/components/navbar";
 import { Plus, Users, Clock, Flame, Star, Bug } from "lucide-react";
+import { noticeService, type NoticeSummary } from "@/lib/notice-service";
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute";
 import { useAuth } from "@/components/auth-provider";
 
@@ -33,6 +34,8 @@ export default function DashboardPage() {
   const [friendSummaries, setFriendSummaries] = useState<Record<number, { friend: string; others: number }>>({});
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [notices, setNotices] = useState<NoticeSummary[]>([]);
+  const [openNotice, setOpenNotice] = useState<NoticeSummary|null>(null);
   const router = useRouter();
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -40,6 +43,8 @@ export default function DashboardPage() {
     // 인증이 완료되고 user가 있을 때만 API 호출
     if (!authLoading && authUser) {
       loadServersAndFavorites();
+      // 공지 목록 병렬 로드
+      noticeService.list().then(setNotices).catch(()=>setNotices([]))
     } else if (!authLoading && !authUser) {
       // 인증이 없으면 로딩 상태를 false로 설정
       setIsLoading(false);
@@ -208,6 +213,27 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
+        {/* 공지 섹션 */}
+        {notices.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-white/80 text-sm">공지</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {notices.slice(0,6).map(n => (
+                <Card key={n.id} className="glass bg-white/10 border-white/20 hover:bg-white/20 transition">
+                  <CardHeader>
+                    <CardTitle className="text-white text-base truncate">{n.title}</CardTitle>
+                    <CardDescription className="text-white/60">{new Date(n.createdAt).toLocaleString()}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button size="sm" className="glass-button" onClick={()=>setOpenNotice(n)}>자세히</Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
         {/* 헤더: 모바일에서 세로, 데스크탑에서 가로 */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 space-y-4 sm:space-y-0">
           <div>
@@ -377,12 +403,12 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Footer: Privacy Links */}
-      <div className="px-4 pb-8 text-center text-xs text-white/60">
+      {/* Footer: Privacy Links (최하단) */}
+      <footer className="px-4 pb-8 text-center text-xs text-white/60">
         <a className="underline" href="/privacy">개인정보 처리방침</a>
         <span className="mx-2">·</span>
         <a className="underline" href="/privacy/choices">개인정보 선택 사항</a>
-      </div>
+      </footer>
 
       {/* 모달 컴포넌트 */}
       <CreateServerModal
@@ -395,6 +421,22 @@ export default function DashboardPage() {
         onClose={() => setShowJoinModal(false)}
         onJoinSuccess={loadServersAndFavorites}
       />
+
+      {/* 공지 모달 */}
+      {openNotice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={()=>setOpenNotice(null)}>
+          <div className="bg-zinc-900 text-white max-w-lg w-full mx-4 rounded-lg border border-white/20" onClick={(e)=>e.stopPropagation()}>
+            <div className="p-4 border-b border-white/10">
+              <div className="text-lg font-semibold truncate">{openNotice.title}</div>
+              <div className="text-xs text-white/60">{new Date(openNotice.createdAt).toLocaleString()}</div>
+            </div>
+            <div className="p-4 text-sm text-white/80 max-h-[60vh] overflow-auto" id="notice-content"></div>
+            <div className="p-4 flex justify-end">
+              <Button variant="outline" className="glass border-white/30 text-white" onClick={()=>setOpenNotice(null)}>닫기</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

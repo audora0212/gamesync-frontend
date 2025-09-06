@@ -18,11 +18,13 @@ export default function AdminPage() {
   const router = useRouter()
   const [authorized, setAuthorized] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<'audit'|'servers'|'timetables'|'parties'>('audit')
+  const [tab, setTab] = useState<'audit'|'servers'|'timetables'|'parties'|'notices'>('audit')
   const [audit, setAudit] = useState<AuditLog[]>([])
   const [servers, setServers] = useState<Server[]>([])
   const [timetables, setTimetables] = useState<Timetable[]>([])
   const [parties, setParties] = useState<Party[]>([])
+  const [notices, setNotices] = useState<{id:number; title:string; createdAt:string}[]>([])
+  const [newNotice, setNewNotice] = useState<{title:string; content:string}>({ title: '', content: '' })
   // 간단한 수정 모달 상태 (Hooks는 모든 early return보다 위에 있어야 함)
   const [editing, setEditing] = useState<{ type: 'server'|'timetable'|'party'; data: any }|null>(null)
   const openEdit = (type: 'server'|'timetable'|'party', data: any) => setEditing({ type, data })
@@ -57,6 +59,7 @@ export default function AdminPage() {
           fetch(`${API}/admin/servers`, { headers: authService.getAuthHeaders() }).then(r=>r.ok?r.json():[]).then(setServers),
           fetch(`${API}/admin/timetables`, { headers: authService.getAuthHeaders() }).then(r=>r.ok?r.json():[]).then(setTimetables),
           fetch(`${API}/admin/parties`, { headers: authService.getAuthHeaders() }).then(r=>r.ok?r.json():[]).then(setParties),
+          fetch(`${API}/notices`, { headers: authService.getAuthHeaders() }).then(r=>r.ok?r.json():[]).then(setNotices),
         ])
       } catch {
         setAuthorized(false)
@@ -100,6 +103,7 @@ export default function AdminPage() {
           <Button variant={tab==='servers'?'default':'outline'} className="glass-button" onClick={()=>setTab('servers')}>서버 목록</Button>
           <Button variant={tab==='timetables'?'default':'outline'} className="glass-button" onClick={()=>setTab('timetables')}>현재 등록된 스케줄</Button>
           <Button variant={tab==='parties'?'default':'outline'} className="glass-button" onClick={()=>setTab('parties')}>파티 목록</Button>
+          <Button variant={tab==='notices'?'default':'outline'} className="glass-button" onClick={()=>setTab('notices')}>공지</Button>
         </div>
 
         {tab==='audit' && (
@@ -122,6 +126,45 @@ export default function AdminPage() {
                 </div>
               ))}
               {audit.length === 0 && <div className="py-2">기록 없음</div>}
+            </div>
+          </CardContent>
+        </Card>
+        )}
+
+        {tab==='notices' && (
+        <Card className="bg-white/10 border-white/20">
+          <CardHeader><CardTitle className="text-white">공지 관리</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <input className="w-full rounded bg-black/30 border border-white/20 px-3 py-2 text-sm text-white" placeholder="제목" value={newNotice.title} onChange={e=>setNewNotice(v=>({...v, title:e.target.value}))} />
+              <textarea className="w-full rounded bg-black/30 border border-white/20 px-3 py-2 text-sm text-white min-h-[120px]" placeholder="내용" value={newNotice.content} onChange={e=>setNewNotice(v=>({...v, content:e.target.value}))} />
+              <div className="flex gap-2">
+                <Button className="glass-button" onClick={async ()=>{
+                  const res = await fetch(`${API}/admin/notices`, { method:'POST', headers: { 'Content-Type':'application/json', ...authService.getAuthHeaders() }, body: JSON.stringify(newNotice) })
+                  if(res.ok){ setNewNotice({title:'', content:''}); const list = await fetch(`${API}/notices`, { headers: authService.getAuthHeaders() }).then(r=>r.json()); setNotices(list) }
+                }}>등록</Button>
+              </div>
+            </div>
+
+            <div className="divide-y divide-white/10">
+              {notices.map(n => (
+                <div key={n.id} className="py-2 flex items-center justify-between text-white/80 text-sm">
+                  <div className="truncate">{n.title}</div>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="glass-button" onClick={async ()=>{
+                      const title = prompt('제목 수정', n.title) ?? n.title
+                      const content = prompt('내용 수정', '') ?? ''
+                      const ok = await fetch(`${API}/admin/notices/${n.id}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...authService.getAuthHeaders() }, body: JSON.stringify({ title, content }) })
+                      if(ok.ok){ const list = await fetch(`${API}/notices`, { headers: authService.getAuthHeaders() }).then(r=>r.json()); setNotices(list) }
+                    }}>수정</Button>
+                    <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={async ()=>{
+                      await fetch(`${API}/admin/notices/${n.id}`, { method:'DELETE', headers: authService.getAuthHeaders() });
+                      setNotices(prev=>prev.filter(x=>x.id!==n.id))
+                    }}>삭제</Button>
+                  </div>
+                </div>
+              ))}
+              {notices.length===0 && <div className="py-2 text-white/60">등록된 공지가 없습니다</div>}
             </div>
           </CardContent>
         </Card>
