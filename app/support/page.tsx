@@ -1,16 +1,24 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { isNative } from "@/lib/native";
 
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@example.com";
 
 export default function SupportPage() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [isNativeApp, setIsNativeApp] = useState<boolean>(false);
+
+  useEffect(() => {
+    (async () => {
+      try { setIsNativeApp(await isNative()); } catch { setIsNativeApp(false); }
+    })();
+  }, []);
 
   const mailtoHref = useMemo(() => {
     const body = `${message}\n\n—\n앱: GameSync\n발생 버전: (선택 입력)\nOS/기기: (선택 입력)`;
@@ -38,6 +46,8 @@ export default function SupportPage() {
             placeholder="예: 로그인 중 오류가 발생합니다"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
+            className={isNativeApp ? "text-base" : "text-sm"}
+            style={isNativeApp ? { fontSize: 16 } : undefined}
           />
         </div>
 
@@ -45,7 +55,8 @@ export default function SupportPage() {
           <Label htmlFor="message">내용</Label>
           <textarea
             id="message"
-            className="min-h-[160px] w-full rounded-md border bg-background p-3 text-sm focus:outline-none"
+            className={`min-h-[160px] w-full rounded-md border bg-background p-3 focus:outline-none ${isNativeApp ? "text-base" : "text-sm"}`}
+            style={isNativeApp ? { fontSize: 16 } : undefined}
             placeholder={`설명을 최대한 자세히 작성해주세요.\n- 어떤 화면/동작에서 문제가 발생했나요?\n- 언제부터 발생했나요?\n- 재현 방법이 있나요?`}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
