@@ -95,6 +95,16 @@ export default function ServerDetailPage() {
     <div className="min-h-screen">
       <Navbar />
       <div className="container mx-auto px-4 py-6">
+        {/* 모바일 전용 뒤로가기 버튼 */}
+        <div className="mb-4 md:hidden">
+          <Button
+            variant="outline"
+            className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+            onClick={() => router.push("/dashboard")}
+          >
+            ← 대시보드
+          </Button>
+        </div>
         {/* 서버 정보 카드 */}
         <Card className="glass border-white/20 mb-6">
           <CardHeader className="space-y-1">
