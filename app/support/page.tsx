@@ -6,11 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export const metadata = {
-  title: "Support | GameSync",
-  description: "GameSync 고객 지원 및 문의 페이지",
-};
-
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@example.com";
 
 export default function SupportPage() {
