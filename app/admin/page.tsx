@@ -47,8 +47,8 @@ export default function AdminPage() {
       try {
         const me = await fetch(`${API}/users/me`, { headers: authService.getAuthHeaders() })
         if (!me.ok) throw new Error('me-fail')
-        const json = await me.json()
-        if (!json?.admin) {
+        const isAdmin = me.headers.get('X-Admin') === 'true'
+        if (!isAdmin) {
           setAuthorized(false)
           setLoading(false)
           return
