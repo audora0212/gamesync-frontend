@@ -18,6 +18,7 @@ import { useAuth } from "@/components/auth-provider"
 
 export default function LoginPage() {
   const { user: authUser, isLoading: authLoading } = useAuth() // AuthProvider 상태 사용
+  const REVIEW_MODE = process.env.NEXT_PUBLIC_REVIEW_MODE === 'true'
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -50,12 +51,16 @@ export default function LoginPage() {
     
     // OAuth 에러 처리
     if (!authLoading && !authUser && error === 'oauth_email_linked') {
-      if (existingProvider === 'kakao') {
-        toast.error('이미 카카오 계정으로 가입된 이메일입니다. 카카오로 로그인해 주세요.')
-      } else if (existingProvider === 'discord') {
-        toast.error('이미 디스코드 계정으로 가입된 이메일입니다. 디스코드로 로그인해 주세요.')
+      if (REVIEW_MODE) {
+        toast.error('이미 가입된 이메일입니다. 아이디/비밀번호로 로그인해 주세요.')
       } else {
-        toast.error('이미 가입된 이메일입니다. 해당 소셜로 로그인해 주세요.')
+        if (existingProvider === 'kakao') {
+          toast.error('이미 카카오 계정으로 가입된 이메일입니다. 카카오로 로그인해 주세요.')
+        } else if (existingProvider === 'discord') {
+          toast.error('이미 디스코드 계정으로 가입된 이메일입니다. 디스코드로 로그인해 주세요.')
+        } else {
+          toast.error('이미 가입된 이메일입니다. 해당 소셜로 로그인해 주세요.')
+        }
       }
     }
   }, [authLoading, authUser, router, error, existingProvider]) // AuthProvider 상태 기반으로 체크
@@ -191,52 +196,56 @@ export default function LoginPage() {
             <CardDescription className="text-muted-foreground">계정 정보를 입력해주세요</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Discord 로그인 버튼 */}
-            <Button
-              onClick={handleDiscordLogin}
-              disabled={isDiscordLoading || isKakaoLoading || isLoading}
-              className="w-full bg-none !bg-[#5865F2] hover:!bg-[#4752C4] text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#5865F2]/50"
-            >
-              {isDiscordLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Discord 연결 중...</span>
-                </>
-              ) : (
-                <>
-                  <DiscordIcon className="w-5 h-5" />
-                  <span>Discord로 계속하기</span>
-                </>
-              )}
-            </Button>
+            {!REVIEW_MODE && (
+              <>
+                {/* Discord 로그인 버튼 */}
+                <Button
+                  onClick={handleDiscordLogin}
+                  disabled={isDiscordLoading || isKakaoLoading || isLoading}
+                  className="w-full bg-none !bg-[#5865F2] hover:!bg-[#4752C4] text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#5865F2]/50"
+                >
+                  {isDiscordLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Discord 연결 중...</span>
+                    </>
+                  ) : (
+                    <>
+                      <DiscordIcon className="w-5 h-5" />
+                      <span>Discord로 계속하기</span>
+                    </>
+                  )}
+                </Button>
 
-            {/* Kakao 로그인 버튼 */}
-            <Button
-              onClick={handleKakaoLogin}
-              disabled={isKakaoLoading || isDiscordLoading || isLoading}
-              className="w-full bg-none !bg-[#FEE500] hover:!bg-[#F7D400] text-black font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#FEE500]/50"
-            >
-              {isKakaoLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>카카오 연결 중...</span>
-                </>
-              ) : (
-                <>
-                  <span>카카오로 계속하기</span>
-                </>
-              )}
-            </Button>
+                {/* Kakao 로그인 버튼 */}
+                <Button
+                  onClick={handleKakaoLogin}
+                  disabled={isKakaoLoading || isDiscordLoading || isLoading}
+                  className="w-full bg-none !bg-[#FEE500] hover:!bg-[#F7D400] text_black font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#FEE500]/50"
+                >
+                  {isKakaoLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>카카오 연결 중...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>카카오로 계속하기</span>
+                    </>
+                  )}
+                </Button>
 
-            {/* 구분선 */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-white/20" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-transparent px-2 text-muted-foreground">또는</span>
-              </div>
-            </div>
+                {/* 구분선 */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-white/20" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-transparent px-2 text-muted-foreground">또는</span>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* 일반 로그인 폼 */}
             <form onSubmit={handleSubmit} className="space-y-4">

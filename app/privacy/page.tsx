@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 export default function PrivacyPage() {
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@example.com";
   const router = useRouter();
+  const REVIEW_MODE = process.env.NEXT_PUBLIC_REVIEW_MODE === 'true'
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       {/* 모바일 뒤로가기 (우측 정렬, 화살표 제거) */}
@@ -34,7 +35,9 @@ export default function PrivacyPage() {
       <section className="mt-8 space-y-3">
         <h2 className="text-xl font-medium">1. 수집하는 개인정보 항목</h2>
         <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-          <li>필수: 계정 식별 정보(카카오 또는 디스코드 계정 ID), 닉네임/프로필(제공 시)</li>
+          {!REVIEW_MODE && (
+            <li>필수: 계정 식별 정보(카카오 또는 디스코드 계정 ID), 닉네임/프로필(제공 시)</li>
+          )}
           <li>선택: 이메일 주소(제공 시), 프로필 이미지</li>
           <li>서비스 이용 정보: 서버/파티/일정 등 사용자가 입력한 데이터, 접속/이용 로그</li>
           <li>알림을 위한 토큰: 푸시 알림용 기기 토큰(FCM/APNs)</li>
@@ -44,7 +47,7 @@ export default function PrivacyPage() {
       <section className="mt-8 space-y-3">
         <h2 className="text-xl font-medium">2. 개인정보 수집 방법</h2>
         <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-          <li>소셜 로그인(OAuth) 과정에서 제공 동의 시 수집</li>
+          {!REVIEW_MODE && (<li>소셜 로그인(OAuth) 과정에서 제공 동의 시 수집</li>)}
           <li>서비스 이용 및 기능 사용(서버 생성, 파티 모집/참여, 일정 예약 등) 과정에서 수집</li>
           <li>문의/지원 접수 시 사용자가 직접 입력한 정보 수집</li>
         </ul>
@@ -67,7 +70,7 @@ export default function PrivacyPage() {
           서비스는 안정적인 제공을 위해 다음 업체에 처리를 위탁하거나, 연동 과정에서 정보가 전송될 수 있습니다.
         </p>
         <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-          <li>인증: 카카오(카카오계정), 디스코드(Discord, Inc.)</li>
+          {!REVIEW_MODE && (<li>인증: 카카오(카카오계정), 디스코드(Discord, Inc.)</li>)}
           <li>푸시 알림: Firebase Cloud Messaging(Google LLC), Apple Push Notification service(Apple Inc.)</li>
           <li>인프라/호스팅: (예) AWS 또는 사용 중인 클라우드 제공자</li>
         </ul>
@@ -100,15 +103,10 @@ export default function PrivacyPage() {
         </ul>
       </section>
 
-      <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">8. 아동의 개인정보</h2>
-        <p className="text-sm text-muted-foreground">
-          본 서비스는 만 14세 미만 아동을 대상으로 하지 않습니다. 해당 연령 미만의 이용자는 가입 및 이용이 제한됩니다.
-        </p>
-      </section>
+
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">9. 개인정보의 안전성 확보조치</h2>
+        <h2 className="text-xl font-medium">8. 개인정보의 안전성 확보조치</h2>
         <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
           <li>전송 구간 암호화(HTTPS), 접근 통제, 최소 권한 원칙 적용</li>
           <li>민감 정보는 수집하지 않으며, 필요한 경우 법령 기준에 따른 암호화 등 보호조치 적용</li>
@@ -116,7 +114,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">10. 문의처</h2>
+        <h2 className="text-xl font-medium">9. 문의처</h2>
         <p className="text-sm text-muted-foreground">
           개인정보 관련 문의, 신고 및 권리 행사는 아래로 연락해 주세요.
         </p>
@@ -129,7 +127,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">11. 본 방침의 변경</h2>
+        <h2 className="text-xl font-medium">10. 본 방침의 변경</h2>
         <p className="text-sm text-muted-foreground">
           법령, 서비스 변경에 따라 방침이 수정될 수 있으며, 변경 사항은 서비스 내 공지 또는 본 페이지를 통해 고지합니다.
         </p>
