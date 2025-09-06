@@ -9,8 +9,8 @@ export default function PrivacyPage() {
   const router = useRouter();
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      {/* 모바일 뒤로가기 */}
-      <div className="mb-4 md:hidden">
+      {/* 모바일 뒤로가기 (우측 정렬, 화살표 제거) */}
+      <div className="mb-4 md:hidden flex justify-end">
         <Button
           variant="outline"
           className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
             }
           }}
         >
-          ← 뒤로가기
+          뒤로가기
         </Button>
       </div>
       <h1 className="text-3xl font-semibold">개인정보 처리방침</h1>

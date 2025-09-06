@@ -31,6 +31,23 @@ export default function SupportPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-12">
+      {/* 모바일 뒤로가기 (우측 정렬) */}
+      <div className="mb-4 md:hidden flex justify-end">
+        <Button
+          variant="outline"
+          className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+          onClick={() => {
+            try {
+              if (typeof window !== "undefined" && window.history.length > 1) history.back();
+              else location.href = "/";
+            } catch {
+              location.href = "/";
+            }
+          }}
+        >
+          뒤로가기
+        </Button>
+      </div>
       <div className="mb-8">
         <h1 className="text-3xl font-semibold">지원 센터</h1>
         <p className="mt-2 text-muted-foreground">
