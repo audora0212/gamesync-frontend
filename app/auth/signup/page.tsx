@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
 import { authService } from "@/lib/auth-service"
-import { Loader2 } from "lucide-react"
+import { Loader2, Apple as AppleIcon } from "lucide-react"
 import Image from "next/image"
 import { DiscordIcon } from "@/components/icons/discord-icon"
 import { openOAuthInBrowser, isNative } from "@/lib/native"
@@ -23,6 +23,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isDiscordLoading, setIsDiscordLoading] = useState(false)
   const [isKakaoLoading, setIsKakaoLoading] = useState(false)
+  const [isAppleLoading, setIsAppleLoading] = useState(false)
   const router = useRouter()
   const inviteCode = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("code") : null
   const returnUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("return") : null
@@ -153,6 +154,22 @@ export default function SignupPage() {
     }
   }
 
+  const handleAppleSignup = async () => {
+    setIsAppleLoading(true)
+    const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
+    const isNativeApp = await isNative()
+    const target = isNativeApp ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
+    const url = `${base}/oauth2/authorization/apple?target=${encodeURIComponent(target)}`
+    if (isNativeApp) {
+      const opened = await openOAuthInBrowser(url)
+      if (!opened) {
+        window.location.href = url
+      }
+    } else {
+      window.location.href = url
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md">
@@ -170,42 +187,53 @@ export default function SignupPage() {
             <CardDescription className="text-muted-foreground">새 계정을 만들어보세요</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Discord 회원가입 버튼 */}
-            <Button
-              onClick={handleDiscordSignup}
-              disabled={isDiscordLoading || isKakaoLoading || isLoading}
-              className="w-full bg-none !bg-[#5865F2] hover:!bg-[#4752C4] text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#5865F2]/50"
-            >
-              {isDiscordLoading ? (
-                <>
+            {/* 소셜 회원가입: 원형 버튼들 */}
+            <div className="flex items-center justify-center gap-4">
+              {/* Discord */}
+              <Button
+                onClick={handleDiscordSignup}
+                disabled={isDiscordLoading || isKakaoLoading || isAppleLoading || isLoading}
+                className="h-12 w-12 rounded-full p-0 bg-[#5865F2] hover:bg-[#4752C4] text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Discord로 계속하기"
+                title="Discord로 계속하기"
+              >
+                {isDiscordLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Discord 연결 중...</span>
-                </>
-              ) : (
-                <>
+                ) : (
                   <DiscordIcon className="w-5 h-5" />
-                  <span>Discord로 계속하기</span>
-                </>
-              )}
-            </Button>
-
-            {/* Kakao 회원가입 버튼 */}
-            <Button
-              onClick={handleKakaoSignup}
-              disabled={isKakaoLoading || isDiscordLoading || isLoading}
-              className="w-full bg-none !bg-[#FEE500] hover:!bg-[#F7D400] text-black font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#FEE500]/50"
-            >
-              {isKakaoLoading ? (
-                <>
+                )}
+              </Button>
+              {/* Kakao */}
+              <Button
+                onClick={handleKakaoSignup}
+                disabled={isKakaoLoading || isDiscordLoading || isAppleLoading || isLoading}
+                className="h-12 w-12 rounded-full p-0 bg-[#FEE500] hover:bg-[#F7D400] text-black shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="카카오로 계속하기"
+                title="카카오로 계속하기"
+              >
+                {isKakaoLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>카카오 연결 중...</span>
-                </>
-              ) : (
-                <>
-                  <span>카카오로 계속하기</span>
-                </>
+                ) : (
+                  <span className="font-bold text-base">K</span>
+                )}
+              </Button>
+              {/* Apple */}
+              {(process.env.NEXT_PUBLIC_ENABLE_APPLE_LOGIN ?? 'true') === 'true' && (
+                <Button
+                  onClick={handleAppleSignup}
+                  disabled={isAppleLoading || isDiscordLoading || isKakaoLoading || isLoading}
+                  className="h-12 w-12 rounded-full p-0 bg-black hover:bg-zinc-800 text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Apple 계정으로 계속하기"
+                  title="Apple 계정으로 계속하기"
+                >
+                  {isAppleLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <AppleIcon className="w-5 h-5" />
+                  )}
+                </Button>
               )}
-            </Button>
+            </div>
 
             {/* 구분선 */}
             <div className="relative">
