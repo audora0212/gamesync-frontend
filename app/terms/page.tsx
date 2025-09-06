@@ -69,7 +69,7 @@ export default function TermsPage() {
         <p className="text-sm text-muted-foreground">본 약관과 관련된 분쟁은 관계 법령과 상관례에 따라 해결합니다.</p>
       </section>
 
-      <p className="mt-10 text-xs text-muted-foreground">시행일: 2025-01-01</p>
+      <p className="mt-10 text-xs text-muted-foreground">시행일: 2025-09-06</p>
     </div>
   );
 }
