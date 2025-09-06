@@ -155,6 +155,15 @@ export default function GameSyncLanding() {
         </div>
       </section>
 
+      {/* Footer */}
+      <footer className="px-4 py-10 border-t border-white/10 text-center text-xs text-muted-foreground">
+        <div className="max-w-6xl mx-auto">
+          <Link className="underline" href="/privacy">개인정보 처리방침</Link>
+          <span className="mx-2">·</span>
+          <Link className="underline" href="/privacy/choices">개인정보 선택 사항</Link>
+        </div>
+      </footer>
+
       {/* CTA Section */}
       <section className="relative px-4 py-16 sm:py-20">
         <div className="max-w-4xl mx-auto text-center">

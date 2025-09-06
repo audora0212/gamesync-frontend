@@ -1,9 +1,31 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function PrivacyPage() {
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@example.com";
+  const router = useRouter();
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
+      {/* 모바일 뒤로가기 */}
+      <div className="mb-4 md:hidden">
+        <Button
+          variant="outline"
+          className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+          onClick={() => {
+            try {
+              if (typeof window !== "undefined" && window.history.length > 1) router.back();
+              else router.push("/");
+            } catch {
+              router.push("/");
+            }
+          }}
+        >
+          ← 뒤로가기
+        </Button>
+      </div>
       <h1 className="text-3xl font-semibold">개인정보 처리방침</h1>
       <p className="mt-3 text-sm text-muted-foreground">
         GameSync(이하 “서비스”)는 이용자의 개인정보를 소중히 다루며, 관련 법령 및 규정을 준수합니다. 본 방침은 서비스가 수집·이용·보관·파기하는 개인정보의 항목과 목적, 이용자의 권리 및 행사 방법을 설명합니다.

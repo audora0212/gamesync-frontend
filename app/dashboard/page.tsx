@@ -377,6 +377,13 @@ export default function DashboardPage() {
         )}
       </div>
 
+      {/* Footer: Privacy Links */}
+      <div className="px-4 pb-8 text-center text-xs text-white/60">
+        <a className="underline" href="/privacy">개인정보 처리방침</a>
+        <span className="mx-2">·</span>
+        <a className="underline" href="/privacy/choices">개인정보 선택 사항</a>
+      </div>
+
       {/* 모달 컴포넌트 */}
       <CreateServerModal
         open={showCreateModal}
