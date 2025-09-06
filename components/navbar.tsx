@@ -67,7 +67,23 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 space-x-4">
           {/* 로고 및 타이틀 */}
-          <Link href="/dashboard" className="flex items-center space-x-2">
+          <Link href="/dashboard" className="flex items-center space-x-2" onClick={(e)=>{
+            try {
+              const w: any = typeof window !== 'undefined' ? window : null
+              const Cap = w?.Capacitor || null
+              const isNative = !!(Cap && typeof Cap.isNativePlatform === 'function' && Cap.isNativePlatform())
+              if (isNative) {
+                e.preventDefault()
+                // 네이티브(WebView)에서는 강제 새로고침
+                if (typeof location !== 'undefined') {
+                  const target = '/dashboard'
+                  if (location.pathname === target) location.reload()
+                  else location.href = target
+                }
+                return
+              }
+            } catch {}
+          }}>
             <Image src="/logo_round.png" alt="GameSync" width={24} height={24} className="h-6 w-6" />
             <span className="hidden sm:inline text-xs sm:text-sm md:text-base lg:text-lg font-bold text-foreground whitespace-nowrap">
               GameSync

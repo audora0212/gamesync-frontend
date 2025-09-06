@@ -1,7 +1,26 @@
+import { Button } from "@/components/ui/button";
+
 export default function PrivacyChoicesPage() {
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@example.com";
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
+      {/* 모바일 뒤로가기 */}
+      <div className="mb-4 md:hidden">
+        <Button
+          variant="outline"
+          className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+          onClick={() => {
+            try {
+              if (typeof window !== "undefined" && window.history.length > 1) history.back();
+              else location.href = "/";
+            } catch {
+              location.href = "/";
+            }
+          }}
+        >
+          ← 뒤로가기
+        </Button>
+      </div>
       <h1 className="text-3xl font-semibold">개인정보 선택 설정</h1>
       <p className="mt-3 text-sm text-muted-foreground">
         아래에서 개인정보 처리와 관련된 선택 사항을 확인하세요. 일부 항목은 앱 내 설정 또는 문의를 통해 처리됩니다.

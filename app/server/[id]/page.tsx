@@ -102,7 +102,7 @@ export default function ServerDetailPage() {
             className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
             onClick={() => router.push("/dashboard")}
           >
-            ← 대시보드
+            대시보드로 가기
           </Button>
         </div>
         {/* 서버 정보 카드 */}
