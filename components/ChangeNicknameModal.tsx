@@ -225,6 +225,11 @@ export function SettingModal() {
               친구 추가/서버 초대는 벨 패널에 항상 표시됩니다. 친구 스케줄 등록은 옵션에 따라 패널 표시/비표시를 선택할 수 있습니다.
             </div>
           </div>
+          {/* 회원 탈퇴 섹션 */}
+          <div className="pt-3 border-t border-white/10">
+            <div className="text-white text-sm mb-2">계정</div>
+            <ConfirmDeleteAccount />
+          </div>
         </div>
         <div className="flex justify-end space-x-2 pt-4">
           <DialogClose asChild>
@@ -237,4 +242,58 @@ export function SettingModal() {
       </DialogContent>
     </Dialog>
   );
+}
+
+function ConfirmDeleteAccount() {
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [busy, setBusy] = useState(false)
+
+  const doDelete = async () => {
+    setBusy(true)
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+        method: 'DELETE',
+        headers: { ...authService.getAuthHeaders() }
+      })
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || '탈퇴에 실패했습니다')
+      }
+      toast.success('탈퇴가 완료되었습니다')
+      await authService.logout()
+      window.location.href = '/auth/login'
+    } catch (e: any) {
+      toast.error(e?.message || '탈퇴에 실패했습니다')
+    } finally {
+      setBusy(false)
+      setConfirmOpen(false)
+    }
+  }
+
+  return (
+    <>
+      <Button
+        variant="destructive"
+        className="w-full glass-button"
+        onClick={() => setConfirmOpen(true)}
+        disabled={busy}
+      >
+        {busy ? '처리 중...' : '회원 탈퇴'}
+      </Button>
+      {confirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={()=>setConfirmOpen(false)}>
+          <div className="bg-zinc-900 text-white max-w-sm w-full mx-4 rounded-lg border border-white/20" onClick={(e)=>e.stopPropagation()}>
+            <div className="p-4 border-b border-white/10 text-lg font-semibold">정말 탈퇴하시겠어요?</div>
+            <div className="p-4 text-sm text-white/80">
+              탈퇴 시 참여 중인 모든 서버에서 제외되고, 등록한 파티/스케줄과 모든 기록이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
+            </div>
+            <div className="p-4 flex justify-end gap-2">
+              <Button variant="outline" className="glass border-white/30 text-white" onClick={()=>setConfirmOpen(false)} disabled={busy}>취소</Button>
+              <Button className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300" onClick={doDelete} disabled={busy}>탈퇴하기</Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
 }
