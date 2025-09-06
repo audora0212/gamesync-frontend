@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { Footer } from "@/components/Footer"
 // Demo image section removed; no Image import needed
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -188,19 +189,8 @@ export default function GameSyncLanding() {
           </Card>
         </div>
       </section>
-      {/* Footer: 최하단 */}
-      <footer className="px-4 py-10 border-t border-white/10 text-center text-xs text-muted-foreground">
-        <div className="max-w-6xl mx-auto space-y-1">
-          <div>© 2025 GameSync. All rights reserved.</div>
-          <div>오류 문의: gy255318@gmail.com</div>
-          <div>Thanks to. SS, YC</div>
-          <div className="pt-2">
-            <Link className="underline" href="/privacy">개인정보 처리방침</Link>
-            <span className="mx-2">·</span>
-            <Link className="underline" href="/privacy/choices">개인정보 선택 사항</Link>
-          </div>
-        </div>
-      </footer>
+      {/* Footer: 공용 컴포넌트 */}
+      <Footer />
     </div>
   )
 }

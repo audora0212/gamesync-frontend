@@ -23,6 +23,7 @@ import { Plus, Users, Clock, Flame, Star, Bug } from "lucide-react";
 import { noticeService, type NoticeSummary } from "@/lib/notice-service";
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute";
 import { useAuth } from "@/components/auth-provider";
+import { Footer } from "@/components/Footer";
 
 export default function DashboardPage() {
   useProtectedRoute();
@@ -36,6 +37,8 @@ export default function DashboardPage() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [notices, setNotices] = useState<NoticeSummary[]>([]);
   const [openNotice, setOpenNotice] = useState<NoticeSummary|null>(null);
+  const [noticeContent, setNoticeContent] = useState<string>("");
+  const [noticeLoading, setNoticeLoading] = useState<boolean>(false);
   const router = useRouter();
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -57,6 +60,25 @@ export default function DashboardPage() {
       }
     };
   }, [authLoading, authUser]);
+
+  // 공지 상세 로딩
+  useEffect(() => {
+    if (!openNotice) {
+      setNoticeContent("");
+      return;
+    }
+    (async () => {
+      try {
+        setNoticeLoading(true)
+        const d = await noticeService.detail(openNotice.id)
+        setNoticeContent(d.content || "")
+      } catch {
+        setNoticeContent("내용을 불러오지 못했습니다.")
+      } finally {
+        setNoticeLoading(false)
+      }
+    })()
+  }, [openNotice])
 
   const loadServers = async () => {
     // AuthProvider 상태 확인
@@ -403,19 +425,8 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Footer: Privacy Links (최하단) */}
-      <footer className="px-4 pb-8 text-center text-xs text-white/60">
-        <div className="space-y-1">
-          <div>© 2025 GameSync. All rights reserved.</div>
-          <div>오류 문의: gy255318@gmail.com</div>
-          <div>Thanks to. SS, YC</div>
-          <div className="pt-2">
-            <a className="underline" href="/privacy">개인정보 처리방침</a>
-            <span className="mx-2">·</span>
-            <a className="underline" href="/privacy/choices">개인정보 선택 사항</a>
-          </div>
-        </div>
-      </footer>
+      {/* Footer: 공용 컴포넌트 */}
+      <Footer />
 
       {/* 모달 컴포넌트 */}
       <CreateServerModal
@@ -437,7 +448,13 @@ export default function DashboardPage() {
               <div className="text-lg font-semibold truncate">{openNotice.title}</div>
               <div className="text-xs text-white/60">{new Date(openNotice.createdAt).toLocaleString()}</div>
             </div>
-            <div className="p-4 text-sm text-white/80 max-h-[60vh] overflow-auto" id="notice-content"></div>
+            <div className="p-4 text-sm text-white/80 max-h-[60vh] overflow-auto">
+              {noticeLoading ? (
+                <div className="text-white/60">불러오는 중...</div>
+              ) : (
+                <pre className="whitespace-pre-wrap font-sans">{noticeContent}</pre>
+              )}
+            </div>
             <div className="p-4 flex justify-end">
               <Button variant="outline" className="glass border-white/30 text-white" onClick={()=>setOpenNotice(null)}>닫기</Button>
             </div>

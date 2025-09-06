@@ -25,6 +25,7 @@ export default function AdminPage() {
   const [parties, setParties] = useState<Party[]>([])
   const [notices, setNotices] = useState<{id:number; title:string; createdAt:string}[]>([])
   const [newNotice, setNewNotice] = useState<{title:string; content:string}>({ title: '', content: '' })
+  const [editNotice, setEditNotice] = useState<{id:number; title:string; content:string}|null>(null)
   // 간단한 수정 모달 상태 (Hooks는 모든 early return보다 위에 있어야 함)
   const [editing, setEditing] = useState<{ type: 'server'|'timetable'|'party'; data: any }|null>(null)
   const openEdit = (type: 'server'|'timetable'|'party', data: any) => setEditing({ type, data })
@@ -152,10 +153,13 @@ export default function AdminPage() {
                   <div className="truncate">{n.title}</div>
                   <div className="flex gap-2">
                     <Button size="sm" className="glass-button" onClick={async ()=>{
-                      const title = prompt('제목 수정', n.title) ?? n.title
-                      const content = prompt('내용 수정', '') ?? ''
-                      const ok = await fetch(`${API}/admin/notices/${n.id}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...authService.getAuthHeaders() }, body: JSON.stringify({ title, content }) })
-                      if(ok.ok){ const list = await fetch(`${API}/notices`, { headers: authService.getAuthHeaders() }).then(r=>r.json()); setNotices(list) }
+                      // 상세를 불러와 모달에 채움
+                      try {
+                        const d = await fetch(`${API}/notices/${n.id}`, { headers: authService.getAuthHeaders() }).then(r=>r.json())
+                        setEditNotice({ id: n.id, title: d.title, content: d.content || '' })
+                      } catch {
+                        setEditNotice({ id: n.id, title: n.title, content: '' })
+                      }
                     }}>수정</Button>
                     <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={async ()=>{
                       await fetch(`${API}/admin/notices/${n.id}`, { method:'DELETE', headers: authService.getAuthHeaders() });
@@ -168,6 +172,30 @@ export default function AdminPage() {
             </div>
           </CardContent>
         </Card>
+        )}
+
+        {/* 공지 수정 모달 */}
+        {editNotice && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={()=>setEditNotice(null)}>
+            <div className="bg-zinc-900 text-white max-w-lg w-full mx-4 rounded-lg border border-white/20" onClick={(e)=>e.stopPropagation()}>
+              <div className="p-4 border-b border-white/10 text-lg font-semibold">공지 수정</div>
+              <div className="p-4 space-y-3">
+                <input className="w-full rounded bg-black/30 border border-white/20 px-3 py-2 text-sm text-white" value={editNotice.title} onChange={e=>setEditNotice(v=>v?{...v, title:e.target.value}:v)} />
+                <textarea className="w-full rounded bg-black/30 border border-white/20 px-3 py-2 text-sm text-white min-h-[160px]" value={editNotice.content} onChange={e=>setEditNotice(v=>v?{...v, content:e.target.value}:v)} />
+              </div>
+              <div className="p-4 flex justify-end gap-2">
+                <Button variant="outline" className="glass border-white/30 text-white" onClick={()=>setEditNotice(null)}>취소</Button>
+                <Button className="glass-button" onClick={async ()=>{
+                  if(!editNotice) return
+                  const ok = await fetch(`${API}/admin/notices/${editNotice.id}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...authService.getAuthHeaders() }, body: JSON.stringify({ title: editNotice.title, content: editNotice.content }) })
+                  if (ok.ok) {
+                    setEditNotice(null)
+                    const list = await fetch(`${API}/notices`, { headers: authService.getAuthHeaders() }).then(r=>r.json()); setNotices(list)
+                  }
+                }}>저장</Button>
+              </div>
+            </div>
+          </div>
         )}
 
         {tab==='servers' && (
