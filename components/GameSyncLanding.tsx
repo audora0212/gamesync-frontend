@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Footer } from "@/components/Footer"
 // Demo image section removed; no Image import needed
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -189,8 +188,7 @@ export default function GameSyncLanding() {
           </Card>
         </div>
       </section>
-      {/* Footer: 공용 컴포넌트 */}
-      <Footer />
+      {/* Footer는 전역 레이아웃에서 렌더링 */}
     </div>
   )
 }

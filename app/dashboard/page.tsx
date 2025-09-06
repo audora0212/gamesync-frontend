@@ -23,7 +23,6 @@ import { Plus, Users, Clock, Flame, Star, Bug } from "lucide-react";
 import { noticeService, type NoticeSummary } from "@/lib/notice-service";
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute";
 import { useAuth } from "@/components/auth-provider";
-import { Footer } from "@/components/Footer";
 
 export default function DashboardPage() {
   useProtectedRoute();
@@ -425,8 +424,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Footer: 공용 컴포넌트 */}
-      <Footer />
+      {/* Footer는 전역 레이아웃에서 렌더링 */}
 
       {/* 모달 컴포넌트 */}
       <CreateServerModal
