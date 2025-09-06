@@ -112,7 +112,7 @@ export default function ClientCallback() {
         toast.success("카카오 계정으로 로그인했습니다.");
         router.replace("/dashboard");
     })()
-  }, [token, userParam, router, oauthTarget]);
+  }, [token, userParam, router, oauthTarget, isProcessing, isDebug]);
 
   const tf = (process as any).env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL as string | undefined
   const deeplink = token && userParam ? `gamesync://auth/kakao/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}` : '#'

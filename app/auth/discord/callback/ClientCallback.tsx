@@ -139,7 +139,7 @@ export default function ClientCallback() {
         router.replace("/dashboard");
     })()
     // 위에서 라우팅 처리되므로 중복 호출 제거
-  }, [token, userParam, router, oauthTarget]);
+  }, [token, userParam, router, oauthTarget, isProcessing, isDebug]);
 
   const tf = (process as any).env.NEXT_PUBLIC_IOS_TESTFLIGHT_URL as string | undefined
   const deeplink = token && userParam ? `gamesync://auth/discord/callback?token=${encodeURIComponent(token)}&user=${encodeURIComponent(userParam)}` : '#'

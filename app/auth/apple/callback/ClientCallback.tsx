@@ -106,7 +106,7 @@ export default function ClientCallback() {
       toast.success("Apple 계정으로 로그인했습니다." as string);
       router.replace("/dashboard");
     })()
-  }, [token, userParam, router, oauthTarget]);
+  }, [token, userParam, router, oauthTarget, isProcessing]);
 
   return (
     <div style={{padding:16}}>
