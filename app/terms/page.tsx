@@ -26,7 +26,7 @@ export default function TermsPage() {
       </div>
       <h1 className="text-3xl font-semibold">이용약관</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        본 약관은 GameSync 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정합니다.
+        본 약관은 GameSync 서비스(이하 &quot;서비스&quot;)의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정합니다.
       </p>
 
       <section className="mt-8 space-y-3">
