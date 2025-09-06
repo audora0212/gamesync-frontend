@@ -405,9 +405,16 @@ export default function DashboardPage() {
 
       {/* Footer: Privacy Links (최하단) */}
       <footer className="px-4 pb-8 text-center text-xs text-white/60">
-        <a className="underline" href="/privacy">개인정보 처리방침</a>
-        <span className="mx-2">·</span>
-        <a className="underline" href="/privacy/choices">개인정보 선택 사항</a>
+        <div className="space-y-1">
+          <div>© 2025 GameSync. All rights reserved.</div>
+          <div>오류 문의: gy255318@gmail.com</div>
+          <div>Thanks to. SS, YC</div>
+          <div className="pt-2">
+            <a className="underline" href="/privacy">개인정보 처리방침</a>
+            <span className="mx-2">·</span>
+            <a className="underline" href="/privacy/choices">개인정보 선택 사항</a>
+          </div>
+        </div>
       </footer>
 
       {/* 모달 컴포넌트 */}

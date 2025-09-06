@@ -190,10 +190,15 @@ export default function GameSyncLanding() {
       </section>
       {/* Footer: 최하단 */}
       <footer className="px-4 py-10 border-t border-white/10 text-center text-xs text-muted-foreground">
-        <div className="max-w-6xl mx-auto">
-          <Link className="underline" href="/privacy">개인정보 처리방침</Link>
-          <span className="mx-2">·</span>
-          <Link className="underline" href="/privacy/choices">개인정보 선택 사항</Link>
+        <div className="max-w-6xl mx-auto space-y-1">
+          <div>© 2025 GameSync. All rights reserved.</div>
+          <div>오류 문의: gy255318@gmail.com</div>
+          <div>Thanks to. SS, YC</div>
+          <div className="pt-2">
+            <Link className="underline" href="/privacy">개인정보 처리방침</Link>
+            <span className="mx-2">·</span>
+            <Link className="underline" href="/privacy/choices">개인정보 선택 사항</Link>
+          </div>
         </div>
       </footer>
     </div>
