@@ -2,15 +2,23 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/lib/auth-service";
+import { isNative } from "@/lib/native";
 
 export default function PrivacyPage() {
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@example.com";
   const router = useRouter();
   const REVIEW_MODE = process.env.NEXT_PUBLIC_REVIEW_MODE === 'true'
   const [lang, setLang] = useState<'ko'|'en'>('ko')
+  const [isNativeApp, setIsNativeApp] = useState(false)
+
+  useEffect(() => {
+    (async () => {
+      try { setIsNativeApp(await isNative()) } catch { setIsNativeApp(false) }
+    })()
+  }, [])
 
   const goStart = () => {
     try {
@@ -26,7 +34,9 @@ export default function PrivacyPage() {
           <Button variant={lang==='ko'?'default':'outline'} size="sm" onClick={()=>setLang('ko')}>한국어</Button>
           <Button variant={lang==='en'?'default':'outline'} size="sm" onClick={()=>setLang('en')}>English</Button>
         </div>
-        <Button variant="secondary" className="glass" onClick={goStart}>시작하러가기</Button>
+        {!isNativeApp && (
+          <Button variant="secondary" className="glass" onClick={goStart}>시작하러가기</Button>
+        )}
       </div>
       {/* 모바일 뒤로가기 (우측 정렬, 화살표 제거) */}
       <div className="mb-4 md:hidden flex justify-end">
@@ -128,7 +138,7 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
               {!REVIEW_MODE && (<li>인증: 카카오(카카오계정), 디스코드(Discord, Inc.)</li>)}
               <li>푸시 알림: Firebase Cloud Messaging(Google LLC), Apple Push Notification service(Apple Inc.)</li>
-              <li>인프라/호스팅: (예) AWS 또는 사용 중인 클라우드 제공자</li>
+              <li>인프라/호스팅: AWS 또는 사용 중인 클라우드 제공자</li>
             </ul>
             <p className="text-xs text-muted-foreground">각 제공자의 개인정보 처리방침은 해당 업체의 공식 페이지를 참고하시기 바랍니다.</p>
           </>
@@ -138,7 +148,7 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
               {!REVIEW_MODE && (<li>Auth: Kakao, Discord</li>)}
               <li>Push: Firebase Cloud Messaging (Google), APNs (Apple)</li>
-              <li>Infra/Hosting: e.g., AWS or our cloud provider</li>
+              <li>Infra/Hosting: AWS or our cloud provider</li>
             </ul>
             <p className="text-xs text-muted-foreground">Refer to each provider’s official privacy policy.</p>
           </>
@@ -146,62 +156,101 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">5. 보유 및 이용 기간</h2>
-        <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-          <li>회원 탈퇴 시, 관련 법령에 따라 보관이 요구되는 경우를 제외하고 지체 없이 파기합니다.</li>
-          <li>접속 기록 등 로그성 정보는 보안 및 분쟁 대응을 위해 최대 1년 보관 후 파기할 수 있습니다.</li>
-          <li>법령상 보존 의무가 있는 경우 해당 기간 동안 분리 보관합니다.</li>
-        </ul>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '5. 보유 및 이용 기간' : '5. Retention Period'}</h2>
+        {lang==='ko' ? (
+          <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+            <li>회원 탈퇴 시, 관련 법령에 따라 보관이 요구되는 경우를 제외하고 지체 없이 파기합니다.</li>
+            <li>접속 기록 등 로그성 정보는 보안 및 분쟁 대응을 위해 최대 1년 보관 후 파기할 수 있습니다.</li>
+            <li>법령상 보존 의무가 있는 경우 해당 기간 동안 분리 보관합니다.</li>
+          </ul>
+        ) : (
+          <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+            <li>Upon account deletion, we erase your data unless retention is required by law.</li>
+            <li>Log data may be retained up to 1 year for security and dispute resolution.</li>
+            <li>Where legally required, data is retained for the mandated period.</li>
+          </ul>
+        )}
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">6. 국외 이전</h2>
-        <p className="text-sm text-muted-foreground">
-          FCM 등 일부 서비스는 국외 서버를 사용합니다. 이에 따라 서비스 이용 과정에서 개인정보가 국외로 이전·보관될 수 있습니다. 이전되는 정보, 국가, 보유 기간 등은 각 제공자의 정책을 따릅니다.
-        </p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '6. 국외 이전' : '6. International Transfers'}</h2>
+        {lang==='ko' ? (
+          <p className="text-sm text-muted-foreground">FCM 등 일부 서비스는 국외 서버를 사용합니다. 이에 따라 서비스 이용 과정에서 개인정보가 국외로 이전·보관될 수 있습니다. 이전되는 정보, 국가, 보유 기간 등은 각 제공자의 정책을 따릅니다.</p>
+        ) : (
+          <p className="text-sm text-muted-foreground">Some services such as FCM use overseas servers. Your data may be transferred/stored abroad per each provider’s policy.</p>
+        )}
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">7. 이용자의 권리</h2>
-        <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-          <li>본인 확인 후 개인정보 열람·정정·삭제·처리정지·동의철회를 요청하실 수 있습니다.</li>
-          <li>앱 내 프로필/설정 또는 아래 연락처를 통해 요청하실 수 있습니다.</li>
-        </ul>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '7. 이용자의 권리' : '7. Your Rights'}</h2>
+        {lang==='ko' ? (
+          <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+            <li>본인 확인 후 개인정보 열람·정정·삭제·처리정지·동의철회를 요청하실 수 있습니다.</li>
+            <li>앱 내 프로필/설정 또는 아래 연락처를 통해 요청하실 수 있습니다.</li>
+          </ul>
+        ) : (
+          <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+            <li>You can request access, correction, deletion, restriction, and withdrawal of consent.</li>
+            <li>Submit requests via in-app profile/settings or through the contact below.</li>
+          </ul>
+        )}
       </section>
 
 
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">8. 개인정보의 안전성 확보조치</h2>
-        <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-          <li>전송 구간 암호화(HTTPS), 접근 통제, 최소 권한 원칙 적용</li>
-          <li>민감 정보는 수집하지 않으며, 필요한 경우 법령 기준에 따른 암호화 등 보호조치 적용</li>
-        </ul>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '8. 개인정보의 안전성 확보조치' : '8. Security Measures'}</h2>
+        {lang==='ko' ? (
+          <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+            <li>전송 구간 암호화(HTTPS), 접근 통제, 최소 권한 원칙 적용</li>
+            <li>민감 정보는 수집하지 않으며, 필요한 경우 법령 기준에 따른 암호화 등 보호조치 적용</li>
+          </ul>
+        ) : (
+          <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+            <li>HTTPS, access control, and least privilege</li>
+            <li>No sensitive data collected; apply legal-grade safeguards if needed</li>
+          </ul>
+        )}
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">9. 문의처</h2>
-        <p className="text-sm text-muted-foreground">
-          개인정보 관련 문의, 신고 및 권리 행사는 아래로 연락해 주세요.
-        </p>
-        <div className="rounded-md border p-4 text-sm text-muted-foreground">
-          이메일: <a className="underline" href={`mailto:${supportEmail}`}>{supportEmail}</a>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          보다 빠른 응답을 위해 문제 상황, 스크린샷, 재현 절차를 함께 제공해 주세요.
-        </p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '9. 문의처' : '9. Contact'}</h2>
+        {lang==='ko' ? (
+          <>
+            <p className="text-sm text-muted-foreground">개인정보 관련 문의, 신고 및 권리 행사는 아래로 연락해 주세요.</p>
+            <div className="rounded-md border p-4 text-sm text-muted-foreground">이메일: <a className="underline" href={`mailto:${supportEmail}`}>{supportEmail}</a></div>
+            <p className="text-xs text-muted-foreground">보다 빠른 응답을 위해 문제 상황, 스크린샷, 재현 절차를 함께 제공해 주세요.</p>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-muted-foreground">For privacy inquiries or rights requests, contact us below.</p>
+            <div className="rounded-md border p-4 text-sm text-muted-foreground">Email: <a className="underline" href={`mailto:${supportEmail}`}>{supportEmail}</a></div>
+            <p className="text-xs text-muted-foreground">For faster response, include context, screenshots, and repro steps.</p>
+          </>
+        )}
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">10. 본 방침의 변경</h2>
-        <p className="text-sm text-muted-foreground">
-          법령, 서비스 변경에 따라 방침이 수정될 수 있으며, 변경 사항은 서비스 내 공지 또는 본 페이지를 통해 고지합니다.
-        </p>
-        <p className="text-xs text-muted-foreground">시행일: 2025-01-01</p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '10. 본 방침의 변경' : '10. Changes to this Policy'}</h2>
+        {lang==='ko' ? (
+          <>
+            <p className="text-sm text-muted-foreground">법령, 서비스 변경에 따라 방침이 수정될 수 있으며, 변경 사항은 서비스 내 공지 또는 본 페이지를 통해 고지합니다.</p>
+            <p className="text-xs text-muted-foreground">시행일: 2025-09-06</p>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-muted-foreground">We may update this policy for legal or service changes; updates will be announced in-app or on this page.</p>
+            <p className="text-xs text-muted-foreground">Effective date: 2025-01-01</p>
+          </>
+        )}
       </section>
 
       <div className="mt-10 text-sm text-muted-foreground">
-        관련 문서: <Link className="underline" href="/terms">이용약관</Link> · <Link className="underline" href="/support">지원 센터</Link>
+        {lang==='ko' ? (
+          <>관련 문서: <Link className="underline" href="/terms">이용약관</Link> · <Link className="underline" href="/support">지원 센터</Link></>
+        ) : (
+          <>Related: <Link className="underline" href="/terms">Terms of Service</Link> · <Link className="underline" href="/support">Support</Link></>
+        )}
       </div>
     </div>
   );

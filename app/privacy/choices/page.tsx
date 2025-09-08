@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/lib/auth-service";
+import { isNative } from "@/lib/native";
 
 export default function PrivacyChoicesPage() {
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@example.com";
   const [lang, setLang] = useState<'ko'|'en'>('ko');
+  const [isNativeApp, setIsNativeApp] = useState(false)
   const goStart = () => {
     try { if (authService.isAuthenticated()) window.location.href='/dashboard'; else window.location.href='/'; } catch { window.location.href='/' }
   }
+  useEffect(() => { (async()=>{ try{ setIsNativeApp(await isNative()) } catch{ setIsNativeApp(false) } })() }, [])
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       {/* 상단: 언어 토글 + 시작하러가기 */}
@@ -18,10 +21,12 @@ export default function PrivacyChoicesPage() {
           <Button variant={lang==='ko'?'default':'outline'} size="sm" onClick={()=>setLang('ko')}>한국어</Button>
           <Button variant={lang==='en'?'default':'outline'} size="sm" onClick={()=>setLang('en')}>English</Button>
         </div>
-        <Button variant="secondary" className="glass" onClick={goStart}>시작하러가기</Button>
+        {!isNativeApp && (
+          <Button variant="secondary" className="glass" onClick={goStart}>시작하러가기</Button>
+        )}
       </div>
-      {/* 모바일 뒤로가기 */}
-      <div className="mb-4 md:hidden">
+      {/* 모바일 뒤로가기 (우측 정렬, 화살표 제거) */}
+      <div className="mb-4 md:hidden flex justify-end">
         <Button
           variant="outline"
           className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
@@ -34,7 +39,7 @@ export default function PrivacyChoicesPage() {
             }
           }}
         >
-          ← 뒤로가기
+          뒤로가기
         </Button>
       </div>
       {lang==='ko' ? (

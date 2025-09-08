@@ -1,16 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/lib/auth-service";
+import { isNative } from "@/lib/native";
 
 export default function TermsPage() {
   const router = useRouter();
   const [lang, setLang] = useState<'ko'|'en'>('ko')
+  const [isNativeApp, setIsNativeApp] = useState(false)
   const goStart = () => {
     try { if (authService.isAuthenticated()) router.push('/dashboard'); else router.push('/'); } catch { router.push('/') }
   }
+  useEffect(() => { (async()=>{ try{ setIsNativeApp(await isNative()) } catch{ setIsNativeApp(false) } })() }, [])
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       {/* 상단: 언어 토글 + 시작하러가기 */}
@@ -19,7 +22,9 @@ export default function TermsPage() {
           <Button variant={lang==='ko'?'default':'outline'} size="sm" onClick={()=>setLang('ko')}>한국어</Button>
           <Button variant={lang==='en'?'default':'outline'} size="sm" onClick={()=>setLang('en')}>English</Button>
         </div>
-        <Button variant="secondary" className="glass" onClick={goStart}>시작하러가기</Button>
+        {!isNativeApp && (
+          <Button variant="secondary" className="glass" onClick={goStart}>시작하러가기</Button>
+        )}
       </div>
       {/* 모바일 뒤로가기 (우측 정렬) */}
       <div className="mb-4 md:hidden flex justify-end">
@@ -56,41 +61,41 @@ export default function TermsPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">2. 용어의 정의</h2>
-        <p className="text-sm text-muted-foreground">서비스, 이용자, 계정, 콘텐츠 등 기본 용어의 정의는 관련 법령과 일반 관례를 따릅니다.</p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '2. 용어의 정의' : '2. Definitions'}</h2>
+        <p className="text-sm text-muted-foreground">{lang==='ko' ? '서비스, 이용자, 계정, 콘텐츠 등 기본 용어의 정의는 관련 법령과 일반 관례를 따릅니다.' : 'Basic terms such as Service, User, Account, and Content follow common legal definitions and practice.'}</p>
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">3. 약관의 게시와 개정</h2>
-        <p className="text-sm text-muted-foreground">회사는 본 약관을 서비스 화면에 게시하며, 관련 법령을 준수하여 개정할 수 있습니다.</p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '3. 약관의 게시와 개정' : '3. Posting and Amendments'}</h2>
+        <p className="text-sm text-muted-foreground">{lang==='ko' ? '회사는 본 약관을 서비스 화면에 게시하며, 관련 법령을 준수하여 개정할 수 있습니다.' : 'We post these Terms in the Service and may amend them in accordance with applicable laws.'}</p>
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">4. 서비스의 제공</h2>
-        <p className="text-sm text-muted-foreground">회사는 서비스의 제공과 관련하여 합리적인 범위 내에서 변경, 중단할 수 있으며 사전 고지합니다.</p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '4. 서비스의 제공' : '4. Provision of the Service'}</h2>
+        <p className="text-sm text-muted-foreground">{lang==='ko' ? '회사는 서비스의 제공과 관련하여 합리적인 범위 내에서 변경, 중단할 수 있으며 사전 고지합니다.' : 'We may change or suspend the Service within reasonable scope and announce it in advance.'}</p>
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">5. 이용자의 의무</h2>
-        <p className="text-sm text-muted-foreground">이용자는 관련 법령, 본 약관, 서비스 내 안내에 따라 서비스를 이용해야 합니다.</p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '5. 이용자의 의무' : '5. User Obligations'}</h2>
+        <p className="text-sm text-muted-foreground">{lang==='ko' ? '이용자는 관련 법령, 본 약관, 서비스 내 안내에 따라 서비스를 이용해야 합니다.' : 'Users must use the Service in accordance with laws, these Terms, and in-app guidance.'}</p>
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">6. 권리의 귀속</h2>
-        <p className="text-sm text-muted-foreground">서비스 및 관련 소프트웨어에 대한 지식재산권은 회사에 귀속됩니다.</p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '6. 권리의 귀속' : '6. Ownership of Rights'}</h2>
+        <p className="text-sm text-muted-foreground">{lang==='ko' ? '서비스 및 관련 소프트웨어에 대한 지식재산권은 회사에 귀속됩니다.' : 'Intellectual property rights in the Service and related software belong to the Company.'}</p>
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">7. 책임 제한</h2>
-        <p className="text-sm text-muted-foreground">회사는 천재지변 등 불가항력으로 인한 서비스 장애에 대해 책임을 지지 않습니다.</p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '7. 책임 제한' : '7. Limitation of Liability'}</h2>
+        <p className="text-sm text-muted-foreground">{lang==='ko' ? '회사는 천재지변 등 불가항력으로 인한 서비스 장애에 대해 책임을 지지 않습니다.' : 'We are not liable for service failures caused by force majeure such as natural disasters.'}</p>
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">8. 분쟁의 해결</h2>
-        <p className="text-sm text-muted-foreground">본 약관과 관련된 분쟁은 관계 법령과 상관례에 따라 해결합니다.</p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '8. 분쟁의 해결' : '8. Dispute Resolution'}</h2>
+        <p className="text-sm text-muted-foreground">{lang==='ko' ? '본 약관과 관련된 분쟁은 관계 법령과 상관례에 따라 해결합니다.' : 'Disputes related to these Terms are resolved under applicable law and common practice.'}</p>
       </section>
 
-      <p className="mt-10 text-xs text-muted-foreground">시행일: 2025-09-06</p>
+      <p className="mt-10 text-xs text-muted-foreground">{lang==='ko' ? '시행일: 2025-09-06' : 'Effective date: 2025-09-06'}</p>
     </div>
   );
 }

@@ -43,7 +43,9 @@ export default function SupportPage() {
           <Button variant={lang==='ko'?'default':'outline'} size="sm" onClick={()=>setLang('ko')}>한국어</Button>
           <Button variant={lang==='en'?'default':'outline'} size="sm" onClick={()=>setLang('en')}>English</Button>
         </div>
-        <Button variant="secondary" className="glass" onClick={goStart}>시작하러가기</Button>
+        {!isNativeApp && (
+          <Button variant="secondary" className="glass" onClick={goStart}>시작하러가기</Button>
+        )}
       </div>
       {/* 모바일 뒤로가기 (우측 정렬) */}
       <div className="mb-4 md:hidden flex justify-end">
