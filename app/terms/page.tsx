@@ -1,12 +1,26 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { authService } from "@/lib/auth-service";
 
 export default function TermsPage() {
   const router = useRouter();
+  const [lang, setLang] = useState<'ko'|'en'>('ko')
+  const goStart = () => {
+    try { if (authService.isAuthenticated()) router.push('/dashboard'); else router.push('/'); } catch { router.push('/') }
+  }
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
+      {/* 상단: 언어 토글 + 시작하러가기 */}
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex gap-2">
+          <Button variant={lang==='ko'?'default':'outline'} size="sm" onClick={()=>setLang('ko')}>한국어</Button>
+          <Button variant={lang==='en'?'default':'outline'} size="sm" onClick={()=>setLang('en')}>English</Button>
+        </div>
+        <Button variant="secondary" className="glass" onClick={goStart}>시작하러가기</Button>
+      </div>
       {/* 모바일 뒤로가기 (우측 정렬) */}
       <div className="mb-4 md:hidden flex justify-end">
         <Button
@@ -24,14 +38,21 @@ export default function TermsPage() {
           뒤로가기
         </Button>
       </div>
-      <h1 className="text-3xl font-semibold">이용약관</h1>
-      <p className="mt-3 text-sm text-muted-foreground">
-        본 약관은 GameSync 서비스(이하 &quot;서비스&quot;)의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정합니다.
-      </p>
+      {lang==='ko' ? (
+        <>
+          <h1 className="text-3xl font-semibold">이용약관</h1>
+          <p className="mt-3 text-sm text-muted-foreground">본 약관은 GameSync 서비스(이하 &quot;서비스&quot;)의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정합니다.</p>
+        </>
+      ) : (
+        <>
+          <h1 className="text-3xl font-semibold">Terms of Service</h1>
+          <p className="mt-3 text-sm text-muted-foreground">These Terms govern the use of GameSync (the "Service"), describing rights, obligations, and responsibilities between us and users.</p>
+        </>
+      )}
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">1. 목적</h2>
-        <p className="text-sm text-muted-foreground">이 약관은 서비스 이용과 관련된 기본 사항을 규정함을 목적으로 합니다.</p>
+        <h2 className="text-xl font-medium">{lang==='ko' ? '1. 목적' : '1. Purpose'}</h2>
+        <p className="text-sm text-muted-foreground">{lang==='ko' ? '이 약관은 서비스 이용과 관련된 기본 사항을 규정함을 목적으로 합니다.' : 'These Terms set forth the basic matters related to using the Service.'}</p>
       </section>
 
       <section className="mt-8 space-y-3">
