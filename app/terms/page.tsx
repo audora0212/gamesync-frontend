@@ -46,7 +46,7 @@ export default function TermsPage() {
       ) : (
         <>
           <h1 className="text-3xl font-semibold">Terms of Service</h1>
-          <p className="mt-3 text-sm text-muted-foreground">These Terms govern the use of GameSync (the "Service"), describing rights, obligations, and responsibilities between us and users.</p>
+          <p className="mt-3 text-sm text-muted-foreground">These Terms govern the use of GameSync (the &quot;Service&quot;), describing rights, obligations, and responsibilities between us and users.</p>
         </>
       )}
 

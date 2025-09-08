@@ -56,7 +56,7 @@ export default function PrivacyPage() {
         <>
           <h1 className="text-3xl font-semibold">Privacy Policy</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            GameSync ("Service") respects your privacy and complies with applicable laws. This policy explains what data we collect, how we use/store/delete it, and your rights.
+            GameSync (&quot;Service&quot;) respects your privacy and complies with applicable laws. This policy explains what data we collect, how we use/store/delete it, and your rights.
           </p>
         </>
       )}
