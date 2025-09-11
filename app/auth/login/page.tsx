@@ -221,7 +221,7 @@ export default function LoginPage() {
                 <Button
                   onClick={handleKakaoLogin}
                   disabled={isKakaoLoading || isDiscordLoading || isLoading}
-                  className="w-full bg-none !bg-[#FEE500] hover:!bg-[#F7D400] text_black font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#FEE500]/50"
+                  className="w-full bg-none !bg-[#FEE500] hover:!bg-[#F7D400] text-black font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#FEE500]/50"
                 >
                   {isKakaoLoading ? (
                     <>
