@@ -11,7 +11,7 @@ export function Footer() {
       <div>
         오류 문의: <a href="mailto:gy255318@gmail.com" className="hover:text-blue-300">gy255318@gmail.com</a>
       </div>
-      <div>Thanks to. SS, YC</div>
+      <div>Thanks to. H.C. J.G.</div>
       <div className="pt-2">
         <Link className="underline" href="/privacy">개인정보 처리방침</Link>
         <span className="mx-2">·</span>
