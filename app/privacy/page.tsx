@@ -235,12 +235,12 @@ export default function PrivacyPage() {
         {lang==='ko' ? (
           <>
             <p className="text-sm text-muted-foreground">법령, 서비스 변경에 따라 방침이 수정될 수 있으며, 변경 사항은 서비스 내 공지 또는 본 페이지를 통해 고지합니다.</p>
-            <p className="text-xs text-muted-foreground">시행일: 2025-09-06</p>
+            <p className="text-xs text-muted-foreground">시행일: 2025-09-06 · JY.L</p>
           </>
         ) : (
           <>
             <p className="text-sm text-muted-foreground">We may update this policy for legal or service changes; updates will be announced in-app or on this page.</p>
-            <p className="text-xs text-muted-foreground">Effective date: 2025-01-01</p>
+            <p className="text-xs text-muted-foreground">Effective date: 2025-01-01 · JY.L</p>
           </>
         )}
       </section>
