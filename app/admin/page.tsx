@@ -20,6 +20,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'audit'|'servers'|'timetables'|'parties'|'notices'>('audit')
   const [audit, setAudit] = useState<AuditLog[]>([])
+  const [auditFilter, setAuditFilter] = useState<{ category: 'all'|'server'|'timetable'|'party'; serverId?: number|string; action?: string }>({ category: 'all' })
   const [servers, setServers] = useState<Server[]>([])
   const [timetables, setTimetables] = useState<Timetable[]>([])
   const [parties, setParties] = useState<Party[]>([])
@@ -70,6 +71,16 @@ export default function AdminPage() {
     })()
   }, [])
 
+  // 감사 로그 필터 적용 fetch
+  const reloadAudit = async (filter = auditFilter) => {
+    const params = new URLSearchParams()
+    if (filter.category && filter.category !== 'all') params.set('category', filter.category)
+    if (filter.serverId) params.set('serverId', String(filter.serverId))
+    if (filter.action) params.set('action', filter.action)
+    const res = await fetch(`${API}/admin/audit-logs?${params.toString()}`, { headers: authService.getAuthHeaders() })
+    if (res.ok) setAudit(await res.json())
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen">
@@ -113,6 +124,27 @@ export default function AdminPage() {
             <CardTitle className="text-white">감사 로그 (최근 {audit.length}건)</CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="mb-3 flex flex-wrap gap-2 text-sm">
+              <select className="bg-black/30 border border-white/20 rounded px-2 py-1 text-white"
+                value={auditFilter.category}
+                onChange={e=>{ const v = e.target.value as 'all'|'server'|'timetable'|'party'; const f = { ...auditFilter, category: v }; setAuditFilter(f); reloadAudit(f) }}>
+                <option value="all">전체</option>
+                <option value="server">서버 참가/관리</option>
+                <option value="timetable">타임테이블</option>
+                <option value="party">파티</option>
+              </select>
+              <input className="bg-black/30 border border-white/20 rounded px-2 py-1 text-white" placeholder="serverId"
+                value={auditFilter.serverId ?? ''}
+                onChange={e=>{ const f = { ...auditFilter, serverId: e.target.value }; setAuditFilter(f) }}
+                onBlur={()=>reloadAudit()}
+              />
+              <input className="bg-black/30 border border-white/20 rounded px-2 py-1 text-white" placeholder="action (정확히)"
+                value={auditFilter.action ?? ''}
+                onChange={e=>{ const f = { ...auditFilter, action: e.target.value }; setAuditFilter(f) }}
+                onBlur={()=>reloadAudit()}
+              />
+              <Button size="sm" className="glass-button" onClick={()=>reloadAudit()}>적용</Button>
+            </div>
             <div className="max-h-[320px] overflow-auto text-white/80 text-sm divide-y divide-white/10">
               {audit.slice().reverse().map(l => (
                 <div key={l.id} className="py-2 flex items-center justify-between gap-2">
@@ -205,13 +237,7 @@ export default function AdminPage() {
             <CardContent>
               <div className="space-y-2">
                 {servers.map(s => (
-                  <div key={s.id} className="flex items-center justify-between text-white/80 text-sm bg-white/5 rounded px-3 py-2">
-                    <div className="truncate">{`${s.name} 서버 · 인원 ${s.members}명 · 서버장 ${s.ownerNickname ?? s.ownerId ?? '-' } · 초기화 ${s.resetTime ?? '-'}`}</div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={async ()=>{ await del(`/admin/servers/${s.id}`); setServers(prev=>prev.filter(x=>x.id!==s.id)) }}>삭제</Button>
-                      <Button size="sm" className="glass-button" onClick={()=>openEdit('server', s)}>수정</Button>
-                    </div>
-                  </div>
+                  <ServerRow key={s.id} s={s} api={API} del={del} openEdit={openEdit} />
                 ))}
                 {servers.length===0 && <div className="text-white/60">없음</div>}
               </div>
@@ -264,4 +290,53 @@ export default function AdminPage() {
   )
 }
 
+
+function ServerRow({ s, api, del, openEdit }: { s: any; api: string; del: (p:string)=>Promise<void>; openEdit: (t:any, d:any)=>void }) {
+  const [open, setOpen] = useState(false)
+  const [joins, setJoins] = useState<AuditLog[]>([])
+  const [loading, setLoading] = useState(false)
+  const toggle = async () => {
+    if (!open) {
+      setLoading(true)
+      try {
+        const res = await fetch(`${api}/admin/servers/${s.id}/join-logs`, { headers: authService.getAuthHeaders() })
+        if (res.ok) setJoins(await res.json())
+      } finally {
+        setLoading(false)
+      }
+    }
+    setOpen(v=>!v)
+  }
+  return (
+    <div className="text-white/80 text-sm bg-white/5 rounded">
+      <div className="flex items-center justify-between px-3 py-2">
+        <button className="text-left flex-1" onClick={toggle}>
+          <div className="truncate">{`${s.name} 서버 · 인원 ${s.members}명 · 서버장 ${s.ownerNickname ?? s.ownerId ?? '-' } · 초기화 ${s.resetTime ?? '-'}`}</div>
+        </button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={async ()=>{ await del(`/admin/servers/${s.id}`) }}>삭제</Button>
+          <Button size="sm" className="glass-button" onClick={()=>openEdit('server', s)}>수정</Button>
+        </div>
+      </div>
+      {open && (
+        <div className="px-3 pb-2">
+          <div className="text-white/60 text-xs mb-1">참가 기록</div>
+          {loading ? (
+            <div className="text-white/60 text-xs py-2">불러오는 중...</div>
+          ) : (
+            <div className="max-h-40 overflow-auto divide-y divide-white/10">
+              {joins.length===0 && <div className="py-2 text-white/60 text-xs">기록 없음</div>}
+              {joins.slice().reverse().map(j => (
+                <div key={j.id} className="py-1">
+                  <div className="font-mono text-[11px] text-white/60">#{j.id} {j.occurredAt}</div>
+                  <div>{`JOIN_SERVER · 유저#${j.userId ?? '-'} · ${j.details ?? ''}`}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
