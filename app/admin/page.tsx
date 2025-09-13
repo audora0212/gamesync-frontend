@@ -8,6 +8,7 @@ import { authService } from '@/lib/auth-service'
 import { Navbar } from '@/components/navbar'
 
 type AuditLog = { id: number; serverId: number|null; userId: number|null; action: string; details?: string|null; occurredAt: string }
+type AuditLogView = AuditLog & { userNickname?: string|null }
 type Server = { id: number; name: string; ownerId: number|null; ownerNickname?: string|null; resetTime?: string; members: number }
 type Timetable = { id: number; serverId: number|null; serverName?: string|null; userId: number|null; userNickname?: string|null; slot: string; gameName?: string|null }
 type Party = { id: number; serverId: number|null; serverName?: string|null; creatorId: number|null; creatorNickname?: string|null; slot: string; capacity: number; gameName?: string|null; participants: number }
@@ -19,7 +20,8 @@ export default function AdminPage() {
   const [authorized, setAuthorized] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'audit'|'servers'|'timetables'|'parties'|'notices'>('audit')
-  const [audit, setAudit] = useState<AuditLog[]>([])
+  const [audit, setAudit] = useState<AuditLogView[]>([])
+  const [auditOpen, setAuditOpen] = useState<Record<number, boolean>>({})
   const [auditFilter, setAuditFilter] = useState<{ category: 'all'|'server'|'timetable'|'party'; serverId?: number|string; action?: string }>({ category: 'all' })
   const [servers, setServers] = useState<Server[]>([])
   const [timetables, setTimetables] = useState<Timetable[]>([])
@@ -146,18 +148,23 @@ export default function AdminPage() {
               <Button size="sm" className="glass-button" onClick={()=>reloadAudit()}>적용</Button>
             </div>
             <div className="max-h-[320px] overflow-auto text-white/80 text-sm divide-y divide-white/10">
-              {audit.slice().reverse().map(l => (
-                <div key={l.id} className="py-2 flex items-center justify-between gap-2">
-                  <div className="truncate">
-                    <div className="font-mono text-xs text-white/60">#{l.id} {l.occurredAt}</div>
-                    <div className="truncate">{(() => {
-                      const srv = l.serverId ? `서버#${l.serverId}` : '서버-'
-                      const usr = l.userId ? `유저#${l.userId}` : '유저-'
-                      return `${l.action} · ${srv} · ${usr} · ${l.details ?? ''}`
-                    })()}</div>
+              {audit.slice().reverse().map(l => {
+                const open = !!auditOpen[l.id]
+                const usr = l.userId ? `유저#${l.userId}${l.userNickname?`(${l.userNickname})`:''}` : '유저-'
+                const srv = l.serverId ? `서버#${l.serverId}` : '서버-'
+                const line = `${l.action} · ${srv} · ${usr} · ${l.details ?? ''}`
+                return (
+                  <div key={l.id} className="py-2">
+                    <button className="w-full text-left" onClick={()=>setAuditOpen(v=>({ ...v, [l.id]: !open }))}>
+                      <div className="font-mono text-xs text-white/60">#{l.id} {l.occurredAt}</div>
+                      <div className={open?"whitespace-pre-wrap break-all":"truncate"}>{line}</div>
+                    </button>
+                    {open && (
+                      <div className="mt-1 text-xs text-white/60">(클릭하여 접기)</div>
+                    )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
               {audit.length === 0 && <div className="py-2">기록 없음</div>}
             </div>
           </CardContent>
@@ -293,7 +300,7 @@ export default function AdminPage() {
 
 function ServerRow({ s, api, del, openEdit }: { s: any; api: string; del: (p:string)=>Promise<void>; openEdit: (t:any, d:any)=>void }) {
   const [open, setOpen] = useState(false)
-  const [joins, setJoins] = useState<AuditLog[]>([])
+  const [joins, setJoins] = useState<AuditLogView[]>([])
   const [loading, setLoading] = useState(false)
   const toggle = async () => {
     if (!open) {
@@ -326,12 +333,15 @@ function ServerRow({ s, api, del, openEdit }: { s: any; api: string; del: (p:str
           ) : (
             <div className="max-h-40 overflow-auto divide-y divide-white/10">
               {joins.length===0 && <div className="py-2 text-white/60 text-xs">기록 없음</div>}
-              {joins.slice().reverse().map(j => (
-                <div key={j.id} className="py-1">
-                  <div className="font-mono text-[11px] text-white/60">#{j.id} {j.occurredAt}</div>
-                  <div>{`JOIN_SERVER · 유저#${j.userId ?? '-'} · ${j.details ?? ''}`}</div>
-                </div>
-              ))}
+              {joins.slice().reverse().map(j => {
+                const who = j.userId ? `유저#${j.userId}${j.userNickname?`(${j.userNickname})`:''}` : '유저-'
+                return (
+                  <div key={j.id} className="py-1">
+                    <div className="font-mono text-[11px] text-white/60">#{j.id} {j.occurredAt}</div>
+                    <div>{`JOIN_SERVER · ${who} · ${j.details ?? ''}`}</div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>
