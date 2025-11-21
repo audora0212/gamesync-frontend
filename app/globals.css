@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Calmer night-ink palette with blue + red accents */
+    --background: 222 35% 9%;
+    --foreground: 210 20% 96%;
+    --card: 222 32% 12%;
+    --card-foreground: 210 20% 96%;
+    --popover: 222 32% 12%;
+    --popover-foreground: 210 20% 96%;
+    --primary: 220 75% 56%; /* blue */
+    --primary-foreground: 210 30% 98%;
+    --secondary: 222 28% 16%;
+    --secondary-foreground: 210 20% 96%;
+    --muted: 222 20% 22%;
+    --muted-foreground: 215 15% 75%;
+    --accent: 355 65% 42%; /* soft crimson for subtle accents */
+    --accent-foreground: 210 20% 96%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 210 30% 98%;
+    --border: 222 22% 24%;
+    --input: 222 22% 24%;
+    --ring: 220 75% 56%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow;
+  }
+
+  .glass-card {
+    @apply glass p-6;
+  }
+
+  .glass-button {
+    @apply bg-white/10 backdrop-blur-sm border border-white/10 text-foreground rounded-xl px-6 py-3 font-medium hover:bg-white/15 transition-colors duration-200;
+  }
+
+  /* Animated rainbow gradient border/background */
+  .rainbow-anim {
+    background: linear-gradient(90deg, #ff6b6b, #f7d794, #6a89cc, #78e08f, #e056fd, #ff6b6b);
+    background-size: 600% 600%;
+    animation: rainbowShift 6s linear infinite;
+    color: white;
+  }
+  .rainbow-anim:hover {
+    filter: brightness(1.05);
+  }
+
+  /* Animated rainbow border only */
+  .rainbow-border {
+    position: relative;
+    border-color: transparent !important;
+  }
+  .rainbow-border::before {
+    content: "";
+    position: absolute;
+    inset: -1px; /* extends 1px beyond to fully cover border */
+    padding: 1px; /* border thickness */
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ff6b6b, #f7d794, #6a89cc, #78e08f, #e056fd, #ff6b6b);
+    background-size: 600% 600%;
+    animation: rainbowShift 6s linear infinite;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+.drag-over {
+  @apply ring-2 ring-slate-400 ring-opacity-50;
+}
+
+/* Ambient background (soft aurora gradients) */
+html, body { min-height: 100%; }
+/* iOS notch 영역까지 배경이 이어지도록 safe-area 적용 */
+body {
+  background-color: hsl(var(--background));
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 600px at 20% 10%, hsl(220 80% 22% / 0.35), transparent 60%),
+    radial-gradient(900px 500px at 80% 20%, hsl(355 70% 24% / 0.35), transparent 55%),
+    radial-gradient(800px 500px at 50% 90%, hsl(250 65% 22% / 0.25), transparent 60%);
+  filter: saturate(1.05);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) rgba(15, 23, 42, 0.4);
+}
+
+/* WebKit (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.35);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.5);
+}
+
+@keyframes rainbowShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

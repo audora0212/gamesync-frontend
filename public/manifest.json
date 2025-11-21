@@ -1,0 +1,33 @@
+{
+  "name": "GameSync",
+  "short_name": "GameSync",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0e14",
+  "theme_color": "#0b0e14",
+  "icons": [
+    {
+      "src": "/logo_round.png",
+      "sizes": "512x512 256x256 192x192 128x128 64x64 32x32 24x24 16x16",
+      "type": "image/png"
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
