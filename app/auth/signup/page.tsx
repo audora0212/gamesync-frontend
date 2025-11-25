@@ -4,6 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -155,19 +156,24 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background grid-bg">
+      <motion.div
+        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 glass rounded-2xl mb-4 overflow-hidden mx-auto">
+          <div className="w-16 h-16 glass rounded-2xl mb-4 overflow-hidden mx-auto animate-float">
             <Image src="/logo_round.png" alt="GameSync" width={64} height={64} className="w-16 h-16" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">GameSync</h1>
+          <h1 className="text-3xl font-bold neon-text-primary mb-2">GameSync</h1>
           <p className="text-muted-foreground">게임 스케줄링 플랫폼에 가입하세요</p>
         </div>
 
-        <Card className="glass border-white/10">
+        <Card className="card-cyber">
           <CardHeader>
-            <CardTitle className="text-foreground">회원가입</CardTitle>
+            <CardTitle className="neon-text-primary text-xl">회원가입</CardTitle>
             <CardDescription className="text-muted-foreground">새 계정을 만들어보세요</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -225,7 +231,7 @@ export default function SignupPage() {
             {/* 일반 회원가입 폼 */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-foreground">
+                <Label htmlFor="username" className="text-muted-foreground">
                   로그인 아이디 (3~20자, 영문,숫자)
                 </Label>
                 <Input
@@ -237,7 +243,7 @@ export default function SignupPage() {
                   maxLength={20}
                   pattern="^[a-zA-Z0-9_]+$"
                   title="3~20자 영문, 숫자, 밑줄(_)만 가능"
-                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
+                  className="input-cyber"
                   placeholder="로그인 아이디를 입력하세요"
                   required
                   disabled={isDiscordLoading || isKakaoLoading}
@@ -245,7 +251,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="nickname" className="text-foreground">
+                <Label htmlFor="nickname" className="text-muted-foreground">
                   사용자명 (2~30자)
                 </Label>
                 <Input
@@ -256,7 +262,7 @@ export default function SignupPage() {
                   minLength={2}
                   maxLength={30}
                   title="2~30자 사이로 입력해주세요"
-                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
+                  className="input-cyber"
                   placeholder="사용자명을 입력하세요"
                   required
                   disabled={isDiscordLoading || isKakaoLoading}
@@ -264,9 +270,9 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">
- 비밀번호 (최소 8자)
-</Label>
+                <Label htmlFor="password" className="text-muted-foreground">
+                  비밀번호 (최소 8자)
+                </Label>
                 <Input
                   id="password"
                   type="password"
@@ -274,7 +280,7 @@ export default function SignupPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   minLength={8}
                   title="비밀번호는 최소 8자 이상이어야 합니다."
-                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
+                  className="input-cyber"
                   placeholder="비밀번호를 입력하세요"
                   required
                   disabled={isDiscordLoading || isKakaoLoading}
@@ -282,7 +288,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground">
+                <Label htmlFor="confirmPassword" className="text-muted-foreground">
                   비밀번호 확인
                 </Label>
                 <Input
@@ -292,7 +298,7 @@ export default function SignupPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   minLength={8}
                   title="비밀번호를 다시 입력하세요"
-                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
+                  className="input-cyber"
                   placeholder="비밀번호를 다시 입력하세요"
                   required
                   disabled={isDiscordLoading || isKakaoLoading}
@@ -301,7 +307,7 @@ export default function SignupPage() {
 
               <Button
                 type="submit"
-                className="w-full glass-button font-medium py-3"
+                className="w-full btn-cyber font-medium py-3"
                 disabled={isLoading || isDiscordLoading || isKakaoLoading}
               >
                 {isLoading ? (
@@ -320,7 +326,7 @@ export default function SignupPage() {
                 이미 계정이 있으신가요? {" "}
                 <Link
                   href="/auth/login"
-                  className="text-muted-foreground hover:text-foreground underline font-medium transition-colors"
+                  className="neon-text-accent hover:drop-shadow-[0_0_10px_rgba(255,0,100,0.8)] font-medium transition-all"
                 >
                   로그인
                 </Link>
@@ -328,7 +334,7 @@ export default function SignupPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     </div>
   )
 }

@@ -41,6 +41,179 @@
     @apply bg-white/10 backdrop-blur-sm border border-white/10 text-foreground rounded-xl px-6 py-3 font-medium hover:bg-white/15 transition-colors duration-200;
   }
 
+  /* ===== 사이버펑크/게이밍 테마 ===== */
+
+  /* 네온 텍스트 효과 (은은하게) */
+  .neon-text-primary {
+    color: #22d3ee;
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+  }
+
+  .neon-text-accent {
+    color: #f472b6;
+    text-shadow: 0 0 8px rgba(244, 114, 182, 0.4);
+  }
+
+  .neon-text-purple {
+    color: #c084fc;
+    text-shadow: 0 0 8px rgba(192, 132, 252, 0.4);
+  }
+
+  .neon-text-white {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+
+  /* 그라데이션 텍스트 */
+  .gradient-text {
+    background: linear-gradient(135deg, #00f5ff 0%, #bf00ff 50%, #ff006a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* 사이버 카드 */
+  .card-cyber {
+    @apply bg-slate-900/80 backdrop-blur-xl border border-cyan-500/30 rounded-2xl shadow-lg;
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .card-cyber:hover {
+    border-color: rgba(0, 245, 255, 0.5);
+    box-shadow: 0 0 30px rgba(0, 245, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* 사이버 버튼 */
+  .btn-cyber {
+    @apply bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl px-6 py-3;
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .btn-cyber:hover {
+    box-shadow: 0 0 30px rgba(0, 245, 255, 0.6), 0 6px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-cyber-outline {
+    @apply bg-transparent border-2 border-cyan-500 text-cyan-400 font-semibold rounded-xl px-6 py-3;
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .btn-cyber-outline:hover {
+    @apply bg-cyan-500/20;
+    box-shadow: 0 0 25px rgba(0, 245, 255, 0.4);
+  }
+
+  /* 보라색 버튼 */
+  .btn-cyber-purple {
+    @apply bg-gradient-to-r from-purple-500 to-violet-600 text-white font-semibold rounded-xl px-6 py-3;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .btn-cyber-purple:hover {
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.6), 0 6px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-cyber-purple-outline {
+    @apply bg-transparent border-2 border-purple-500 text-purple-400 font-semibold rounded-xl px-6 py-3;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .btn-cyber-purple-outline:hover {
+    @apply bg-purple-500/20;
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+  }
+
+  /* 핑크색 버튼 */
+  .btn-cyber-pink {
+    @apply bg-gradient-to-r from-pink-500 to-rose-600 text-white font-semibold rounded-xl px-6 py-3;
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .btn-cyber-pink:hover {
+    box-shadow: 0 0 30px rgba(236, 72, 153, 0.6), 0 6px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-cyber-pink-outline {
+    @apply bg-transparent border-2 border-pink-500 text-pink-400 font-semibold rounded-xl px-6 py-3;
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .btn-cyber-pink-outline:hover {
+    @apply bg-pink-500/20;
+    box-shadow: 0 0 25px rgba(236, 72, 153, 0.4);
+  }
+
+  /* 에메랄드 버튼 */
+  .btn-cyber-emerald {
+    @apply bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl px-6 py-3;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .btn-cyber-emerald:hover {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.6), 0 6px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-cyber-emerald-outline {
+    @apply bg-transparent border-2 border-emerald-500 text-emerald-400 font-semibold rounded-xl px-6 py-3;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .btn-cyber-emerald-outline:hover {
+    @apply bg-emerald-500/20;
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
+  }
+
+  /* 사이버 인풋 */
+  .input-cyber {
+    @apply bg-slate-800/60 border border-cyan-500/30 rounded-xl text-white placeholder:text-slate-400;
+    transition: all 0.3s ease;
+  }
+
+  .input-cyber:focus {
+    @apply border-cyan-400 ring-2 ring-cyan-400/30;
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+  }
+
+  /* 사이버 뱃지 */
+  .badge-cyber {
+    @apply bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 rounded-full px-3 py-1 text-sm font-medium;
+  }
+
+  /* 그리드 배경 */
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* 호버 리프트 효과 */
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-5px);
+  }
+
+  /* 디바이더 글로우 */
+  .divider-glow {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.5), transparent);
+  }
+
   /* Animated rainbow gradient border/background */
   .rainbow-anim {
     background: linear-gradient(90deg, #ff6b6b, #f7d794, #6a89cc, #78e08f, #e056fd, #ff6b6b);
@@ -133,4 +306,28 @@ body::before {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+/* 플로팅 애니메이션 */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* 글로우 펄스 애니메이션 (은은하게) */
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 12px rgba(34, 211, 238, 0.5);
+  }
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
 }

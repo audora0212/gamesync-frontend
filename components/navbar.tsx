@@ -63,7 +63,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="glass border-b border-white/10/60">
+    <nav className="glass border-b border-cyan-500/20">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 space-x-4">
           {/* 로고 및 타이틀 */}
@@ -84,8 +84,8 @@ export function Navbar() {
               }
             } catch {}
           }}>
-            <Image src="/logo_round.png" alt="GameSync" width={24} height={24} className="h-6 w-6" />
-            <span className="hidden sm:inline text-xs sm:text-sm md:text-base lg:text-lg font-bold text-foreground whitespace-nowrap">
+            <Image src="/logo_round.png" alt="GameSync" width={24} height={24} className="h-6 w-6 animate-float" />
+            <span className="hidden sm:inline text-xs sm:text-sm md:text-base lg:text-lg font-bold neon-text-primary whitespace-nowrap">
               GameSync
             </span>
           </Link>
@@ -93,7 +93,7 @@ export function Navbar() {
           {/* 사용자 정보 및 액션 */}
           <div className="flex items-center space-x-3">
             {user && (
-              <span className="max-w-[30vw] truncate text-xs sm:text-sm md:text-base text-foreground font-medium whitespace-nowrap">
+              <span className="max-w-[30vw] truncate text-xs sm:text-sm md:text-base neon-text-accent font-medium whitespace-nowrap">
                 {user}
               </span>
             )}
@@ -101,7 +101,7 @@ export function Navbar() {
               <Link href="/admin" className="hidden sm:inline-block">
                 <Button
                   variant="ghost"
-                  className="text-xs sm:text-sm md:text-base text-muted-foreground hover:bg-white/10 hover:text-foreground whitespace-nowrap"
+                  className="text-xs sm:text-sm md:text-base text-muted-foreground hover:neon-text-primary whitespace-nowrap transition-all"
                 >
                   관리
                 </Button>
@@ -110,7 +110,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="relative text-muted-foreground hover:bg-white/10 hover:text-foreground"
+              className="relative text-muted-foreground hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(0,255,255,0.8)] transition-all"
               onClick={() => setFriendOpen(true)}
               aria-label="친구 열기"
             >
@@ -119,19 +119,19 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="relative text-muted-foreground hover:bg-white/10 hover:text-foreground"
+              className="relative text-muted-foreground hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(0,255,255,0.8)] transition-all"
               onClick={() => setNotifOpen(v => !v)}
             >
               <Bell className="h-5 w-5" />
               {unread > 0 && (
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(255,0,0,0.8)] animate-pulse" />
               )}
             </Button>
             <SettingModal />
             <Button
               onClick={handleLogout}
               variant="ghost"
-              className="flex items-center text-xs sm:text-sm md:text-base text-muted-foreground hover:bg-white/10 hover:text-foreground whitespace-nowrap"
+              className="flex items-center text-xs sm:text-sm md:text-base text-muted-foreground hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(0,255,255,0.8)] whitespace-nowrap transition-all"
             >
               <LogOut className="mr-1 h-4 w-4" />
               로그아웃

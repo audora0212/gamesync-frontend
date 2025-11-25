@@ -4,6 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -180,19 +181,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background grid-bg">
+      <motion.div
+        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 glass rounded-2xl mb-4 overflow-hidden mx-auto">
+          <div className="w-16 h-16 glass rounded-2xl mb-4 overflow-hidden mx-auto animate-float">
             <Image src="/logo_round.png" alt="GameSync" width={64} height={64} className="w-16 h-16" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">GameSync</h1>
+          <h1 className="text-3xl font-bold neon-text-primary mb-2">GameSync</h1>
           <p className="text-muted-foreground">게임 스케줄링 플랫폼에 로그인하세요</p>
         </div>
 
-        <Card className="glass border-white/10">
+        <Card className="card-cyber">
           <CardHeader>
-            <CardTitle className="text-foreground">로그인</CardTitle>
+            <CardTitle className="neon-text-primary text-xl">로그인</CardTitle>
             <CardDescription className="text-muted-foreground">계정 정보를 입력해주세요</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -250,7 +256,7 @@ export default function LoginPage() {
             {/* 일반 로그인 폼 */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-foreground">
+                <Label htmlFor="username" className="text-muted-foreground">
                   로그인 아이디
                 </Label>
                 <Input
@@ -258,14 +264,14 @@ export default function LoginPage() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
+                  className="input-cyber"
                   placeholder="로그인 아이디를 입력하세요"
                   required
                   disabled={isDiscordLoading || isKakaoLoading}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">
+                <Label htmlFor="password" className="text-muted-foreground">
                   비밀번호
                 </Label>
                 <Input
@@ -273,7 +279,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="glass border-white/10 text-foreground placeholder:text-muted-foreground focus:border-white/20 focus:ring-white/10"
+                  className="input-cyber"
                   placeholder="비밀번호를 입력하세요"
                   required
                   disabled={isDiscordLoading || isKakaoLoading}
@@ -281,7 +287,7 @@ export default function LoginPage() {
               </div>
               <Button
                 type="submit"
-                className="w-full glass-button font-medium py-3"
+                className="w-full btn-cyber font-medium py-3"
                 disabled={isLoading || isDiscordLoading || isKakaoLoading}
               >
                 {isLoading ? (
@@ -300,7 +306,7 @@ export default function LoginPage() {
                 계정이 없으신가요?{" "}
                 <Link
                   href="/auth/signup"
-                  className="text-muted-foreground hover:text-foreground underline font-medium transition-colors"
+                  className="neon-text-accent hover:drop-shadow-[0_0_10px_rgba(255,0,100,0.8)] font-medium transition-all"
                 >
                   회원가입
                 </Link>
@@ -308,7 +314,7 @@ export default function LoginPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -208,7 +209,7 @@ export default function DashboardPage() {
   // AuthProvider가 로딩 중이거나 user가 없으면 로딩 표시
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen grid-bg">
         <Navbar />
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center h-64">
@@ -231,24 +232,29 @@ export default function DashboardPage() {
   // 디버그 버튼 제거: 페이지는 /debug/native 로 직접 접근 가능
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen grid-bg">
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <motion.div
+        className="container mx-auto px-4 py-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         {/* 공지 섹션 */}
         {notices.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-white/80 text-sm">공지</span>
+              <span className="text-muted-foreground text-sm">공지</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {notices.slice(0,6).map(n => (
-                <Card key={n.id} className="glass bg-white/10 border-white/20 hover:bg-white/20 transition">
+                <Card key={n.id} className="card-cyber hover-lift">
                   <CardHeader>
-                    <CardTitle className="text-white text-base truncate">{n.title}</CardTitle>
-                    <CardDescription className="text-white/60">{new Date(n.createdAt).toLocaleString()}</CardDescription>
+                    <CardTitle className="neon-text-purple text-base truncate">{n.title}</CardTitle>
+                    <CardDescription className="text-muted-foreground">{new Date(n.createdAt).toLocaleString()}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button size="sm" className="glass-button" onClick={()=>setOpenNotice(n)}>자세히</Button>
+                    <Button size="sm" className="btn-cyber-outline" onClick={()=>setOpenNotice(n)}>자세히</Button>
                   </CardContent>
                 </Card>
               ))}
@@ -262,20 +268,20 @@ export default function DashboardPage() {
               <Flame className="w-4 h-4 text-orange-300" />
               <span className="text-xs">내 서버 허브</span>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-1">대시보드</h1>
-            <p className="text-white/70">내가 참여한 서버를 한눈에 모아보세요</p>
+            <h1 className="text-3xl font-bold neon-text-primary mb-1">대시보드</h1>
+            <p className="text-muted-foreground">내가 참여한 서버를 한눈에 모아보세요</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button
               onClick={() => setShowJoinModal(true)}
-              className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
+              className="w-full sm:w-auto btn-cyber-outline h-12 px-6"
             >
               초대 코드로 참가
             </Button>
             {/* 디버그 버튼 제거 (링크 직접 접근 허용) */}
             <Button
               onClick={() => setShowCreateModal(true)}
-              className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
+              className="w-full sm:w-auto btn-cyber h-12 px-6"
             >
               <Plus className="mr-2 h-4 w-4" />서버 생성
             </Button>
@@ -286,8 +292,8 @@ export default function DashboardPage() {
         {favoriteServers.length > 0 && (
           <div className="mb-10">
             <div className="flex items-center gap-2 mb-3">
-              <Star className="w-4 h-4 text-yellow-300" />
-              <span className="text-white/80 text-sm">즐겨찾기</span>
+              <Star className="w-4 h-4 text-yellow-300 drop-shadow-[0_0_6px_rgba(255,215,0,0.8)]" />
+              <span className="text-muted-foreground text-sm">즐겨찾기</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {favoriteServers.map((server) => {
@@ -296,24 +302,24 @@ export default function DashboardPage() {
                 return (
                   <Card
                     key={server.id}
-                    className="glass bg-white/10 border-white/20 hover:bg-white/20 hover:shadow-lg hover:shadow-white/10 transition-all duration-300"
+                    className="card-cyber hover-lift"
                   >
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-white">{server.name}</CardTitle>
-                        <Badge variant="secondary" className="glass text-yellow-300">
+                        <CardTitle className="neon-text-primary">{server.name}</CardTitle>
+                        <Badge className="badge-cyber">
                           {isOwner ? "소유자" : "멤버"}
                         </Badge>
                       </div>
-                      <CardDescription className="text-white/70">서버장: {server.owner}</CardDescription>
+                      <CardDescription className="text-muted-foreground">서버장: {server.owner}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <div className="flex items-center text-white/80">
+                        <div className="flex items-center text-muted-foreground">
                           <Users className="mr-2 h-4 w-4" />
                           <span>{server.members.length}명 참여</span>
                         </div>
-                        <div className="flex items-center justify-between text-white/80">
+                        <div className="flex items-center justify-between text-muted-foreground">
                           <div className="flex items-center gap-2">
                             <Star
                               onClick={() => toggleFavorite(server)}
@@ -326,7 +332,7 @@ export default function DashboardPage() {
                           </div>
                           <Button
                             onClick={() => router.push(`/server/${server.id}`)}
-                            className="glass-button hover:bg-white/20 h-15 px-8"
+                            className="btn-cyber h-15 px-8"
                             size="sm"
                           >
                             입장
@@ -343,7 +349,7 @@ export default function DashboardPage() {
 
         {/* 모든 서버 */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-white/80 text-sm">모든 서버</span>
+          <span className="text-muted-foreground text-sm">모든 서버</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {servers.map((server) => {
@@ -352,24 +358,24 @@ export default function DashboardPage() {
             return (
               <Card
                 key={server.id}
-                className="glass bg-white/10 border-white/20 hover:bg-white/20 hover:shadow-lg hover:shadow-white/10 transition-all duration-300"
+                className="card-cyber hover-lift"
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-white">{server.name}</CardTitle>
-                    <Badge variant="secondary" className="glass text-yellow-300">
+                    <CardTitle className="neon-text-primary">{server.name}</CardTitle>
+                    <Badge className="badge-cyber">
                       {isOwner ? "소유자" : "멤버"}
                     </Badge>
                   </div>
-                  <CardDescription className="text-white/70">서버장: {server.owner}</CardDescription>
+                  <CardDescription className="text-muted-foreground">서버장: {server.owner}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="flex items-center text-white/80">
+                    <div className="flex items-center text-muted-foreground">
                       <Users className="mr-2 h-4 w-4" />
                       <span>{server.members.length}명 참여</span>
                     </div>
-                    <div className="flex items-center justify-between text-white/80">
+                    <div className="flex items-center justify-between text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <Star
                           onClick={() => toggleFavorite(server)}
@@ -382,7 +388,7 @@ export default function DashboardPage() {
                       </div>
                       <Button
                         onClick={() => router.push(`/server/${server.id}`)}
-                        className="glass-button hover:bg-white/20 h-15 px-8"
+                        className="btn-cyber h-15 px-8"
                         size="sm"
                       >
                         입장
@@ -398,23 +404,23 @@ export default function DashboardPage() {
         {/* 서버가 없을 때 */}
         {servers.length === 0 && (
           <div className="text-center py-12">
-            <div className="glass max-w-md mx-auto p-8">
-              <h3 className="text-xl font-semibold text-white mb-2">
+            <div className="card-cyber max-w-md mx-auto p-8">
+              <h3 className="text-xl font-semibold neon-text-primary mb-2">
                 서버가 없습니다
               </h3>
-              <p className="text-white/70 mb-6">
+              <p className="text-muted-foreground mb-6">
                 초대 코드를 입력하거나 새 서버를 생성하세요.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <Button
                   onClick={() => setShowJoinModal(true)}
-                  className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
+                  className="w-full sm:w-auto btn-cyber-outline h-12 px-6"
                 >
                   초대 코드로 참가
                 </Button>
                 <Button
                   onClick={() => setShowCreateModal(true)}
-                  className="w-full sm:w-auto glass-button hover:bg-white/20 h-12 px-6"
+                  className="w-full sm:w-auto btn-cyber h-12 px-6"
                 >
                   서버 생성
                 </Button>
@@ -422,7 +428,7 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Footer는 전역 레이아웃에서 렌더링 */}
 
@@ -441,22 +447,28 @@ export default function DashboardPage() {
       {/* 공지 모달 */}
       {openNotice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={()=>setOpenNotice(null)}>
-          <div className="bg-zinc-900 text-white max-w-lg w-full mx-4 rounded-lg border border-white/20" onClick={(e)=>e.stopPropagation()}>
-            <div className="p-4 border-b border-white/10">
-              <div className="text-lg font-semibold truncate">{openNotice.title}</div>
-              <div className="text-xs text-white/60">{new Date(openNotice.createdAt).toLocaleString()}</div>
+          <motion.div
+            className="card-cyber max-w-lg w-full mx-4"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            onClick={(e)=>e.stopPropagation()}
+          >
+            <div className="p-4 border-b border-cyan-500/30">
+              <div className="text-lg font-semibold truncate text-white">{openNotice.title}</div>
+              <div className="text-xs text-white/70">{new Date(openNotice.createdAt).toLocaleString()}</div>
             </div>
             <div className="p-4 text-sm text-white/80 max-h-[60vh] overflow-auto">
               {noticeLoading ? (
-                <div className="text-white/60">불러오는 중...</div>
+                <div className="text-white/70">불러오는 중...</div>
               ) : (
                 <pre className="whitespace-pre-wrap font-sans">{noticeContent}</pre>
               )}
             </div>
             <div className="p-4 flex justify-end">
-              <Button variant="outline" className="glass border-white/30 text-white" onClick={()=>setOpenNotice(null)}>닫기</Button>
+              <Button className="btn-cyber-outline" onClick={()=>setOpenNotice(null)}>닫기</Button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </div>
