@@ -98,35 +98,35 @@ export function NewPartyModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="card-cyber border-pink-500/30 max-w-sm">
+      <DialogContent className="max-w-sm">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-xl bg-pink-500/20">
-              <Users className="w-5 h-5 text-pink-400" />
+            <div className="p-2.5 rounded-xl bg-neon-pink/20 shadow-[0_0_15px_rgba(242,5,203,0.2)]">
+              <Users className="w-5 h-5 text-neon-pink" />
             </div>
-            <DialogTitle className="neon-text-accent text-lg">새 파티 모집</DialogTitle>
+            <DialogTitle className="text-neon-pink drop-shadow-[0_0_10px_rgba(242,5,203,0.5)] font-display">새 파티 모집</DialogTitle>
           </div>
-          <DialogDescription className="text-white/70">
+          <DialogDescription>
             원하는 시간과 게임, 정원을 설정하세요.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className={isNativeApp ? "w-full flex justify-center" : "w-full"}>
               <Input
                 type="date"
                 value={selectedDate}
                 disabled
-                className={"input-cyber text-sm appearance-none h-8 sm:h-9 leading-8 sm:leading-9 py-0 " + (isNativeApp ? "inline-block w-auto text-center px-2" : "w-full px-2")}
+                className={"text-sm appearance-none h-11 py-0 " + (isNativeApp ? "inline-block w-auto text-center px-3" : "w-full px-3")}
               />
             </div>
             <Select value={selectedTime} onValueChange={setSelectedTime} required>
-              <SelectTrigger className="input-cyber text-sm w-full">
+              <SelectTrigger className="text-sm w-full h-11">
                 <SelectValue placeholder="시간 선택" />
               </SelectTrigger>
-              <SelectContent className="card-cyber border-pink-500/30 text-white text-sm max-h-60 overflow-y-auto">
+              <SelectContent className="text-sm max-h-60 overflow-y-auto">
                 <SelectGroup>
-                  <SelectLabel className="text-pink-400">시간</SelectLabel>
+                  <SelectLabel className="text-neon-pink">시간</SelectLabel>
                   {timeOptions.map((time) => (
                     <SelectItem key={time} value={time}>
                       {time}
@@ -137,12 +137,12 @@ export function NewPartyModal({
             </Select>
           </div>
           <Select value={selectedGame} onValueChange={setSelectedGame} defaultValue="">
-            <SelectTrigger className="input-cyber text-sm">
+            <SelectTrigger className="text-sm h-11">
               <SelectValue placeholder="게임 선택" />
             </SelectTrigger>
-            <SelectContent className="card-cyber border-pink-500/30 text-white text-sm max-h-60 overflow-y-auto">
+            <SelectContent className="text-sm max-h-60 overflow-y-auto">
               <SelectGroup>
-                <SelectLabel className="text-cyan-400">기본 게임</SelectLabel>
+                <SelectLabel className="text-neon-cyan">기본 게임</SelectLabel>
                 {defaultGames.map((game) => (
                   <SelectItem key={`default-${game.id}`} value={`default-${game.id}`}>
                     {game.name}
@@ -150,7 +150,7 @@ export function NewPartyModal({
                 ))}
               </SelectGroup>
               <SelectGroup>
-                <SelectLabel className="text-purple-400">커스텀 게임</SelectLabel>
+                <SelectLabel className="text-neon-magenta">커스텀 게임</SelectLabel>
                 {customGames.map((game) => (
                   <SelectItem key={`custom-${game.id}`} value={`custom-${game.id}`}>
                     {game.name}
@@ -160,19 +160,19 @@ export function NewPartyModal({
             </SelectContent>
           </Select>
           <div className="space-y-2">
-            <label className="text-pink-400 text-sm flex items-center gap-2">
+            <label className="text-neon-pink text-sm flex items-center gap-2">
               <Gamepad2 className="w-4 h-4" />
               정원
             </label>
-            <Input type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="input-cyber text-base sm:text-sm" />
+            <Input type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="text-base sm:text-sm" />
           </div>
           <div className="flex justify-end space-x-2 pt-4">
             <DialogClose asChild>
-              <Button type="button" className="btn-cyber-outline text-sm px-4 py-2">
+              <Button type="button" variant="outline">
                 취소
               </Button>
             </DialogClose>
-            <Button type="submit" className="btn-cyber-pink text-sm px-4 py-2" disabled={!canSubmit || isSubmitting}>
+            <Button type="submit" variant="secondary" disabled={!canSubmit || isSubmitting}>
               {isSubmitting ? "생성 중..." : "파티 모집하기"}
             </Button>
           </div>
@@ -181,11 +181,3 @@ export function NewPartyModal({
     </Dialog>
   )
 }
-
-
-
-
-
-
-
-

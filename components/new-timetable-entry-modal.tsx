@@ -95,35 +95,35 @@ export function NewTimetableEntryModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="card-cyber border-emerald-500/30 max-w-sm">
+      <DialogContent className="max-w-sm">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-xl bg-emerald-500/20">
-              <Clock className="w-5 h-5 text-emerald-400" />
+            <div className="p-2.5 rounded-xl bg-neon-cyan/20 shadow-[0_0_15px_rgba(5,242,219,0.2)]">
+              <Clock className="w-5 h-5 text-neon-cyan" />
             </div>
-            <DialogTitle className="text-emerald-400 text-lg">새 합류 시간 예약</DialogTitle>
+            <DialogTitle className="text-neon-cyan drop-shadow-[0_0_10px_rgba(5,242,219,0.5)] font-display">새 합류 시간 예약</DialogTitle>
           </div>
-          <DialogDescription className="text-white/70">
+          <DialogDescription>
             오늘 날짜 기준으로 합류 시간을 예약합니다.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className={isNativeApp ? "w-full flex justify-center" : "w-full"}>
               <Input
                 type="date"
                 value={selectedDate}
                 disabled
-                className={"input-cyber text-sm appearance-none h-8 sm:h-9 leading-8 sm:leading-9 py-0 " + (isNativeApp ? "inline-block w-auto text-center px-2" : "w-full px-2")}
+                className={"text-sm appearance-none h-11 py-0 " + (isNativeApp ? "inline-block w-auto text-center px-3" : "w-full px-3")}
               />
             </div>
             <Select value={selectedTime} onValueChange={setSelectedTime} required>
-              <SelectTrigger className="input-cyber text-sm w-full">
+              <SelectTrigger className="text-sm w-full h-11">
                 <SelectValue placeholder="시간 선택" />
               </SelectTrigger>
-              <SelectContent className="card-cyber border-emerald-500/30 text-white text-sm max-h-60 overflow-y-auto">
+              <SelectContent className="text-sm max-h-60 overflow-y-auto">
                 <SelectGroup>
-                  <SelectLabel className="text-emerald-400">시간</SelectLabel>
+                  <SelectLabel className="text-neon-cyan">시간</SelectLabel>
                   {timeOptions.map((time) => (
                     <SelectItem key={time} value={time}>
                       {time}
@@ -134,17 +134,17 @@ export function NewTimetableEntryModal({
             </Select>
           </div>
           <div className="space-y-2">
-            <label className="text-emerald-400 text-sm flex items-center gap-2">
+            <label className="text-neon-cyan text-sm flex items-center gap-2">
               <Gamepad2 className="w-4 h-4" />
               게임 선택
             </label>
             <Select value={selectedGame} onValueChange={setSelectedGame} defaultValue="">
-              <SelectTrigger className="input-cyber text-sm">
+              <SelectTrigger className="text-sm h-11">
                 <SelectValue placeholder="게임 선택" />
               </SelectTrigger>
-              <SelectContent className="card-cyber border-emerald-500/30 text-white text-sm max-h-60 overflow-y-auto">
+              <SelectContent className="text-sm max-h-60 overflow-y-auto">
                 <SelectGroup>
-                  <SelectLabel className="text-cyan-400">기본 게임</SelectLabel>
+                  <SelectLabel className="text-neon-cyan">기본 게임</SelectLabel>
                   {defaultGames.map((game) => (
                     <SelectItem key={`default-${game.id}`} value={`default-${game.id}`}>
                       {game.name}
@@ -152,7 +152,7 @@ export function NewTimetableEntryModal({
                   ))}
                 </SelectGroup>
                 <SelectGroup>
-                  <SelectLabel className="text-purple-400">커스텀 게임</SelectLabel>
+                  <SelectLabel className="text-neon-magenta">커스텀 게임</SelectLabel>
                   {customGames.map((game) => (
                     <SelectItem key={`custom-${game.id}`} value={`custom-${game.id}`}>
                       {game.name}
@@ -164,11 +164,11 @@ export function NewTimetableEntryModal({
           </div>
           <div className="flex justify-end space-x-2 pt-4">
             <DialogClose asChild>
-              <Button type="button" className="btn-cyber-outline text-sm px-4 py-2">
+              <Button type="button" variant="outline">
                 취소
               </Button>
             </DialogClose>
-            <Button type="submit" className="btn-cyber-emerald text-sm px-4 py-2" disabled={!canSubmit || isSubmitting}>
+            <Button type="submit" disabled={!canSubmit || isSubmitting}>
               {isSubmitting ? "예약 중..." : "합류 시간 예약"}
             </Button>
           </div>
@@ -177,11 +177,3 @@ export function NewTimetableEntryModal({
     </Dialog>
   )
 }
-
-
-
-
-
-
-
-

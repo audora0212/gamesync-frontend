@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { serverService } from "@/lib/server-service"
-import { UserPlus, Server, Users, Clock, KeyRound } from "lucide-react"
+import { UserPlus, Server, Users, Clock, KeyRound, ArrowLeft } from "lucide-react"
 
 interface JoinByCodeModalProps {
   open: boolean
@@ -50,55 +50,75 @@ export function JoinByCodeModal({ open, onClose, onJoinSuccess }: JoinByCodeModa
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="card-cyber border-purple-500/30 max-w-sm">
+      <DialogContent className="max-w-sm">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-xl bg-purple-500/20">
-              <KeyRound className="w-5 h-5 text-purple-400" />
+            <div className="p-2.5 rounded-xl bg-neon-magenta/20 shadow-[0_0_15px_rgba(217,4,142,0.2)]">
+              <KeyRound className="w-5 h-5 text-neon-magenta" />
             </div>
-            <DialogTitle className="neon-text-purple text-lg">{step === "input" ? "초대 코드로 가입" : "서버 참가 확인"}</DialogTitle>
+            <DialogTitle className="text-neon-magenta drop-shadow-[0_0_10px_rgba(217,4,142,0.5)] text-lg font-display">
+              {step === "input" ? "초대 코드로 참가" : "서버 참가 확인"}
+            </DialogTitle>
           </div>
-          <DialogDescription className="text-white/60">
+          <DialogDescription>
             초대 코드를 확인하고 서버 참가를 진행합니다.
           </DialogDescription>
         </DialogHeader>
         {step === "input" ? (
           <>
-            <div className="p-4">
+            <div className="py-4">
               <Input
                 placeholder="초대 코드 (6자리)"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 maxLength={6}
-                className="input-cyber text-center font-mono text-lg tracking-widest"
+                className="text-center font-mono text-lg tracking-[0.3em] uppercase"
               />
             </div>
-            <div className="flex justify-end space-x-2 pt-4">
+            <div className="flex justify-end space-x-2 pt-2">
               <DialogClose asChild>
-                <Button className="btn-cyber-outline text-sm px-4 py-2">취소</Button>
+                <Button variant="outline">취소</Button>
               </DialogClose>
-              <Button onClick={handlePreview} disabled={code.length !== 6} className="btn-cyber-purple text-sm px-4 py-2">다음</Button>
+              <Button
+                onClick={handlePreview}
+                disabled={code.length !== 6}
+                variant="secondary"
+              >
+                다음
+              </Button>
             </div>
           </>
         ) : (
           <>
-            <div className="p-4 space-y-3 text-white">
-              <div className="flex justify-between items-center">
-                <span className="text-white/70 flex items-center gap-2"><Server className="w-4 h-4" />서버 이름</span>
-                <span className="text-cyan-400 font-medium">{preview?.name}</span>
+            <div className="py-4 space-y-3">
+              <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/10">
+                <span className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <Server className="w-4 h-4 text-neon-cyan" />
+                  서버 이름
+                </span>
+                <span className="text-neon-cyan font-medium">{preview?.name}</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-white/70 flex items-center gap-2"><Users className="w-4 h-4" />참여자 수</span>
-                <span className="text-purple-400">{preview?.members}명</span>
+              <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/10">
+                <span className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <Users className="w-4 h-4 text-neon-magenta" />
+                  참여자 수
+                </span>
+                <span className="text-neon-magenta font-medium">{preview?.members}명</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-white/70 flex items-center gap-2"><Clock className="w-4 h-4" />초기화 시간</span>
-                <span className="text-pink-400">{preview?.resetTime}</span>
+              <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/10">
+                <span className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <Clock className="w-4 h-4 text-neon-pink" />
+                  초기화 시간
+                </span>
+                <span className="text-neon-pink font-medium">{preview?.resetTime}</span>
               </div>
             </div>
             <div className="flex justify-end space-x-2 pt-2">
-              <Button className="btn-cyber-outline text-sm px-4 py-2" onClick={() => setStep("input")}>뒤로</Button>
-              <Button onClick={handleJoin} className="btn-cyber-emerald text-sm px-4 py-2">
+              <Button variant="outline" onClick={() => setStep("input")}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                뒤로
+              </Button>
+              <Button onClick={handleJoin}>
                 <UserPlus className="w-4 h-4 mr-2" />
                 참가
               </Button>
