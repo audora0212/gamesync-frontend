@@ -4,13 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { serverService, Server as IServer } from "@/lib/server-service";
@@ -20,7 +14,10 @@ import { authService } from "@/lib/auth-service";
 import { CreateServerModal } from "@/components/create-server-modal";
 import { JoinByCodeModal } from "@/components/join-by-code-modal";
 import { Navbar } from "@/components/navbar";
-import { Plus, Users, Clock, Flame, Star, Bug } from "lucide-react";
+import {
+  Plus, Users, Clock, Star, ChevronRight,
+  Gamepad2, Bell, Search, TrendingUp, Sparkles
+} from "lucide-react";
 import { noticeService, type NoticeSummary } from "@/lib/notice-service";
 import { useProtectedRoute } from "@/app/hooks/useProtectedRoute";
 import { useAuth } from "@/components/auth-provider";
@@ -43,17 +40,13 @@ export default function DashboardPage() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    // 인증이 완료되고 user가 있을 때만 API 호출
     if (!authLoading && authUser) {
       loadServersAndFavorites();
-      // 공지 목록 병렬 로드
       noticeService.list().then(setNotices).catch(()=>setNotices([]))
     } else if (!authLoading && !authUser) {
-      // 인증이 없으면 로딩 상태를 false로 설정
       setIsLoading(false);
     }
-    
-    // cleanup: 컴포넌트 unmount 시 진행 중인 API 호출 취소
+
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -61,7 +54,6 @@ export default function DashboardPage() {
     };
   }, [authLoading, authUser]);
 
-  // 공지 상세 로딩
   useEffect(() => {
     if (!openNotice) {
       setNoticeContent("");
@@ -80,72 +72,41 @@ export default function DashboardPage() {
     })()
   }, [openNotice])
 
-  const loadServers = async () => {
-    // AuthProvider 상태 확인
-    if (!authUser) return;
-    
-    setIsLoading(true);
-    try {
-      const data = await serverService.getMyServers();
-      setServers(data);
-      await buildFriendSummaries(data);
-    } catch (error: any) {
-      // 취소된 요청은 무시
-      if (error?.name !== 'AbortError') {
-        toast.error("서버 로드 실패", {
-          description: "내 서버 정보를 불러오는데 실패했습니다.",
-        });
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const loadServersAndFavorites = async () => {
-    // AuthProvider 상태 확인
     if (!authUser) return;
-    
-    // 이전 요청 취소
+
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-    
-    // 새 AbortController 생성
+
     abortControllerRef.current = new AbortController();
-    
+
     setIsLoading(true);
     try {
       const [data, favs] = await Promise.all([
         serverService.getMyServers(),
         serverService.getMyFavorites(),
       ]);
-      
-      // 취소되지 않았다면 상태 업데이트
+
       if (!abortControllerRef.current.signal.aborted) {
         setServers(data);
         setFavoriteIds(new Set(favs.map((s) => s.id)));
         await buildFriendSummaries(data);
       }
     } catch (error: any) {
-      // 취소된 요청은 무시
       if (error?.name !== 'AbortError') {
-        toast.error("서버 로드 실패", {
-          description: "내 서버 정보를 불러오는데 실패했습니다.",
-        });
+        toast.error("서버 로드 실패");
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 각 서버에 내 친구가 스케줄을 등록했는지 요약 계산
   const buildFriendSummaries = async (serversList: IServer[]) => {
     try {
-      // 친구 닉네임 집합 구성
       const friends = await friendService.getFriends();
       const friendNickSet = new Set((friends.friends || []).map((f) => f.nickname));
 
-      // 서버별 타임테이블 병렬 조회
       const entriesPerServer = await Promise.all(
         serversList.map(async (s) => {
           try {
@@ -172,12 +133,12 @@ export default function DashboardPage() {
       }
       setFriendSummaries(result);
     } catch {
-      // 요약 실패는 무시 (UI에만 추가 정보)
       setFriendSummaries({});
     }
   };
 
-  const toggleFavorite = async (srv: IServer) => {
+  const toggleFavorite = async (srv: IServer, e: React.MouseEvent) => {
+    e.stopPropagation();
     const isFav = favoriteIds.has(srv.id);
     try {
       if (isFav) {
@@ -206,233 +167,217 @@ export default function DashboardPage() {
     });
   };
 
-  // AuthProvider가 로딩 중이거나 user가 없으면 로딩 표시
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen grid-bg">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <Navbar />
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-white">로딩 중...</div>
+        <div className="container mx-auto px-4 py-12">
+          <div className="flex flex-col items-center justify-center h-64 gap-4">
+            <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+            <p className="text-slate-400 text-sm">불러오는 중...</p>
           </div>
         </div>
       </div>
     );
   }
-  
-  // 인증되지 않은 상태
+
   if (!authUser) {
-    return null; // useProtectedRoute가 리다이렉트 처리
+    return null;
   }
 
   const currentUserId = authService.getCurrentUserId();
   const favoriteServers = servers.filter((s) => favoriteIds.has(s.id));
-  const otherServers = servers.filter((s) => !favoriteIds.has(s.id));
-
-  // 디버그 버튼 제거: 페이지는 /debug/native 로 직접 접근 가능
 
   return (
-    <div className="min-h-screen grid-bg">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <Navbar />
-      <motion.div
-        className="container mx-auto px-4 py-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* 공지 섹션 */}
-        {notices.length > 0 && (
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-muted-foreground text-sm">공지</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {notices.slice(0,6).map(n => (
-                <Card key={n.id} className="card-cyber hover-lift">
-                  <CardHeader>
-                    <CardTitle className="neon-text-purple text-base truncate">{n.title}</CardTitle>
-                    <CardDescription className="text-muted-foreground">{new Date(n.createdAt).toLocaleString()}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button size="sm" className="btn-cyber-outline" onClick={()=>setOpenNotice(n)}>자세히</Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-        {/* 헤더: 모바일에서 세로, 데스크탑에서 가로 */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 space-y-4 sm:space-y-0">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/80 mb-3">
-              <Flame className="w-4 h-4 text-orange-300" />
-              <span className="text-xs">내 서버 허브</span>
-            </div>
-            <h1 className="text-3xl font-bold neon-text-primary mb-1">대시보드</h1>
-            <p className="text-muted-foreground">내가 참여한 서버를 한눈에 모아보세요</p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button
-              onClick={() => setShowJoinModal(true)}
-              className="w-full sm:w-auto btn-cyber-outline h-12 px-6"
-            >
-              초대 코드로 참가
-            </Button>
-            {/* 디버그 버튼 제거 (링크 직접 접근 허용) */}
-            <Button
-              onClick={() => setShowCreateModal(true)}
-              className="w-full sm:w-auto btn-cyber h-12 px-6"
-            >
-              <Plus className="mr-2 h-4 w-4" />서버 생성
-            </Button>
-          </div>
-        </div>
 
-        {/* 즐겨찾기 서버 */}
-        {favoriteServers.length > 0 && (
-          <div className="mb-10">
-            <div className="flex items-center gap-2 mb-3">
-              <Star className="w-4 h-4 text-yellow-300 drop-shadow-[0_0_6px_rgba(255,215,0,0.8)]" />
-              <span className="text-muted-foreground text-sm">즐겨찾기</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {favoriteServers.map((server) => {
-                const isOwner = server.ownerId === currentUserId;
-                const isFav = favoriteIds.has(server.id);
-                return (
-                  <Card
-                    key={server.id}
-                    className="card-cyber hover-lift"
-                  >
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="neon-text-primary">{server.name}</CardTitle>
-                        <Badge className="badge-cyber">
-                          {isOwner ? "소유자" : "멤버"}
-                        </Badge>
-                      </div>
-                      <CardDescription className="text-muted-foreground">서버장: {server.owner}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex items-center text-muted-foreground">
-                          <Users className="mr-2 h-4 w-4" />
-                          <span>{server.members.length}명 참여</span>
-                        </div>
-                        <div className="flex items-center justify-between text-muted-foreground">
-                          <div className="flex items-center gap-2">
-                            <Star
-                              onClick={() => toggleFavorite(server)}
-                              className="mr-2 h-4 w-4 cursor-pointer"
-                              style={{ color: isFav ? "#FACC15" : "#9CA3AF" }}
-                              fill={isFav ? "currentColor" : "none"}
-                            />
-                            <Clock className="mr-2 h-4 w-4" />
-                            <span>초기화: {server.resetTime}</span>
-                          </div>
-                          <Button
-                            onClick={() => router.push(`/server/${server.id}`)}
-                            className="btn-cyber h-15 px-8"
-                            size="sm"
-                          >
-                            입장
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* 모든 서버 */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-muted-foreground text-sm">모든 서버</span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {servers.map((server) => {
-            const isOwner = server.ownerId === currentUserId;
-            const isFav = favoriteIds.has(server.id);
-            return (
-              <Card
-                key={server.id}
-                className="card-cyber hover-lift"
-              >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="neon-text-primary">{server.name}</CardTitle>
-                    <Badge className="badge-cyber">
-                      {isOwner ? "소유자" : "멤버"}
-                    </Badge>
-                  </div>
-                  <CardDescription className="text-muted-foreground">서버장: {server.owner}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center text-muted-foreground">
-                      <Users className="mr-2 h-4 w-4" />
-                      <span>{server.members.length}명 참여</span>
-                    </div>
-                    <div className="flex items-center justify-between text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Star
-                          onClick={() => toggleFavorite(server)}
-                          className="mr-2 h-4 w-4 cursor-pointer"
-                          style={{ color: isFav ? "#FACC15" : "#9CA3AF" }}
-                          fill={isFav ? "currentColor" : "none"}
-                        />
-                        <Clock className="mr-2 h-4 w-4" />
-                        <span>초기화: {server.resetTime}</span>
-                      </div>
-                      <Button
-                        onClick={() => router.push(`/server/${server.id}`)}
-                        className="btn-cyber h-15 px-8"
-                        size="sm"
-                      >
-                        입장
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* 서버가 없을 때 */}
-        {servers.length === 0 && (
-          <div className="text-center py-12">
-            <div className="card-cyber max-w-md mx-auto p-8">
-              <h3 className="text-xl font-semibold neon-text-primary mb-2">
-                서버가 없습니다
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                초대 코드를 입력하거나 새 서버를 생성하세요.
+      <main className="container mx-auto px-4 py-6 max-w-7xl">
+        {/* Welcome Section */}
+        <motion.section
+          className="mb-8"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+                안녕하세요, <span className="text-cyan-400">{authUser}</span>님
+              </h1>
+              <p className="text-slate-400 text-sm sm:text-base">
+                오늘도 함께 게임할 준비 되셨나요?
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                <Button
-                  onClick={() => setShowJoinModal(true)}
-                  className="w-full sm:w-auto btn-cyber-outline h-12 px-6"
-                >
-                  초대 코드로 참가
-                </Button>
-                <Button
-                  onClick={() => setShowCreateModal(true)}
-                  className="w-full sm:w-auto btn-cyber h-12 px-6"
-                >
-                  서버 생성
-                </Button>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setShowJoinModal(true)}
+                variant="outline"
+                className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
+              >
+                <Search className="w-4 h-4 mr-2" />
+                참가
+              </Button>
+              <Button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                새 서버
+              </Button>
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Notice Banner */}
+        {notices.length > 0 && (
+          <motion.section
+            className="mb-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+            <div
+              className="bg-gradient-to-r from-violet-600/20 to-purple-600/20 border border-violet-500/30 rounded-xl p-4 cursor-pointer hover:border-violet-500/50 transition-colors"
+              onClick={() => setOpenNotice(notices[0])}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center">
+                  <Bell className="w-4 h-4 text-violet-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-violet-300 text-sm font-medium truncate">{notices[0].title}</p>
+                  <p className="text-violet-400/60 text-xs">{new Date(notices[0].createdAt).toLocaleDateString()}</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-violet-400" />
+              </div>
+            </div>
+          </motion.section>
+        )}
+
+        {/* Stats Overview */}
+        <motion.section
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+        >
+          <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                <Gamepad2 className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{servers.length}</p>
+                <p className="text-slate-400 text-xs">참여 서버</p>
               </div>
             </div>
           </div>
+          <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                <Star className="w-5 h-5 text-yellow-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{favoriteServers.length}</p>
+                <p className="text-slate-400 text-xs">즐겨찾기</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">
+                  {servers.reduce((acc, s) => acc + s.members.length, 0)}
+                </p>
+                <p className="text-slate-400 text-xs">총 멤버</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-purple-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">
+                  {Object.keys(friendSummaries).length}
+                </p>
+                <p className="text-slate-400 text-xs">친구 활동</p>
+              </div>
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Favorite Servers */}
+        {favoriteServers.length > 0 && (
+          <motion.section
+            className="mb-8"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Star className="w-4 h-4 text-yellow-400" />
+              <h2 className="text-lg font-semibold text-white">즐겨찾기</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {favoriteServers.map((server) => (
+                <ServerCard
+                  key={server.id}
+                  server={server}
+                  isFavorite={true}
+                  isOwner={server.ownerId === currentUserId}
+                  friendSummary={friendSummaries[server.id]}
+                  onToggleFavorite={toggleFavorite}
+                  onClick={() => router.push(`/server/${server.id}`)}
+                />
+              ))}
+            </div>
+          </motion.section>
         )}
-      </motion.div>
 
-      {/* Footer는 전역 레이아웃에서 렌더링 */}
+        {/* All Servers */}
+        <motion.section
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.25 }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Gamepad2 className="w-4 h-4 text-cyan-400" />
+            <h2 className="text-lg font-semibold text-white">내 서버</h2>
+            <span className="text-slate-500 text-sm">({servers.length})</span>
+          </div>
 
-      {/* 모달 컴포넌트 */}
+          {servers.length === 0 ? (
+            <EmptyState
+              onCreateClick={() => setShowCreateModal(true)}
+              onJoinClick={() => setShowJoinModal(true)}
+            />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {servers.map((server) => (
+                <ServerCard
+                  key={server.id}
+                  server={server}
+                  isFavorite={favoriteIds.has(server.id)}
+                  isOwner={server.ownerId === currentUserId}
+                  friendSummary={friendSummaries[server.id]}
+                  onToggleFavorite={toggleFavorite}
+                  onClick={() => router.push(`/server/${server.id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </motion.section>
+      </main>
+
+      {/* Modals */}
       <CreateServerModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
@@ -444,33 +389,153 @@ export default function DashboardPage() {
         onJoinSuccess={loadServersAndFavorites}
       />
 
-      {/* 공지 모달 */}
+      {/* Notice Detail Modal */}
       {openNotice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={()=>setOpenNotice(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={()=>setOpenNotice(null)}>
           <motion.div
-            className="card-cyber max-w-lg w-full mx-4"
+            className="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full overflow-hidden"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2 }}
             onClick={(e)=>e.stopPropagation()}
           >
-            <div className="p-4 border-b border-cyan-500/30">
-              <div className="text-lg font-semibold truncate text-white">{openNotice.title}</div>
-              <div className="text-xs text-white/70">{new Date(openNotice.createdAt).toLocaleString()}</div>
+            <div className="p-5 border-b border-slate-700">
+              <h3 className="text-lg font-semibold text-white">{openNotice.title}</h3>
+              <p className="text-slate-400 text-xs mt-1">{new Date(openNotice.createdAt).toLocaleString()}</p>
             </div>
-            <div className="p-4 text-sm text-white/80 max-h-[60vh] overflow-auto">
+            <div className="p-5 max-h-[60vh] overflow-auto">
               {noticeLoading ? (
-                <div className="text-white/70">불러오는 중...</div>
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                </div>
               ) : (
-                <pre className="whitespace-pre-wrap font-sans">{noticeContent}</pre>
+                <pre className="text-slate-300 text-sm whitespace-pre-wrap font-sans leading-relaxed">{noticeContent}</pre>
               )}
             </div>
-            <div className="p-4 flex justify-end">
-              <Button className="btn-cyber-outline" onClick={()=>setOpenNotice(null)}>닫기</Button>
+            <div className="p-4 border-t border-slate-700 flex justify-end">
+              <Button variant="outline" className="border-slate-600" onClick={()=>setOpenNotice(null)}>닫기</Button>
             </div>
           </motion.div>
         </div>
       )}
+    </div>
+  );
+}
+
+// Server Card Component
+function ServerCard({
+  server,
+  isFavorite,
+  isOwner,
+  friendSummary,
+  onToggleFavorite,
+  onClick
+}: {
+  server: IServer;
+  isFavorite: boolean;
+  isOwner: boolean;
+  friendSummary?: { friend: string; others: number };
+  onToggleFavorite: (server: IServer, e: React.MouseEvent) => void;
+  onClick: () => void;
+}) {
+  return (
+    <Card
+      className="bg-slate-800/50 border-slate-700/50 hover:border-slate-600 hover:bg-slate-800/70 transition-all cursor-pointer group"
+      onClick={onClick}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
+              {server.name}
+            </h3>
+            <p className="text-slate-400 text-xs mt-0.5">서버장: {server.owner}</p>
+          </div>
+          <div className="flex items-center gap-2 ml-2">
+            <button
+              onClick={(e) => onToggleFavorite(server, e)}
+              className="p-1.5 rounded-lg hover:bg-slate-700/50 transition-colors"
+            >
+              <Star
+                className={`w-4 h-4 ${isFavorite ? 'text-yellow-400 fill-yellow-400' : 'text-slate-500'}`}
+              />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <Users className="w-3.5 h-3.5" />
+            <span>{server.members.length}명</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <Clock className="w-3.5 h-3.5" />
+            <span>{server.resetTime}</span>
+          </div>
+          {isOwner && (
+            <Badge variant="outline" className="text-xs border-cyan-500/50 text-cyan-400 bg-cyan-500/10">
+              소유자
+            </Badge>
+          )}
+        </div>
+
+        {friendSummary && (
+          <div className="mt-3 pt-3 border-t border-slate-700/50">
+            <div className="flex items-center gap-2 text-xs">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-emerald-400">
+                {friendSummary.friend}
+                {friendSummary.others > 0 && ` 외 ${friendSummary.others}명`}이 스케줄 등록
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-3 flex justify-end">
+          <div className="flex items-center gap-1 text-cyan-400 text-xs font-medium group-hover:translate-x-1 transition-transform">
+            입장하기
+            <ChevronRight className="w-3.5 h-3.5" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Empty State Component
+function EmptyState({
+  onCreateClick,
+  onJoinClick
+}: {
+  onCreateClick: () => void;
+  onJoinClick: () => void;
+}) {
+  return (
+    <div className="bg-slate-800/30 border border-slate-700/50 border-dashed rounded-2xl p-8 sm:p-12 text-center">
+      <div className="w-16 h-16 rounded-2xl bg-slate-700/50 flex items-center justify-center mx-auto mb-4">
+        <Gamepad2 className="w-8 h-8 text-slate-500" />
+      </div>
+      <h3 className="text-lg font-semibold text-white mb-2">서버가 없습니다</h3>
+      <p className="text-slate-400 text-sm mb-6 max-w-sm mx-auto">
+        새로운 서버를 만들거나 초대 코드로 친구의 서버에 참가해보세요
+      </p>
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <Button
+          onClick={onJoinClick}
+          variant="outline"
+          className="border-slate-600 text-slate-300 hover:bg-slate-700"
+        >
+          <Search className="w-4 h-4 mr-2" />
+          초대 코드로 참가
+        </Button>
+        <Button
+          onClick={onCreateClick}
+          className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          새 서버 만들기
+        </Button>
+      </div>
     </div>
   );
 }
