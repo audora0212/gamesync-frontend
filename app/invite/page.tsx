@@ -2,17 +2,18 @@
 
 import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { motion } from "framer-motion"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { serverService } from "@/lib/server-service"
 import { authService } from "@/lib/auth-service"
 import { toast } from "sonner"
 import { Navbar } from "@/components/navbar"
+import { Users, Clock, Server, UserPlus } from "lucide-react"
 
 export default function InvitePage() {
-  // useSearchParams()를 사용하는 클라이언트 컴포넌트를 Suspense 경계로 감쌉니다
   return (
-    <Suspense fallback={<div className="min-h-screen"><Navbar /></div>}>
+    <Suspense fallback={<div className="min-h-screen grid-bg"><Navbar /></div>}>
       <InviteInner />
     </Suspense>
   )
@@ -64,24 +65,38 @@ function InviteInner() {
   }, [code, router])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen grid-bg">
       <Navbar />
       <Dialog open={open} onOpenChange={(v)=>{setOpen(v); if(!v) {/* stay */}}}>
-        <DialogContent className="glass border-white/20 max-w-sm">
+        <DialogContent className="card-cyber border-emerald-500/30 max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-white">서버 참가 확인</DialogTitle>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-xl bg-emerald-500/20">
+                <UserPlus className="w-5 h-5 text-emerald-400" />
+              </div>
+              <DialogTitle className="text-emerald-400 text-lg">서버 참가 확인</DialogTitle>
+            </div>
             <DialogDescription className="text-white/60">아래 정보를 확인하고 참가를 진행하세요.</DialogDescription>
           </DialogHeader>
-          <div className="p-4 space-y-2 text-white">
-            <div className="flex justify-between"><span className="text-white/70">서버 이름</span><span>{info?.name || ""}</span></div>
-            <div className="flex justify-between"><span className="text-white/70">참여자 수</span><span>{info?.members ?? 0}명</span></div>
-            <div className="flex justify-between"><span className="text-white/70">초기화 시간</span><span>{info?.resetTime || ""}</span></div>
+          <div className="p-4 space-y-3 text-white">
+            <div className="flex justify-between items-center">
+              <span className="text-white/70 flex items-center gap-2"><Server className="w-4 h-4" />서버 이름</span>
+              <span className="text-cyan-400 font-medium">{info?.name || ""}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-white/70 flex items-center gap-2"><Users className="w-4 h-4" />참여자 수</span>
+              <span className="text-purple-400">{info?.members ?? 0}명</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-white/70 flex items-center gap-2"><Clock className="w-4 h-4" />초기화 시간</span>
+              <span className="text-pink-400">{info?.resetTime || ""}</span>
+            </div>
           </div>
           <div className="flex justify-end space-x-2 pt-2">
             <DialogClose asChild>
-              <Button variant="outline" className="glass border-white/30 text-white" onClick={()=>router.push("/")}>취소</Button>
+              <Button className="btn-cyber-outline text-sm px-4 py-2" onClick={()=>router.push("/")}>취소</Button>
             </DialogClose>
-            <Button className="glass-button text-white" onClick={async()=>{
+            <Button className="btn-cyber-emerald text-sm px-4 py-2" onClick={async()=>{
               try{
                 await serverService.joinByCode(code)
                 toast.success("서버 참가 완료")
@@ -90,7 +105,10 @@ function InviteInner() {
                 toast.info("이미 서버에 참여중입니다")
                 router.replace(info ? `/server/${info.id}` : "/dashboard")
               }
-            }}>참가</Button>
+            }}>
+              <UserPlus className="w-4 h-4 mr-2" />
+              참가
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

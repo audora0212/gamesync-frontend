@@ -27,22 +27,23 @@ export default function PrivacyPage() {
     } catch { router.push('/') }
   }
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="min-h-screen grid-bg">
+      <div className="mx-auto max-w-3xl px-6 py-12">
       {/* 상단: 언어 토글 + 시작하러가기 */}
       <div className="mb-3 flex items-center justify-between">
         <div className="flex gap-2">
-          <Button variant={lang==='ko'?'default':'outline'} size="sm" onClick={()=>setLang('ko')}>한국어</Button>
-          <Button variant={lang==='en'?'default':'outline'} size="sm" onClick={()=>setLang('en')}>English</Button>
+          <Button className={lang==='ko'?'btn-cyber text-sm':'btn-cyber-outline text-sm'} size="sm" onClick={()=>setLang('ko')}>한국어</Button>
+          <Button className={lang==='en'?'btn-cyber text-sm':'btn-cyber-outline text-sm'} size="sm" onClick={()=>setLang('en')}>English</Button>
         </div>
         {!isNativeApp && (
-          <Button variant="secondary" className="glass" onClick={goStart}>시작하러가기</Button>
+          <Button className="btn-cyber-emerald text-sm" onClick={goStart}>시작하러가기</Button>
         )}
       </div>
       {/* 모바일 뒤로가기 (우측 정렬, 화살표 제거) */}
       <div className="mb-4 md:hidden flex justify-end">
         <Button
           variant="outline"
-          className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+          className="btn-cyber-outline text-sm"
           onClick={() => {
             try {
               if (typeof window !== "undefined" && window.history.length > 1) router.back();
@@ -57,14 +58,14 @@ export default function PrivacyPage() {
       </div>
       {lang==='ko' ? (
         <>
-          <h1 className="text-3xl font-semibold">개인정보 처리방침</h1>
+          <h1 className="text-3xl font-semibold neon-text-primary">개인정보 처리방침</h1>
           <p className="mt-3 text-sm text-muted-foreground">
             GameSync(이하 “서비스”)는 이용자의 개인정보를 소중히 다루며, 관련 법령 및 규정을 준수합니다. 본 방침은 서비스가 수집·이용·보관·파기하는 개인정보의 항목과 목적, 이용자의 권리 및 행사 방법을 설명합니다.
           </p>
         </>
       ) : (
         <>
-          <h1 className="text-3xl font-semibold">Privacy Policy</h1>
+          <h1 className="text-3xl font-semibold neon-text-primary">Privacy Policy</h1>
           <p className="mt-3 text-sm text-muted-foreground">
             GameSync (&quot;Service&quot;) respects your privacy and complies with applicable laws. This policy explains what data we collect, how we use/store/delete it, and your rights.
           </p>
@@ -72,7 +73,7 @@ export default function PrivacyPage() {
       )}
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">{lang==='ko' ? '1. 수집하는 개인정보 항목' : '1. Data We Collect'}</h2>
+        <h2 className="text-xl font-medium text-cyan-400">{lang==='ko' ? '1. 수집하는 개인정보 항목' : '1. Data We Collect'}</h2>
         {lang==='ko' ? (
           <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
             {!REVIEW_MODE && (
@@ -93,7 +94,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">{lang==='ko' ? '2. 개인정보 수집 방법' : '2. How We Collect'}</h2>
+        <h2 className="text-xl font-medium text-purple-400">{lang==='ko' ? '2. 개인정보 수집 방법' : '2. How We Collect'}</h2>
         {lang==='ko' ? (
           <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
             {!REVIEW_MODE && (<li>소셜 로그인(OAuth) 과정에서 제공 동의 시 수집</li>)}
@@ -110,7 +111,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">{lang==='ko' ? '3. 개인정보의 이용 목적' : '3. Purpose of Use'}</h2>
+        <h2 className="text-xl font-medium text-emerald-400">{lang==='ko' ? '3. 개인정보의 이용 목적' : '3. Purpose of Use'}</h2>
         {lang==='ko' ? (
           <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
             <li>회원 식별 및 로그인, 부정 이용 방지</li>
@@ -131,7 +132,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">{lang==='ko' ? '4. 처리위탁 및 제3자 제공' : '4. Processors and Third Parties'}</h2>
+        <h2 className="text-xl font-medium text-pink-400">{lang==='ko' ? '4. 처리위탁 및 제3자 제공' : '4. Processors and Third Parties'}</h2>
         {lang==='ko' ? (
           <>
             <p className="text-sm text-muted-foreground">서비스는 안정적인 제공을 위해 다음 업체에 처리를 위탁하거나, 연동 과정에서 정보가 전송될 수 있습니다.</p>
@@ -156,7 +157,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">{lang==='ko' ? '5. 보유 및 이용 기간' : '5. Retention Period'}</h2>
+        <h2 className="text-xl font-medium text-yellow-400">{lang==='ko' ? '5. 보유 및 이용 기간' : '5. Retention Period'}</h2>
         {lang==='ko' ? (
           <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
             <li>회원 탈퇴 시, 관련 법령에 따라 보관이 요구되는 경우를 제외하고 지체 없이 파기합니다.</li>
@@ -173,7 +174,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">{lang==='ko' ? '6. 국외 이전' : '6. International Transfers'}</h2>
+        <h2 className="text-xl font-medium text-cyan-400">{lang==='ko' ? '6. 국외 이전' : '6. International Transfers'}</h2>
         {lang==='ko' ? (
           <p className="text-sm text-muted-foreground">FCM 등 일부 서비스는 국외 서버를 사용합니다. 이에 따라 서비스 이용 과정에서 개인정보가 국외로 이전·보관될 수 있습니다. 이전되는 정보, 국가, 보유 기간 등은 각 제공자의 정책을 따릅니다.</p>
         ) : (
@@ -182,7 +183,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">{lang==='ko' ? '7. 이용자의 권리' : '7. Your Rights'}</h2>
+        <h2 className="text-xl font-medium text-purple-400">{lang==='ko' ? '7. 이용자의 권리' : '7. Your Rights'}</h2>
         {lang==='ko' ? (
           <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
             <li>본인 확인 후 개인정보 열람·정정·삭제·처리정지·동의철회를 요청하실 수 있습니다.</li>
@@ -199,7 +200,7 @@ export default function PrivacyPage() {
 
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">{lang==='ko' ? '8. 개인정보의 안전성 확보조치' : '8. Security Measures'}</h2>
+        <h2 className="text-xl font-medium text-emerald-400">{lang==='ko' ? '8. 개인정보의 안전성 확보조치' : '8. Security Measures'}</h2>
         {lang==='ko' ? (
           <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
             <li>전송 구간 암호화(HTTPS), 접근 통제, 최소 권한 원칙 적용</li>
@@ -214,7 +215,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">{lang==='ko' ? '9. 문의처' : '9. Contact'}</h2>
+        <h2 className="text-xl font-medium text-pink-400">{lang==='ko' ? '9. 문의처' : '9. Contact'}</h2>
         {lang==='ko' ? (
           <>
             <p className="text-sm text-muted-foreground">개인정보 관련 문의, 신고 및 권리 행사는 아래로 연락해 주세요.</p>
@@ -231,7 +232,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-xl font-medium">{lang==='ko' ? '10. 본 방침의 변경' : '10. Changes to this Policy'}</h2>
+        <h2 className="text-xl font-medium text-yellow-400">{lang==='ko' ? '10. 본 방침의 변경' : '10. Changes to this Policy'}</h2>
         {lang==='ko' ? (
           <>
             <p className="text-sm text-muted-foreground">법령, 서비스 변경에 따라 방침이 수정될 수 있으며, 변경 사항은 서비스 내 공지 또는 본 페이지를 통해 고지합니다.</p>
@@ -247,10 +248,11 @@ export default function PrivacyPage() {
 
       <div className="mt-10 text-sm text-muted-foreground">
         {lang==='ko' ? (
-          <>관련 문서: <Link className="underline" href="/terms">이용약관</Link> · <Link className="underline" href="/support">지원 센터</Link></>
+          <>관련 문서: <Link className="underline text-cyan-400 hover:text-cyan-300" href="/terms">이용약관</Link> · <Link className="underline text-cyan-400 hover:text-cyan-300" href="/support">지원 센터</Link></>
         ) : (
-          <>Related: <Link className="underline" href="/terms">Terms of Service</Link> · <Link className="underline" href="/support">Support</Link></>
+          <>Related: <Link className="underline text-cyan-400 hover:text-cyan-300" href="/terms">Terms of Service</Link> · <Link className="underline text-cyan-400 hover:text-cyan-300" href="/support">Support</Link></>
         )}
+      </div>
       </div>
     </div>
   );

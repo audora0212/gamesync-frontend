@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { serverService } from "@/lib/server-service"
-import { Loader2 } from "lucide-react"
+import { Loader2, Server, Clock, Plus } from "lucide-react"
 
 interface CreateServerModalProps {
   open: boolean
@@ -45,27 +45,34 @@ export function CreateServerModal({ open, onClose, onServerCreated }: CreateServ
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="glass border-white/20 max-w-sm">
+      <DialogContent className="card-cyber border-cyan-500/30 max-w-sm">
         <DialogHeader>
-          <DialogTitle className="text-white">새 서버 생성</DialogTitle>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-xl bg-cyan-500/20">
+              <Plus className="w-5 h-5 text-cyan-400" />
+            </div>
+            <DialogTitle className="neon-text-primary text-lg">새 서버 생성</DialogTitle>
+          </div>
           <DialogDescription className="text-white/70">새로운 게임 서버를 생성합니다.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-white">
+            <Label htmlFor="name" className="text-cyan-400 flex items-center gap-2">
+              <Server className="w-4 h-4" />
               서버 이름
             </Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="glass border-white/30 text-white placeholder:text-white/50 w-full"
+              className="input-cyber w-full"
               placeholder="서버 이름을 입력하세요"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="resetTime" className="text-white">
+            <Label htmlFor="resetTime" className="text-cyan-400 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
               초기화 시간
             </Label>
             <Input
@@ -73,27 +80,29 @@ export function CreateServerModal({ open, onClose, onServerCreated }: CreateServ
               type="time"
               value={resetTime}
               onChange={(e) => setResetTime(e.target.value)}
-              className="glass border-white/30 text-white w-full"
+              className="input-cyber w-full"
               required
             />
           </div>
           <div className="flex justify-end space-x-2 pt-4">
             <Button
               type="button"
-              variant="outline"
               onClick={onClose}
-              className="glass-button"
+              className="btn-cyber-outline text-sm px-4 py-2"
             >
               취소
             </Button>
-            <Button type="submit" className="glass-button" disabled={isLoading}>
+            <Button type="submit" className="btn-cyber text-sm px-4 py-2" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   생성 중...
                 </>
               ) : (
-                "생성"
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  생성
+                </>
               )}
             </Button>
           </div>

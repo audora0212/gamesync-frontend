@@ -160,10 +160,10 @@ export function ServerOverview({
 
   return (
     <>
-    <Card className="glass border-white/20 h-full flex flex-col">
+    <Card className="card-cyber h-full flex flex-col">
       <CardHeader>
-        <CardTitle className="text-white flex items-center">
-          <Users className="mr-2 h-5 w-5 text-white" /> 서버 개요
+        <CardTitle className="neon-text-primary flex items-center">
+          <Users className="mr-2 h-5 w-5 text-cyan-400" /> 서버 개요
         </CardTitle>
         <CardDescription className="text-white/70">
           서버 정보와 멤버를 관리합니다
@@ -172,28 +172,28 @@ export function ServerOverview({
       <CardContent className="space-y-6 flex-grow">
         {/* 서버 기본 정보 */}
         <div className="space-y-3">
-          <h3 className="text-white font-medium">서버 정보</h3>
+          <h3 className="text-cyan-400 font-medium">서버 정보</h3>
           <div className="space-y-2 text-sm text-white/70">
             <div className="flex justify-between">
               <span>서버 이름:</span>
-              <span>{server.name}</span>
+              <span className="text-white">{server.name}</span>
             </div>
             <div className="flex justify-between">
               <span>초기화 시간:</span>
-              <span>{server.resetTime}</span>
+              <span className="text-emerald-400">{server.resetTime}</span>
             </div>
             <div className="flex justify-between">
               <span>총 멤버:</span>
-              <span>{server.members.length}명</span>
+              <span className="text-purple-400">{server.members.length}명</span>
             </div>
             {/* 초대 */}
             <div className="pt-2 space-y-2">
-              <div className="text-white mb-1">초대</div>
+              <div className="text-pink-400 mb-1">초대</div>
               <div className="flex items-center justify-center gap-2 w-full">
                 {isMember && (
                   <>
                     <Button
-                      className="glass-button"
+                      className="btn-cyber-emerald text-sm px-3 py-2"
                       onClick={async () => {
                         setInviteOpen(true)
                         try {
@@ -207,8 +207,7 @@ export function ServerOverview({
                       <UserPlus className="h-4 w-4 mr-1" /> 친구 초대
                     </Button>
                     <Button
-                      variant="outline"
-                      className="glass border-white/30 text-white hover:bg-black/10 hover:text-white"
+                      className="btn-cyber-purple-outline text-sm px-3 py-2"
                       onClick={async () => {
                         const origin = typeof window !== 'undefined' ? window.location.origin : ''
                         const link = `${origin}/invite?code=${server.inviteCode}`
@@ -231,12 +230,12 @@ export function ServerOverview({
 
         {/* 멤버 목록 */}
         <div className="space-y-3">
-          <h3 className="text-white font-medium">멤버 목록</h3>
+          <h3 className="text-cyan-400 font-medium">멤버 목록</h3>
           <div className="space-y-2 max-h-48 overflow-y-auto overflow-x-hidden">
             {server.members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between px-3 py-2 glass rounded-lg hover:bg-black/10"
+                className="flex items-center justify-between px-3 py-2 bg-cyan-500/10 rounded-xl border border-cyan-500/20 hover:bg-cyan-500/20 transition-colors"
               >
                 {/* 닉네임 왼쪽 */}
                 <span className="text-white text-sm truncate w-32">

@@ -7,6 +7,7 @@ import { friendService } from "@/lib/friend-service"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { toast } from "sonner"
+import { Bell, Trash2, X } from "lucide-react"
 
 interface Props {
   open: boolean
@@ -112,14 +113,17 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
 
   const panel = (
     <div className={`fixed top-16 right-4 z-[11000] transition ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-      <div ref={panelRef} className={`w-[360px] glass border border-white/10 rounded-xl overflow-hidden`}>
-        <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-          <div className="text-sm text-white/80">알림 {unread > 0 ? `(미읽음 ${unread})` : ""}</div>
+      <div ref={panelRef} className={`w-[360px] card-cyber border-yellow-500/30 rounded-xl overflow-hidden`}>
+        <div className="px-4 py-3 border-b border-yellow-500/20 flex items-center justify-between bg-yellow-500/10">
+          <div className="text-sm text-yellow-400 flex items-center gap-2">
+            <Bell className="w-4 h-4" />
+            알림 {unread > 0 ? `(미읽음 ${unread})` : ""}
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
-              className="text-white/70"
+              className="text-yellow-400/70 hover:text-yellow-300 hover:bg-yellow-500/20"
               onClick={async () => {
                 try {
                   await notificationService.clearAll()
@@ -131,10 +135,11 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
                 }
               }}
             >
-              알림 지우기
+              <Trash2 className="w-4 h-4 mr-1" />
+              비우기
             </Button>
-            <Button variant="ghost" size="sm" className="text-white/70" onClick={onClose}>
-              닫기
+            <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10" onClick={onClose}>
+              <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -182,7 +187,7 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
               displayText = (n.message && !(isFriendRequest || (isInvite && inviteMarker)) ? n.message : '') || n.title || ''
             }
             return (
-              <Card key={n.id} className="glass border-white/10 p-3 mb-2">
+              <Card key={n.id} className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3 mb-2 hover:bg-yellow-500/15 transition-colors">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     {/* 제목은 숨기고, 최종 본문만 표시 (길면 말줄임) */}
@@ -195,7 +200,7 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
                   <div className="mt-2 flex gap-2">
                     <Button
                       size="sm"
-                      className="glass-button"
+                      className="btn-cyber-emerald text-xs"
                       onClick={() => {
                         try { window.location.href = `/invite/by-id?inviteId=${inviteId}` } catch {}
                       }}
@@ -203,7 +208,7 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
                       확인
                     </Button>
                     {onInviteAction && (
-                      <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={() => handleInviteDecision(n, false, inviteId)}>
+                      <Button size="sm" variant="outline" className="btn-cyber-outline text-xs" onClick={() => handleInviteDecision(n, false, inviteId)}>
                         거절
                       </Button>
                     )}
@@ -212,10 +217,10 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
                 {/* 친구 요청 알림이면 수락/거절 버튼 */}
                 {isFriendRequest && (
                   <div className="mt-2 flex gap-2">
-                    <Button size="sm" className="glass-button" onClick={() => handleFriendRequestDecision(n, payload!.requestId!, true)}>
+                    <Button size="sm" className="btn-cyber-emerald text-xs" onClick={() => handleFriendRequestDecision(n, payload!.requestId!, true)}>
                       수락
                     </Button>
-                    <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={() => handleFriendRequestDecision(n, payload!.requestId!, false)}>
+                    <Button size="sm" variant="outline" className="btn-cyber-outline text-xs" onClick={() => handleFriendRequestDecision(n, payload!.requestId!, false)}>
                       거절
                     </Button>
                   </div>

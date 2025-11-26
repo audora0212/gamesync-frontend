@@ -23,6 +23,7 @@ import {
 import { toast } from "sonner"
 import { timetableService } from "@/lib/timetable-service"
 import { isNative } from "@/lib/native"
+import { Clock, Gamepad2 } from "lucide-react"
 
 interface Game {
   id: number
@@ -94,9 +95,14 @@ export function NewTimetableEntryModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="glass border-white/20 max-w-sm">
+      <DialogContent className="card-cyber border-emerald-500/30 max-w-sm">
         <DialogHeader>
-          <DialogTitle className="text-white">새 합류 시간 예약</DialogTitle>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-xl bg-emerald-500/20">
+              <Clock className="w-5 h-5 text-emerald-400" />
+            </div>
+            <DialogTitle className="text-emerald-400 text-lg">새 합류 시간 예약</DialogTitle>
+          </div>
           <DialogDescription className="text-white/70">
             오늘 날짜 기준으로 합류 시간을 예약합니다.
           </DialogDescription>
@@ -108,16 +114,16 @@ export function NewTimetableEntryModal({
                 type="date"
                 value={selectedDate}
                 disabled
-                className={"glass border-white/30 text-white text-sm appearance-none h-8 sm:h-9 leading-8 sm:leading-9 py-0 " + (isNativeApp ? "inline-block w-auto text-center px-2" : "w-full px-2")}
+                className={"input-cyber text-sm appearance-none h-8 sm:h-9 leading-8 sm:leading-9 py-0 " + (isNativeApp ? "inline-block w-auto text-center px-2" : "w-full px-2")}
               />
             </div>
             <Select value={selectedTime} onValueChange={setSelectedTime} required>
-              <SelectTrigger className="glass border-white/30 text-white text-sm w-full">
+              <SelectTrigger className="input-cyber text-sm w-full">
                 <SelectValue placeholder="시간 선택" />
               </SelectTrigger>
-              <SelectContent className="glass border-white/20 text-white text-sm max-h-60 overflow-y-auto">
+              <SelectContent className="card-cyber border-emerald-500/30 text-white text-sm max-h-60 overflow-y-auto">
                 <SelectGroup>
-                  <SelectLabel>시간</SelectLabel>
+                  <SelectLabel className="text-emerald-400">시간</SelectLabel>
                   {timeOptions.map((time) => (
                     <SelectItem key={time} value={time}>
                       {time}
@@ -127,36 +133,42 @@ export function NewTimetableEntryModal({
               </SelectContent>
             </Select>
           </div>
-          <Select value={selectedGame} onValueChange={setSelectedGame} defaultValue="">
-            <SelectTrigger className="glass border-white/30 text-white text-sm">
-              <SelectValue placeholder="게임 선택" />
-            </SelectTrigger>
-            <SelectContent className="glass border-white/20 text-white text-sm max-h-60 overflow-y-auto">
-              <SelectGroup>
-                <SelectLabel>기본 게임</SelectLabel>
-                {defaultGames.map((game) => (
-                  <SelectItem key={`default-${game.id}`} value={`default-${game.id}`}>
-                    {game.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>커스텀 게임</SelectLabel>
-                {customGames.map((game) => (
-                  <SelectItem key={`custom-${game.id}`} value={`custom-${game.id}`}>
-                    {game.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <label className="text-emerald-400 text-sm flex items-center gap-2">
+              <Gamepad2 className="w-4 h-4" />
+              게임 선택
+            </label>
+            <Select value={selectedGame} onValueChange={setSelectedGame} defaultValue="">
+              <SelectTrigger className="input-cyber text-sm">
+                <SelectValue placeholder="게임 선택" />
+              </SelectTrigger>
+              <SelectContent className="card-cyber border-emerald-500/30 text-white text-sm max-h-60 overflow-y-auto">
+                <SelectGroup>
+                  <SelectLabel className="text-cyan-400">기본 게임</SelectLabel>
+                  {defaultGames.map((game) => (
+                    <SelectItem key={`default-${game.id}`} value={`default-${game.id}`}>
+                      {game.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel className="text-purple-400">커스텀 게임</SelectLabel>
+                  {customGames.map((game) => (
+                    <SelectItem key={`custom-${game.id}`} value={`custom-${game.id}`}>
+                      {game.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex justify-end space-x-2 pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline" className="glass border-white/30 text-white">
+              <Button type="button" className="btn-cyber-outline text-sm px-4 py-2">
                 취소
               </Button>
             </DialogClose>
-            <Button type="submit" className="glass-button text-white" disabled={!canSubmit || isSubmitting}>
+            <Button type="submit" className="btn-cyber-emerald text-sm px-4 py-2" disabled={!canSubmit || isSubmitting}>
               {isSubmitting ? "예약 중..." : "합류 시간 예약"}
             </Button>
           </div>

@@ -135,14 +135,14 @@ export function GameManagement({ serverId }: GameManagementProps) {
 
   if (isLoading) {
     return (
-      <Card className="glass border-white/20 h-full">
+      <Card className="card-cyber border-purple-500/30 h-full">
         <CardHeader>
-          <CardTitle className="text-black flex items-center">
+          <CardTitle className="neon-text-purple flex items-center">
             <Image src="/logo_round.png" alt="게임" width={20} height={20} className="mr-2 h-5 w-5" /> 게임 관리
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div>로딩 중...</div>
+          <div className="text-muted-foreground">로딩 중...</div>
         </CardContent>
       </Card>
     )
@@ -150,9 +150,9 @@ export function GameManagement({ serverId }: GameManagementProps) {
 
   return (
     <>
-      <Card className="glass border-white/20 h-full flex flex-col">
+      <Card className="card-cyber border-purple-500/30 h-full flex flex-col">
         <CardHeader>
-          <CardTitle className="text-white flex items-center">
+          <CardTitle className="neon-text-purple flex items-center">
             <Image src="/logo_round.png" alt="게임" width={20} height={20} className="mr-2 h-5 w-5" /> 게임 관리
           </CardTitle>
           <CardDescription className="text-white/70">
@@ -160,7 +160,7 @@ export function GameManagement({ serverId }: GameManagementProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 flex-grow">
-          <h3 className="text-white font-medium mb-3">커스텀 게임</h3>
+          <h3 className="text-purple-400 font-medium mb-3">커스텀 게임</h3>
           <form
             onSubmit={handleAddCustomGame}
             className="flex gap-2 mb-3"
@@ -169,14 +169,14 @@ export function GameManagement({ serverId }: GameManagementProps) {
               value={newGameName}
               onChange={(e) => setNewGameName(e.target.value)}
               placeholder="게임 이름"
-              className="glass border-white/30 text-white placeholder:text-white/50 text-sm"
+              className="input-cyber text-sm"
               inputMode="text"
               style={{ fontSize: 16 }}
             />
             <Button
               type="submit"
               size="sm"
-              className="glass-button hover:bg-black/10"
+              className="btn-cyber-purple"
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -185,7 +185,7 @@ export function GameManagement({ serverId }: GameManagementProps) {
             {customGames.map((game) => (
               <div
                 key={game.id}
-                className="flex items-center justify-between p-2 glass rounded-lg hover:bg-black/10"
+                className="flex items-center justify-between p-2 bg-purple-500/10 rounded-xl border border-purple-500/20 hover:bg-purple-500/20 transition-colors"
               >
                 <span className="text-white text-sm truncate w-40">
                   {game.name}
@@ -196,7 +196,7 @@ export function GameManagement({ serverId }: GameManagementProps) {
                   }
                   size="sm"
                   variant="ghost"
-                  className="text-red-400 truncate hover:text-red-300 hover:bg-red-500/20"
+                  className="text-pink-400 truncate hover:text-pink-300 hover:bg-pink-500/20"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -211,33 +211,30 @@ export function GameManagement({ serverId }: GameManagementProps) {
         open={showDeleteModal}
         onOpenChange={setShowDeleteModal}
       >
-        <DialogContent className="glass border-white/20 max-w-md">
+        <DialogContent className="card-cyber border-pink-500/30 max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-white">
+            <DialogTitle className="neon-text-accent">
               {deletingGameName} 삭제 확인
             </DialogTitle>
           </DialogHeader>
           <div className="p-4 text-white">
             <p>다음 사용자가 예약한 기록이 있습니다:</p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
+            <ul className="list-disc list-inside mt-2 space-y-1 text-pink-400">
               {scheduledUsers.map((user) => (
                 <li key={user}>{user}</li>
               ))}
             </ul>
-            <p className="mt-4">정말로 삭제하시겠습니까?</p>
+            <p className="mt-4 text-white/80">정말로 삭제하시겠습니까?</p>
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button
-                variant="outline"
-                className="glass border-white/30 text-white"
-              >
+              <Button className="btn-cyber-outline text-sm px-4 py-2">
                 취소
               </Button>
             </DialogClose>
             <Button
               onClick={confirmDelete}
-              className="glass-button text-white"
+              className="btn-cyber-pink text-sm px-4 py-2"
             >
               예, 삭제합니다
             </Button>

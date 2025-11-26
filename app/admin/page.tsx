@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { authService } from '@/lib/auth-service'
 import { Navbar } from '@/components/navbar'
+import { Shield, FileText, Server, Clock, Users, Bell, Settings } from 'lucide-react'
 
 type AuditLog = { id: number; serverId: number|null; userId: number|null; action: string; details?: string|null; occurredAt: string }
 type AuditLogView = AuditLog & { userNickname?: string|null }
@@ -85,9 +87,9 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen grid-bg">
         <Navbar />
-        <div className="container mx-auto px-4 py-8 text-white/80">로딩 중...</div>
+        <div className="container mx-auto px-4 py-8 text-muted-foreground">로딩 중...</div>
       </div>
     )
   }
@@ -107,27 +109,57 @@ export default function AdminPage() {
 
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen grid-bg">
       <Navbar />
       <div className="container mx-auto px-4 py-8 space-y-6">
-        <h1 className="text-2xl font-bold text-white">관리자 페이지</h1>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center gap-3"
+        >
+          <div className="p-2 rounded-xl bg-red-500/20">
+            <Shield className="w-6 h-6 text-red-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-red-400">관리자 페이지</h1>
+        </motion.div>
 
-        <div className="flex gap-2">
-          <Button variant={tab==='audit'?'default':'outline'} className="glass-button" onClick={()=>setTab('audit')}>감사 로그</Button>
-          <Button variant={tab==='servers'?'default':'outline'} className="glass-button" onClick={()=>setTab('servers')}>서버 목록</Button>
-          <Button variant={tab==='timetables'?'default':'outline'} className="glass-button" onClick={()=>setTab('timetables')}>현재 등록된 스케줄</Button>
-          <Button variant={tab==='parties'?'default':'outline'} className="glass-button" onClick={()=>setTab('parties')}>파티 목록</Button>
-          <Button variant={tab==='notices'?'default':'outline'} className="glass-button" onClick={()=>setTab('notices')}>공지</Button>
-        </div>
+        <motion.div
+          className="flex flex-wrap gap-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <Button className={tab==='audit'?'btn-cyber':'btn-cyber-outline'} onClick={()=>setTab('audit')}>
+            <FileText className="w-4 h-4 mr-2" />감사 로그
+          </Button>
+          <Button className={tab==='servers'?'btn-cyber-purple':'btn-cyber-purple-outline'} onClick={()=>setTab('servers')}>
+            <Server className="w-4 h-4 mr-2" />서버 목록
+          </Button>
+          <Button className={tab==='timetables'?'btn-cyber-emerald':'btn-cyber-emerald-outline'} onClick={()=>setTab('timetables')}>
+            <Clock className="w-4 h-4 mr-2" />현재 등록된 스케줄
+          </Button>
+          <Button className={tab==='parties'?'btn-cyber-pink':'btn-cyber-pink-outline'} onClick={()=>setTab('parties')}>
+            <Users className="w-4 h-4 mr-2" />파티 목록
+          </Button>
+          <Button className={tab==='notices'?'btn-cyber':'btn-cyber-outline'} onClick={()=>setTab('notices')}>
+            <Bell className="w-4 h-4 mr-2" />공지
+          </Button>
+        </motion.div>
 
         {tab==='audit' && (
-        <Card className="bg-white/10 border-white/20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+        <Card className="card-cyber">
           <CardHeader>
-            <CardTitle className="text-white">감사 로그 (최근 {audit.length}건)</CardTitle>
+            <CardTitle className="neon-text-primary">감사 로그 (최근 {audit.length}건)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="mb-3 flex flex-wrap gap-2 text-sm">
-              <select className="bg-black/30 border border-white/20 rounded px-2 py-1 text-white"
+              <select className="input-cyber px-2 py-1 text-sm"
                 value={auditFilter.category}
                 onChange={e=>{ const v = e.target.value as 'all'|'server'|'timetable'|'party'; const f = { ...auditFilter, category: v }; setAuditFilter(f); reloadAudit(f) }}>
                 <option value="all">전체</option>
@@ -135,17 +167,17 @@ export default function AdminPage() {
                 <option value="timetable">타임테이블</option>
                 <option value="party">파티</option>
               </select>
-              <input className="bg-black/30 border border-white/20 rounded px-2 py-1 text-white" placeholder="serverId"
+              <input className="input-cyber px-2 py-1 text-sm" placeholder="serverId"
                 value={auditFilter.serverId ?? ''}
                 onChange={e=>{ const f = { ...auditFilter, serverId: e.target.value }; setAuditFilter(f) }}
                 onBlur={()=>reloadAudit()}
               />
-              <input className="bg-black/30 border border-white/20 rounded px-2 py-1 text-white" placeholder="action (정확히)"
+              <input className="input-cyber px-2 py-1 text-sm" placeholder="action (정확히)"
                 value={auditFilter.action ?? ''}
                 onChange={e=>{ const f = { ...auditFilter, action: e.target.value }; setAuditFilter(f) }}
                 onBlur={()=>reloadAudit()}
               />
-              <Button size="sm" className="glass-button" onClick={()=>reloadAudit()}>적용</Button>
+              <Button size="sm" className="btn-cyber text-sm px-3 py-1" onClick={()=>reloadAudit()}>적용</Button>
             </div>
             <div className="max-h-[320px] overflow-auto text-white/80 text-sm divide-y divide-white/10">
               {audit.slice().reverse().map(l => {
@@ -165,34 +197,39 @@ export default function AdminPage() {
                   </div>
                 )
               })}
-              {audit.length === 0 && <div className="py-2">기록 없음</div>}
+              {audit.length === 0 && <div className="py-2 text-cyan-400/60">기록 없음</div>}
             </div>
           </CardContent>
         </Card>
+        </motion.div>
         )}
 
         {tab==='notices' && (
-        <Card className="bg-white/10 border-white/20">
-          <CardHeader><CardTitle className="text-white">공지 관리</CardTitle></CardHeader>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+        <Card className="card-cyber">
+          <CardHeader><CardTitle className="neon-text-primary">공지 관리</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <input className="w-full rounded bg-black/30 border border-white/20 px-3 py-2 text-sm text-white" placeholder="제목" value={newNotice.title} onChange={e=>setNewNotice(v=>({...v, title:e.target.value}))} />
-              <textarea className="w-full rounded bg-black/30 border border-white/20 px-3 py-2 text-sm text-white min-h-[120px]" placeholder="내용" value={newNotice.content} onChange={e=>setNewNotice(v=>({...v, content:e.target.value}))} />
+              <input className="input-cyber w-full px-3 py-2 text-sm" placeholder="제목" value={newNotice.title} onChange={e=>setNewNotice(v=>({...v, title:e.target.value}))} />
+              <textarea className="input-cyber w-full px-3 py-2 text-sm min-h-[120px]" placeholder="내용" value={newNotice.content} onChange={e=>setNewNotice(v=>({...v, content:e.target.value}))} />
               <div className="flex gap-2">
-                <Button className="glass-button" onClick={async ()=>{
+                <Button className="btn-cyber-emerald text-sm px-4 py-2" onClick={async ()=>{
                   const res = await fetch(`${API}/admin/notices`, { method:'POST', headers: { 'Content-Type':'application/json', ...authService.getAuthHeaders() }, body: JSON.stringify(newNotice) })
                   if(res.ok){ setNewNotice({title:'', content:''}); const list = await fetch(`${API}/notices`, { headers: authService.getAuthHeaders() }).then(r=>r.json()); setNotices(list) }
                 }}>등록</Button>
               </div>
             </div>
 
-            <div className="divide-y divide-white/10">
+            <div className="divide-y divide-cyan-500/20">
               {notices.map(n => (
                 <div key={n.id} className="py-2 flex items-center justify-between text-white/80 text-sm">
-                  <div className="truncate">{n.title}</div>
+                  <div className="truncate text-cyan-400">{n.title}</div>
                   <div className="flex gap-2">
-                    <Button size="sm" className="glass-button" onClick={async ()=>{
-                      // 상세를 불러와 모달에 채움
+                    <Button size="sm" className="btn-cyber text-xs px-3 py-1" onClick={async ()=>{
                       try {
                         const d = await fetch(`${API}/notices/${n.id}`, { headers: authService.getAuthHeaders() }).then(r=>r.json())
                         setEditNotice({ id: n.id, title: d.title, content: d.content || '' })
@@ -200,31 +237,35 @@ export default function AdminPage() {
                         setEditNotice({ id: n.id, title: n.title, content: '' })
                       }
                     }}>수정</Button>
-                    <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={async ()=>{
+                    <Button size="sm" className="btn-cyber-pink-outline text-xs px-3 py-1" onClick={async ()=>{
                       await fetch(`${API}/admin/notices/${n.id}`, { method:'DELETE', headers: authService.getAuthHeaders() });
                       setNotices(prev=>prev.filter(x=>x.id!==n.id))
                     }}>삭제</Button>
                   </div>
                 </div>
               ))}
-              {notices.length===0 && <div className="py-2 text-white/60">등록된 공지가 없습니다</div>}
+              {notices.length===0 && <div className="py-2 text-cyan-400/60">등록된 공지가 없습니다</div>}
             </div>
           </CardContent>
         </Card>
+        </motion.div>
         )}
 
         {/* 공지 수정 모달 */}
         {editNotice && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={()=>setEditNotice(null)}>
-            <div className="bg-zinc-900 text-white max-w-lg w-full mx-4 rounded-lg border border-white/20" onClick={(e)=>e.stopPropagation()}>
-              <div className="p-4 border-b border-white/10 text-lg font-semibold">공지 수정</div>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={()=>setEditNotice(null)}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="card-cyber text-white max-w-lg w-full mx-4" onClick={(e)=>e.stopPropagation()}>
+              <div className="p-4 border-b border-cyan-500/20 text-lg font-semibold neon-text-primary">공지 수정</div>
               <div className="p-4 space-y-3">
-                <input className="w-full rounded bg-black/30 border border-white/20 px-3 py-2 text-sm text-white" value={editNotice.title} onChange={e=>setEditNotice(v=>v?{...v, title:e.target.value}:v)} />
-                <textarea className="w-full rounded bg-black/30 border border-white/20 px-3 py-2 text-sm text-white min-h-[160px]" value={editNotice.content} onChange={e=>setEditNotice(v=>v?{...v, content:e.target.value}:v)} />
+                <input className="input-cyber w-full px-3 py-2 text-sm" value={editNotice.title} onChange={e=>setEditNotice(v=>v?{...v, title:e.target.value}:v)} />
+                <textarea className="input-cyber w-full px-3 py-2 text-sm min-h-[160px]" value={editNotice.content} onChange={e=>setEditNotice(v=>v?{...v, content:e.target.value}:v)} />
               </div>
               <div className="p-4 flex justify-end gap-2">
-                <Button variant="outline" className="glass border-white/30 text-white" onClick={()=>setEditNotice(null)}>취소</Button>
-                <Button className="glass-button" onClick={async ()=>{
+                <Button className="btn-cyber-outline text-sm px-4 py-2" onClick={()=>setEditNotice(null)}>취소</Button>
+                <Button className="btn-cyber text-sm px-4 py-2" onClick={async ()=>{
                   if(!editNotice) return
                   const ok = await fetch(`${API}/admin/notices/${editNotice.id}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...authService.getAuthHeaders() }, body: JSON.stringify({ title: editNotice.title, content: editNotice.content }) })
                   if (ok.ok) {
@@ -233,64 +274,81 @@ export default function AdminPage() {
                   }
                 }}>저장</Button>
               </div>
-            </div>
+            </motion.div>
           </div>
         )}
 
         {tab==='servers' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="bg-white/10 border-white/20">
-            <CardHeader><CardTitle className="text-white">서버 목록 ({servers.length})</CardTitle></CardHeader>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <Card className="card-cyber border-purple-500/30">
+            <CardHeader><CardTitle className="neon-text-purple">서버 목록 ({servers.length})</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-2">
                 {servers.map(s => (
                   <ServerRow key={s.id} s={s} api={API} del={del} openEdit={openEdit} />
                 ))}
-                {servers.length===0 && <div className="text-white/60">없음</div>}
+                {servers.length===0 && <div className="text-purple-400/60">없음</div>}
               </div>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
         )}
 
         {tab==='timetables' && (
-          <Card className="bg-white/10 border-white/20">
-            <CardHeader><CardTitle className="text-white">스케줄 목록 ({timetables.length})</CardTitle></CardHeader>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+          <Card className="card-cyber border-emerald-500/30">
+            <CardHeader><CardTitle className="text-emerald-400">스케줄 목록 ({timetables.length})</CardTitle></CardHeader>
             <CardContent>
               <div className="max-h-[360px] overflow-auto space-y-2">
                 {timetables.map(t => (
-                  <div key={t.id} className="flex items-center justify-between text-white/80 text-sm bg-white/5 rounded px-3 py-2">
+                  <div key={t.id} className="flex items-center justify-between text-white/80 text-sm bg-emerald-500/10 rounded-xl px-3 py-2 border border-emerald-500/20">
                     <div className="truncate">{`${t.userNickname ?? ('유저#'+(t.userId ?? '-'))} 님이 ${t.serverName ?? ('서버#'+(t.serverId ?? '-'))}에 ${t.gameName ?? '게임'} 예약 등록 (${t.slot})`}</div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={async ()=>{ await del(`/admin/timetables/${t.id}`); setTimetables(prev=>prev.filter(x=>x.id!==t.id)) }}>삭제</Button>
-                      <Button size="sm" className="glass-button" onClick={()=>openEdit('timetable', t)}>수정</Button>
+                      <Button size="sm" className="btn-cyber-pink-outline text-xs px-3 py-1" onClick={async ()=>{ await del(`/admin/timetables/${t.id}`); setTimetables(prev=>prev.filter(x=>x.id!==t.id)) }}>삭제</Button>
+                      <Button size="sm" className="btn-cyber-emerald text-xs px-3 py-1" onClick={()=>openEdit('timetable', t)}>수정</Button>
                     </div>
                   </div>
                 ))}
-                {timetables.length===0 && <div className="text-white/60">없음</div>}
+                {timetables.length===0 && <div className="text-emerald-400/60">없음</div>}
               </div>
             </CardContent>
           </Card>
+          </motion.div>
         )}
 
         {tab==='parties' && (
-        <Card className="bg-white/10 border-white/20">
-          <CardHeader><CardTitle className="text-white">파티 목록 ({parties.length})</CardTitle></CardHeader>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+        <Card className="card-cyber border-pink-500/30">
+          <CardHeader><CardTitle className="neon-text-accent">파티 목록 ({parties.length})</CardTitle></CardHeader>
           <CardContent>
             <div className="max-h-[360px] overflow-auto space-y-2">
               {parties.map(p => (
-                <div key={p.id} className="flex items-center justify-between text-white/80 text-sm bg-white/5 rounded px-3 py-2">
+                <div key={p.id} className="flex items-center justify-between text-white/80 text-sm bg-pink-500/10 rounded-xl px-3 py-2 border border-pink-500/20">
                   <div className="truncate">{`${p.creatorNickname ?? ('유저#'+(p.creatorId ?? '-'))} 님이 ${p.serverName ?? ('서버#'+(p.serverId ?? '-'))}에서 ${p.gameName ?? '게임'} 파티 모집 (${p.slot}) · 정원 ${p.capacity}명 · 참가 ${p.participants}명`}</div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={async ()=>{ await del(`/admin/parties/${p.id}`); setParties(prev=>prev.filter(x=>x.id!==p.id)) }}>삭제</Button>
-                    <Button size="sm" className="glass-button" onClick={()=>openEdit('party', p)}>수정</Button>
+                    <Button size="sm" className="btn-cyber-outline text-xs px-3 py-1" onClick={async ()=>{ await del(`/admin/parties/${p.id}`); setParties(prev=>prev.filter(x=>x.id!==p.id)) }}>삭제</Button>
+                    <Button size="sm" className="btn-cyber-pink text-xs px-3 py-1" onClick={()=>openEdit('party', p)}>수정</Button>
                   </div>
                 </div>
               ))}
-              {parties.length===0 && <div className="text-white/60">없음</div>}
+              {parties.length===0 && <div className="text-pink-400/60">없음</div>}
             </div>
           </CardContent>
         </Card>
+        </motion.div>
         )}
       </div>
     </div>
@@ -315,30 +373,30 @@ function ServerRow({ s, api, del, openEdit }: { s: any; api: string; del: (p:str
     setOpen(v=>!v)
   }
   return (
-    <div className="text-white/80 text-sm bg-white/5 rounded">
+    <div className="text-white/80 text-sm bg-purple-500/10 rounded-xl border border-purple-500/20">
       <div className="flex items-center justify-between px-3 py-2">
         <button className="text-left flex-1" onClick={toggle}>
-          <div className="truncate">{`${s.name} 서버 · 인원 ${s.members}명 · 서버장 ${s.ownerNickname ?? s.ownerId ?? '-' } · 초기화 ${s.resetTime ?? '-'}`}</div>
+          <div className="truncate"><span className="text-purple-400 font-medium">{s.name}</span> 서버 · 인원 <span className="text-cyan-400">{s.members}</span>명 · 서버장 <span className="text-pink-400">{s.ownerNickname ?? s.ownerId ?? '-' }</span> · 초기화 <span className="text-emerald-400">{s.resetTime ?? '-'}</span></div>
         </button>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" className="glass border-white/30 text-white" onClick={async ()=>{ await del(`/admin/servers/${s.id}`) }}>삭제</Button>
-          <Button size="sm" className="glass-button" onClick={()=>openEdit('server', s)}>수정</Button>
+          <Button size="sm" className="btn-cyber-pink-outline text-xs px-3 py-1" onClick={async ()=>{ await del(`/admin/servers/${s.id}`) }}>삭제</Button>
+          <Button size="sm" className="btn-cyber-purple text-xs px-3 py-1" onClick={()=>openEdit('server', s)}>수정</Button>
         </div>
       </div>
       {open && (
         <div className="px-3 pb-2">
-          <div className="text-white/60 text-xs mb-1">참가 기록</div>
+          <div className="text-purple-400/80 text-xs mb-1">참가 기록</div>
           {loading ? (
-            <div className="text-white/60 text-xs py-2">불러오는 중...</div>
+            <div className="text-purple-400/60 text-xs py-2">불러오는 중...</div>
           ) : (
-            <div className="max-h-40 overflow-auto divide-y divide-white/10">
-              {joins.length===0 && <div className="py-2 text-white/60 text-xs">기록 없음</div>}
+            <div className="max-h-40 overflow-auto divide-y divide-purple-500/20">
+              {joins.length===0 && <div className="py-2 text-purple-400/60 text-xs">기록 없음</div>}
               {joins.slice().reverse().map(j => {
                 const who = j.userId ? `유저#${j.userId}${j.userNickname?`(${j.userNickname})`:''}` : '유저-'
                 return (
                   <div key={j.id} className="py-1">
-                    <div className="font-mono text-[11px] text-white/60">#{j.id} {j.occurredAt}</div>
-                    <div>{`JOIN_SERVER · ${who} · ${j.details ?? ''}`}</div>
+                    <div className="font-mono text-[11px] text-purple-400/60">#{j.id} {j.occurredAt}</div>
+                    <div className="text-white/80">{`JOIN_SERVER · ${who} · ${j.details ?? ''}`}</div>
                   </div>
                 )
               })}

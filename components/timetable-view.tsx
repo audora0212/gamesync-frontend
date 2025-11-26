@@ -239,26 +239,26 @@ export function TimetableView({ serverId }: TimetableViewProps) {
 
   if (isLoading) {
     return (
-      <Card className="glass border-white/20 h-full">
+      <Card className="card-cyber border-emerald-500/30 h-full">
         <CardHeader>
-          <CardTitle className="text-white flex items-center">
-            <Calendar className="mr-2 h-5 w-5" />합류 시간표
+          <CardTitle className="text-emerald-400 flex items-center">
+            <Calendar className="mr-2 h-5 w-5 text-emerald-400" />합류 시간표
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-white/70">로딩 중...</div>
+          <div className="text-muted-foreground">로딩 중...</div>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card className="glass border-white/20 h-full">
+    <Card className="card-cyber border-emerald-500/30 h-full">
       <CardHeader>
         <div className="flex flex-col sm:flex-row items-start sm:items-start justify-start sm:justify-between gap-2">
           <div className="min-w-0">
-            <CardTitle className="text-white flex items-center break-keep">
-              <Calendar className="mr-2 h-5 w-5 shrink-0" />
+            <CardTitle className="text-emerald-400 flex items-center break-keep">
+              <Calendar className="mr-2 h-5 w-5 shrink-0 text-emerald-400" />
               <span className="truncate">합류 시간표</span>
             </CardTitle>
             <CardDescription className="text-white/70 break-keep text-sm">
@@ -279,7 +279,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                     }
                   }}
                   variant="outline"
-                  className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm"
+                  className="btn-cyber-outline text-sm"
                 >
                   합류 시간 취소하기
                 </Button>
@@ -290,7 +290,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
               >
                 <Button
                   onClick={() => setIsNewEntryOpen(true)}
-                  className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-xs sm:text-sm rainbow-border"
+                  className="btn-cyber-emerald text-xs sm:text-sm"
                   disabled={isJoinedSomeParty}
                 >
                   <Plus className="mr-1 h-4 w-4" /> {hasOwnEntryToday ? "합류 시간 다시 정하기" : "새 합류 시간 예약하기"}
@@ -302,9 +302,9 @@ export function TimetableView({ serverId }: TimetableViewProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         {userSchedules.length > 0 ? (
-          <div className="glass rounded-lg p-4 overflow-x-auto">
-            <h3 className="text-white font-medium mb-4 flex items-center text-sm">
-              <Users className="mr-2 h-5 w-5" />오늘의 합류 예정 ({userSchedules.length}명)
+          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 overflow-x-auto">
+            <h3 className="text-emerald-400 font-medium mb-4 flex items-center text-sm">
+              <Users className="mr-2 h-5 w-5 text-emerald-400" />오늘의 합류 예정 ({userSchedules.length}명)
             </h3>
             <div className="w-full sm:min-w-[600px]">
               <div className="flex items-center border-b border-white/20 pb-2 relative">
@@ -397,11 +397,11 @@ export function TimetableView({ serverId }: TimetableViewProps) {
             </div>
           </div>
         ) : (
-          <div className="glass rounded-lg p-8 text-center">
+          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-8 text-center">
             <div className="text-white/60 mb-3 text-sm">아직 등록된 합류 시간이 없습니다.</div>
             <Button
               onClick={() => setIsNewEntryOpen(true)}
-              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+              className="btn-cyber-emerald text-sm"
               disabled={isJoinedSomeParty}
               title={isJoinedSomeParty ? "파티를 떠난 후에 합류 시간을 등록할 수 있습니다" : undefined}
             >
@@ -413,8 +413,8 @@ export function TimetableView({ serverId }: TimetableViewProps) {
         {/* 파티 모집 헤더 (상단) */}
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="text-white font-medium text-sm flex items-center">
-              <PartyPopper className="mr-2 h-5 w-5" />파티 모집
+            <h3 className="text-pink-400 font-medium text-sm flex items-center">
+              <PartyPopper className="mr-2 h-5 w-5 text-pink-400" />파티 모집
             </h3>
           </div>
           <div className="pt-1"
@@ -422,7 +422,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           >
             <Button
               onClick={() => setIsNewPartyOpen(true)}
-              className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-xs sm:text-sm rainbow-border"
+              className="btn-cyber-pink text-xs sm:text-sm"
               disabled={isJoinedSomeParty}
             >
               <Plus className="mr-1 h-4 w-4" /> 새 파티 모집하기
@@ -431,13 +431,13 @@ export function TimetableView({ serverId }: TimetableViewProps) {
         </div>
 
         {/* 파티 모집 영역 (리스트 박스) */}
-        <div className="glass rounded-lg p-4">
+        <div className="bg-pink-500/10 border border-pink-500/20 rounded-xl p-4">
           <div className="space-y-2">
             {parties.map((p) => {
               const full = p.full || p.participants >= p.capacity
               const joined = !!p.joined
               return (
-                <div key={p.id} className={`p-3 glass rounded-lg ${joined ? "bg-white/10" : ""}`}>
+                <div key={p.id} className={`p-3 bg-pink-500/5 border border-pink-500/20 rounded-xl ${joined ? "bg-pink-500/15" : ""}`}>
                   <div className="flex items-center justify-between mb-1 text-sm">
                     <div className="text-white font-medium text-[12px]">
                       {new Date(p.slot).toLocaleString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })} · {p.gameName}
@@ -453,7 +453,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                         <Button
                           size="sm"
                           onClick={() => setDeleteParty(p)}
-                          className="glass border-red-400/60 text-red-400 hover:bg-red-500/15 hover:text-red-300 text-xs"
+                          className="bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 hover:text-red-300 text-xs"
                         >
                           파티 삭제
                         </Button>
@@ -471,7 +471,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                               toast.error("파티 떠나기 실패")
                             }
                           }}
-                          className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-xs"
+                          className="btn-cyber-pink-outline text-xs"
                         >
                           파티 떠나기
                         </Button>
@@ -494,7 +494,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                               toast.error("파티 참가 실패", { description: "정원이 찼거나 오류가 발생했습니다." })
                             }
                           }}
-                          className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-xs"
+                          className="btn-cyber-pink text-xs"
                         >
                           {full ? "정원 마감" : "파티 참가하기"}
                         </Button>
@@ -510,7 +510,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
                 <div className="mt-3">
                   <Button
                     onClick={() => setIsNewPartyOpen(true)}
-                    className="glass border-white/30 text-white hover:bg-black/10 hover:text-white text-sm rainbow-border"
+                    className="btn-cyber-pink text-sm"
                     disabled={isJoinedSomeParty}
                     title={isJoinedSomeParty ? "파티를 떠난 후에 파티를 모집할 수 있습니다" : undefined}
                   >
@@ -549,17 +549,17 @@ export function TimetableView({ serverId }: TimetableViewProps) {
 
         {/* 파티 삭제 확인 모달 */}
         <ConfirmDialog open={!!deleteParty} onOpenChange={(open) => { if (!open) setDeleteParty(null) }}>
-          <ConfirmContent className="glass border-white/20 max-w-sm">
+          <ConfirmContent className="card-cyber border-red-500/30 max-w-sm">
             <ConfirmHeader>
-              <ConfirmTitle className="text-white">파티 삭제</ConfirmTitle>
+              <ConfirmTitle className="text-red-400">파티 삭제</ConfirmTitle>
             </ConfirmHeader>
-            <div className="text-white/80 text-sm">이 파티를 삭제하시겠습니까?</div>
+            <div className="text-white/80 text-sm p-4">이 파티를 삭제하시겠습니까?</div>
             <ConfirmFooter>
               <ConfirmClose asChild>
-                <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
+                <Button variant="outline" className="btn-cyber-outline text-sm px-4 py-2">취소</Button>
               </ConfirmClose>
               <Button
-                className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300"
+                className="bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 text-sm px-4 py-2"
                 onClick={async () => {
                   if (!deleteParty) return
                   try {
@@ -584,7 +584,7 @@ export function TimetableView({ serverId }: TimetableViewProps) {
             placeholder="게임 이름으로 필터"
             value={gameFilter}
             onChange={(e) => setGameFilter(e.target.value)}
-            className="glass border-white/30 text-white placeholder:text-white/50 text-sm"
+            className="input-cyber text-sm"
             inputMode="search"
             // 모바일 확대 방지: iOS에서 폰트 16px 이상이면 확대 방지
             style={{ fontSize: 16 }}
@@ -592,8 +592,8 @@ export function TimetableView({ serverId }: TimetableViewProps) {
           <Button
             onClick={() => setSortByGame(!sortByGame)}
             variant="outline"
-            className={`glass border-white/30 text-white hover:bg-black/10 text-xs sm:text-sm ${
-              sortByGame ? "bg-white/10" : ""
+            className={`btn-cyber-outline text-xs sm:text-sm ${
+              sortByGame ? "bg-cyan-500/20" : ""
             }`}
           >
             <Filter className="mr-1 h-4 w-4" /> 게임순
@@ -602,15 +602,15 @@ export function TimetableView({ serverId }: TimetableViewProps) {
 
         <div className="space-y-2 max-h-64 sm:max-h-96 overflow-y-auto">
           {entries.map((entry) => (
-            <div key={entry.id} className="p-3 glass rounded-lg">
+            <div key={entry.id} className="p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-xl hover:bg-cyan-500/15 transition-colors">
               <div className="flex items-center justify-between mb-1 text-sm">
                 <div className="flex items-center space-x-1">
-                  <Clock className="h-4 w-4 text-white/60" />
+                  <Clock className="h-4 w-4 text-cyan-400" />
                   <span className="text-white font-medium text-[12px]">
                     {formatDateTime(entry.slot)}
                   </span>
                 </div>
-                <Badge variant={entry.custom ? "secondary" : "default"} className="text-[10px]">
+                <Badge variant={entry.custom ? "secondary" : "default"} className={`text-[10px] ${entry.custom ? "bg-purple-500/20 text-purple-400" : "bg-cyan-500/20 text-cyan-400"}`}>
                   {entry.custom ? "커스텀" : "기본"}
                 </Badge>
               </div>
