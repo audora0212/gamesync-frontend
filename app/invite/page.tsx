@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { motion } from "framer-motion"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { serverService } from "@/lib/server-service"
@@ -13,7 +12,17 @@ import { Users, Clock, Server, UserPlus } from "lucide-react"
 
 export default function InvitePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen grid-bg"><Navbar /></div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex flex-col">
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(5,242,219,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(5,242,219,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        </div>
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-10 h-10 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin" />
+        </div>
+      </div>
+    }>
       <InviteInner />
     </Suspense>
   )
@@ -52,7 +61,6 @@ function InviteInner() {
         setInfo({ id: s.id as number, name: s.name, members: s.members?.length || 0, resetTime: s.resetTime })
       } catch (e: any) {
         if (typeof e?.message === 'string' && e.message.includes('UNAUTHORIZED')) {
-          // fetch-with-auth가 로그인으로 이동; 로그인 후 이 페이지로 복귀하도록 쿼리 보존
           const returnUrl = `/invite?code=${encodeURIComponent(code)}`
           toast.error("로그인을 먼저 해주세요")
           router.replace(`/auth/login?return=${encodeURIComponent(returnUrl)}`)
@@ -65,55 +73,63 @@ function InviteInner() {
   }, [code, router])
 
   return (
-    <div className="min-h-screen grid-bg">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* 배경 효과 */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(5,242,219,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(5,242,219,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-neon-green/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-neon-cyan/10 rounded-full blur-[150px]" />
+      </div>
+
       <Navbar />
-      <Dialog open={open} onOpenChange={(v)=>{setOpen(v); if(!v) {/* stay */}}}>
-        <DialogContent className="card-cyber border-emerald-500/30 max-w-sm">
-          <DialogHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-xl bg-emerald-500/20">
-                <UserPlus className="w-5 h-5 text-emerald-400" />
+
+      <main className="flex-1 z-10">
+        <Dialog open={open} onOpenChange={(v)=>{setOpen(v); if(!v) {/* stay */}}}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 rounded-xl bg-neon-green/20 shadow-[0_0_15px_rgba(0,255,136,0.2)]">
+                  <UserPlus className="w-5 h-5 text-neon-green" />
+                </div>
+                <DialogTitle className="text-neon-green drop-shadow-[0_0_10px_rgba(0,255,136,0.5)] font-display">서버 참가 확인</DialogTitle>
               </div>
-              <DialogTitle className="text-emerald-400 text-lg">서버 참가 확인</DialogTitle>
+              <DialogDescription>아래 정보를 확인하고 참가를 진행하세요.</DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-3">
+              <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/10">
+                <span className="text-muted-foreground flex items-center gap-2 text-sm"><Server className="w-4 h-4 text-neon-cyan" />서버 이름</span>
+                <span className="text-neon-cyan font-medium">{info?.name || ""}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/10">
+                <span className="text-muted-foreground flex items-center gap-2 text-sm"><Users className="w-4 h-4 text-neon-magenta" />참여자 수</span>
+                <span className="text-neon-magenta font-medium">{info?.members ?? 0}명</span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/10">
+                <span className="text-muted-foreground flex items-center gap-2 text-sm"><Clock className="w-4 h-4 text-neon-pink" />초기화 시간</span>
+                <span className="text-neon-pink font-medium">{info?.resetTime || ""}</span>
+              </div>
             </div>
-            <DialogDescription className="text-white/60">아래 정보를 확인하고 참가를 진행하세요.</DialogDescription>
-          </DialogHeader>
-          <div className="p-4 space-y-3 text-white">
-            <div className="flex justify-between items-center">
-              <span className="text-white/70 flex items-center gap-2"><Server className="w-4 h-4" />서버 이름</span>
-              <span className="text-cyan-400 font-medium">{info?.name || ""}</span>
+            <div className="flex justify-end space-x-2 pt-2">
+              <DialogClose asChild>
+                <Button variant="outline" onClick={()=>router.push("/")}>취소</Button>
+              </DialogClose>
+              <Button onClick={async()=>{
+                try{
+                  await serverService.joinByCode(code)
+                  toast.success("서버 참가 완료")
+                  router.replace(info ? `/server/${info.id}` : "/dashboard")
+                }catch{
+                  toast.info("이미 서버에 참여중입니다")
+                  router.replace(info ? `/server/${info.id}` : "/dashboard")
+                }
+              }}>
+                <UserPlus className="w-4 h-4 mr-2" />
+                참가
+              </Button>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-white/70 flex items-center gap-2"><Users className="w-4 h-4" />참여자 수</span>
-              <span className="text-purple-400">{info?.members ?? 0}명</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-white/70 flex items-center gap-2"><Clock className="w-4 h-4" />초기화 시간</span>
-              <span className="text-pink-400">{info?.resetTime || ""}</span>
-            </div>
-          </div>
-          <div className="flex justify-end space-x-2 pt-2">
-            <DialogClose asChild>
-              <Button className="btn-cyber-outline text-sm px-4 py-2" onClick={()=>router.push("/")}>취소</Button>
-            </DialogClose>
-            <Button className="btn-cyber-emerald text-sm px-4 py-2" onClick={async()=>{
-              try{
-                await serverService.joinByCode(code)
-                toast.success("서버 참가 완료")
-                router.replace(info ? `/server/${info.id}` : "/dashboard")
-              }catch{
-                toast.info("이미 서버에 참여중입니다")
-                router.replace(info ? `/server/${info.id}` : "/dashboard")
-              }
-            }}>
-              <UserPlus className="w-4 h-4 mr-2" />
-              참가
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      </main>
     </div>
   )
 }
-
-
