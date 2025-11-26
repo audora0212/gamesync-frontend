@@ -19,14 +19,31 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-10 w-full items-center justify-between whitespace-nowrap rounded-xl border border-input/60 bg-black/10 backdrop-blur-sm px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      // 기본 스타일
+      "flex h-11 w-full items-center justify-between whitespace-nowrap rounded-xl px-4 py-2 text-sm font-body",
+      // 글래스모피즘 배경
+      "bg-white/[0.03] backdrop-blur-xl border border-white/[0.08]",
+      // 내부 글로우
+      "shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)]",
+      // 트랜지션
+      "transition-all duration-300 ease-out",
+      // 호버
+      "hover:border-white/[0.15] hover:bg-white/[0.04]",
+      // 포커스
+      "focus:outline-none focus:border-neon-cyan/40 focus:bg-white/[0.05]",
+      "focus:shadow-[0_0_20px_rgba(5,242,219,0.15),inset_0_1px_1px_rgba(5,242,219,0.05)]",
+      // 플레이스홀더
+      "data-[placeholder]:text-muted-foreground/50",
+      // 비활성화
+      "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-white/[0.08]",
+      "[&>span]:line-clamp-1",
       className
     )}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50" />
+      <ChevronDown className="h-4 w-4 text-neon-cyan/70" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ))
@@ -39,7 +56,7 @@ const SelectScrollUpButton = React.forwardRef<
   <SelectPrimitive.ScrollUpButton
     ref={ref}
     className={cn(
-      "flex cursor-default items-center justify-center py-1",
+      "flex cursor-default items-center justify-center py-1 text-neon-cyan/70",
       className
     )}
     {...props}
@@ -56,7 +73,7 @@ const SelectScrollDownButton = React.forwardRef<
   <SelectPrimitive.ScrollDownButton
     ref={ref}
     className={cn(
-      "flex cursor-default items-center justify-center py-1",
+      "flex cursor-default items-center justify-center py-1 text-neon-cyan/70",
       className
     )}
     {...props}
@@ -75,7 +92,18 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-xl border border-white/10 bg-popover/80 backdrop-blur-md text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-select-content-transform-origin]",
+        "relative z-50 max-h-[--radix-select-content-available-height] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-xl",
+        // 글래스모피즘 강화
+        "bg-white/[0.02] backdrop-blur-2xl border border-white/[0.08]",
+        // 다중 그림자 (내부 글로우 + 외부 글로우)
+        "shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_0_30px_rgba(5,242,219,0.08),0_25px_50px_rgba(0,0,0,0.4)]",
+        // 애니메이션
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
+        "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "origin-[--radix-select-content-transform-origin]",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
         className
@@ -105,7 +133,10 @@ const SelectLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={cn("px-2 py-1.5 text-sm font-semibold", className)}
+    className={cn(
+      "px-3 py-2 text-xs font-semibold text-neon-cyan/70 uppercase tracking-wider",
+      className
+    )}
     {...props}
   />
 ))
@@ -118,14 +149,21 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex w-full cursor-default select-none items-center rounded-lg py-2 pl-3 pr-8 text-sm font-body outline-none",
+      // 호버/포커스 - 글래스모피즘
+      "focus:bg-neon-cyan/[0.08] focus:text-neon-cyan focus:shadow-[inset_0_1px_1px_rgba(5,242,219,0.1)]",
+      "hover:bg-white/[0.04]",
+      // 트랜지션
+      "transition-all duration-150",
+      // 비활성화
+      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}
   >
-    <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
+    <span className="absolute right-2 flex h-4 w-4 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
+        <Check className="h-4 w-4 text-neon-cyan" />
       </SelectPrimitive.ItemIndicator>
     </span>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -139,7 +177,7 @@ const SelectSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-muted", className)}
+    className={cn("-mx-1 my-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent", className)}
     {...props}
   />
 ))
