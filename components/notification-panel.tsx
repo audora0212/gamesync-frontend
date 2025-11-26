@@ -7,7 +7,7 @@ import { friendService } from "@/lib/friend-service"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { toast } from "sonner"
-import { Bell, Trash2, X } from "lucide-react"
+import { Bell, Trash2, X, Check, XCircle, ExternalLink } from "lucide-react"
 
 interface Props {
   open: boolean
@@ -37,12 +37,10 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
         setUnread(data.unreadCount)
         onUnreadChange?.(data.unreadCount)
 
-        // 패널을 연 시점에 모두 읽음 처리
         const unreadIds = data.notifications.filter(n => !n.read).map(n => n.id)
         if (unreadIds.length > 0) {
           await Promise.allSettled(unreadIds.map(id => notificationService.markAsRead(id)))
           if (!active) return
-          // 로컬 상태 업데이트 및 배지 제거
           setItems(prev => prev.map(i => ({ ...i, read: true })))
           setUnread(0)
           onUnreadChange?.(0)
@@ -68,13 +66,6 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
     return () => document.removeEventListener("mousedown", onOutside)
   }, [open, onClose])
 
-  const heightClass = useMemo(() => {
-    // 아이템 수에 따라 높이 동적 조절: 최대 420px, 최소 160px
-    const base = Math.min(Math.max(items.length * 80 + 80, 160), 420)
-    return `max-h-[${base}px]`
-  }, [items.length])
-
-  // 개별 읽음 버튼은 제거. 수동 호출이 필요한 내부 시나리오만 유지할 경우 아래 유틸 사용
   const markRead = async (id: number) => {
     try {
       await notificationService.markAsRead(id)
@@ -82,7 +73,6 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
     } catch {}
   }
 
-  // 메시지가 JSON이면 파싱, 아니면 null
   function parseMessage<T = any>(msg: string | null): T | null {
     if (!msg) return null
     try { return JSON.parse(msg) as T } catch { return null }
@@ -112,18 +102,24 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
   }
 
   const panel = (
-    <div className={`fixed top-16 right-4 z-[11000] transition ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-      <div ref={panelRef} className={`w-[360px] card-cyber border-yellow-500/30 rounded-xl overflow-hidden`}>
-        <div className="px-4 py-3 border-b border-yellow-500/20 flex items-center justify-between bg-yellow-500/10">
-          <div className="text-sm text-yellow-400 flex items-center gap-2">
-            <Bell className="w-4 h-4" />
-            알림 {unread > 0 ? `(미읽음 ${unread})` : ""}
-          </div>
+    <div className={`fixed top-16 right-4 z-[11000] transition-all duration-300 ${open ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
+      <div
+        ref={panelRef}
+        className="w-[360px] bg-card/95 backdrop-blur-xl border border-neon-yellow/30 rounded-xl overflow-hidden shadow-[0_0_30px_rgba(255,215,0,0.15)]"
+      >
+        {/* Header */}
+        <div className="px-4 py-3 border-b border-neon-yellow/20 flex items-center justify-between bg-neon-yellow/5">
           <div className="flex items-center gap-2">
+            <Bell className="w-4 h-4 text-neon-yellow" />
+            <span className="text-sm font-medium text-neon-yellow">
+              알림 {unread > 0 ? `(미읽음 ${unread})` : ""}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
-              className="text-yellow-400/70 hover:text-yellow-300 hover:bg-yellow-500/20"
+              className="text-neon-yellow/70 hover:text-neon-yellow hover:bg-neon-yellow/10"
               onClick={async () => {
                 try {
                   await notificationService.clearAll()
@@ -138,14 +134,29 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
               <Trash2 className="w-4 h-4 mr-1" />
               비우기
             </Button>
-            <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10" onClick={onClose}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-neon-yellow hover:bg-neon-yellow/10"
+              onClick={onClose}
+            >
               <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
-        <div className={`p-2 overflow-y-auto ${heightClass}`}>
-          {loading && <div className="text-white/70 p-4">불러오는 중...</div>}
-          {!loading && items.length === 0 && <div className="text-white/60 p-4 text-sm">알림이 없습니다.</div>}
+
+        {/* Content */}
+        <div className="p-2 overflow-y-auto max-h-[420px]">
+          {loading && (
+            <div className="flex items-center justify-center py-8">
+              <div className="w-6 h-6 border-2 border-neon-yellow border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
+          {!loading && items.length === 0 && (
+            <div className="text-muted-foreground text-sm p-4 text-center">
+              알림이 없습니다.
+            </div>
+          )}
           {!loading && items
             .slice()
             .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -157,7 +168,7 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
             const isFriendRequest = (payload?.kind === 'friend_request' && typeof payload.requestId === 'number') || !!friendMarker
             const inviteId = payload?.kind === 'server_invite' && typeof payload.inviteId === 'number' ? payload.inviteId : undefined
             const fromNickname = payload?.fromNickname || (n.message && (n.message.match(/\"fromNickname\":\"([^\"]+)\"/)?.[1])) || undefined
-            // 표시할 본문 생성 로직 (메시지 우선, 없으면 종류별 구성)
+
             let displayText: string = ''
             if (isFriendRequest) {
               displayText = `${fromNickname ?? '상대방'} 님이 친구 요청을 보냈습니다.`
@@ -186,41 +197,53 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
             if (!displayText) {
               displayText = (n.message && !(isFriendRequest || (isInvite && inviteMarker)) ? n.message : '') || n.title || ''
             }
+
             return (
-              <Card key={n.id} className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3 mb-2 hover:bg-yellow-500/15 transition-colors">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    {/* 제목은 숨기고, 최종 본문만 표시 (길면 말줄임) */}
-                    <div className="text-sm text-white mt-0.5 whitespace-nowrap truncate max-w-[280px]">{displayText}</div>
-                  </div>
-                  <div className="flex items-center gap-1" />
+              <Card key={n.id} className="p-3 mb-2 hover:border-neon-yellow/40">
+                <div className="text-sm text-foreground/90 whitespace-nowrap truncate max-w-[310px]">
+                  {displayText}
                 </div>
-                {/* 서버 초대 알림이면 확인 페이지로 이동 및 거절 제공 */}
+
+                {/* 서버 초대 알림 */}
                 {inviteId && (
                   <div className="mt-2 flex gap-2">
                     <Button
                       size="sm"
-                      className="btn-cyber-emerald text-xs"
                       onClick={() => {
                         try { window.location.href = `/invite/by-id?inviteId=${inviteId}` } catch {}
                       }}
                     >
+                      <ExternalLink className="w-3 h-3 mr-1" />
                       확인
                     </Button>
                     {onInviteAction && (
-                      <Button size="sm" variant="outline" className="btn-cyber-outline text-xs" onClick={() => handleInviteDecision(n, false, inviteId)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleInviteDecision(n, false, inviteId)}
+                      >
                         거절
                       </Button>
                     )}
                   </div>
                 )}
-                {/* 친구 요청 알림이면 수락/거절 버튼 */}
+
+                {/* 친구 요청 알림 */}
                 {isFriendRequest && (
                   <div className="mt-2 flex gap-2">
-                    <Button size="sm" className="btn-cyber-emerald text-xs" onClick={() => handleFriendRequestDecision(n, payload!.requestId!, true)}>
+                    <Button
+                      size="sm"
+                      onClick={() => handleFriendRequestDecision(n, payload!.requestId!, true)}
+                    >
+                      <Check className="w-3 h-3 mr-1" />
                       수락
                     </Button>
-                    <Button size="sm" variant="outline" className="btn-cyber-outline text-xs" onClick={() => handleFriendRequestDecision(n, payload!.requestId!, false)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleFriendRequestDecision(n, payload!.requestId!, false)}
+                    >
+                      <XCircle className="w-3 h-3 mr-1" />
                       거절
                     </Button>
                   </div>
@@ -236,5 +259,3 @@ export function NotificationPanel({ open, onClose, onInviteAction, onUnreadChang
   if (!mounted) return null
   return createPortal(panel, document.body)
 }
-
-
