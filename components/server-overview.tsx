@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { Users, Crown, Settings as SettingsIcon, BarChart3, UserPlus } from "lucide-react"
+import { Users, Crown, Settings as SettingsIcon, BarChart3, UserPlus, Trash2 } from "lucide-react"
 import { Dialog as ConfirmDialog, DialogContent as ConfirmContent, DialogHeader as ConfirmHeader, DialogFooter as ConfirmFooter, DialogTitle as ConfirmTitle, DialogClose as ConfirmClose } from "@/components/ui/dialog"
 import {
   Dialog,
@@ -160,92 +160,93 @@ export function ServerOverview({
 
   return (
     <>
-    <Card className="card-cyber h-full flex flex-col">
+    <Card className="flex flex-col">
       <CardHeader>
-        <CardTitle className="neon-text-primary flex items-center">
-          <Users className="mr-2 h-5 w-5 text-cyan-400" /> 서버 개요
+        <CardTitle className="text-neon-cyan drop-shadow-[0_0_10px_rgba(5,242,219,0.5)] flex items-center">
+          <Users className="mr-2 h-5 w-5 text-neon-cyan" /> 서버 개요
         </CardTitle>
-        <CardDescription className="text-white/70">
+        <CardDescription>
           서버 정보와 멤버를 관리합니다
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6 flex-grow">
+      <CardContent className="space-y-6">
         {/* 서버 기본 정보 */}
         <div className="space-y-3">
-          <h3 className="text-cyan-400 font-medium">서버 정보</h3>
-          <div className="space-y-2 text-sm text-white/70">
+          <h3 className="text-neon-cyan font-medium text-sm">서버 정보</h3>
+          <div className="space-y-2 text-sm text-foreground/70">
             <div className="flex justify-between">
               <span>서버 이름:</span>
-              <span className="text-white">{server.name}</span>
+              <span className="text-foreground">{server.name}</span>
             </div>
             <div className="flex justify-between">
               <span>초기화 시간:</span>
-              <span className="text-emerald-400">{server.resetTime}</span>
+              <span className="text-neon-green">{server.resetTime}</span>
             </div>
             <div className="flex justify-between">
               <span>총 멤버:</span>
-              <span className="text-purple-400">{server.members.length}명</span>
+              <span className="text-neon-magenta">{server.members.length}명</span>
             </div>
             {/* 초대 */}
-            <div className="pt-2 space-y-2">
-              <div className="text-pink-400 mb-1">초대</div>
-              <div className="flex items-center justify-center gap-2 w-full">
-                {isMember && (
-                  <>
-                    <Button
-                      className="btn-cyber-emerald text-sm px-3 py-2"
-                      onClick={async () => {
-                        setInviteOpen(true)
-                        try {
-                          const f = await friendService.getFriends()
-                          setFriends(f)
-                        } catch {
-                          toast.error("친구 목록 로드 실패")
-                        }
-                      }}
-                    >
-                      <UserPlus className="h-4 w-4 mr-1" /> 친구 초대
-                    </Button>
-                    <Button
-                      className="btn-cyber-purple-outline text-sm px-3 py-2"
-                      onClick={async () => {
-                        const origin = typeof window !== 'undefined' ? window.location.origin : ''
-                        const link = `${origin}/invite?code=${server.inviteCode}`
-                        try {
-                          await navigator.clipboard.writeText(link)
-                          toast.success("초대 링크가 복사되었습니다")
-                        } catch {
-                          toast.error("초대 링크 복사 실패")
-                        }
-                      }}
-                    >
-                      초대 링크 복사
-                    </Button>
-                  </>
-                )}
+            {isMember && (
+              <div className="pt-3 space-y-2">
+                <div className="text-neon-pink text-sm">초대</div>
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={async () => {
+                      setInviteOpen(true)
+                      try {
+                        const f = await friendService.getFriends()
+                        setFriends(f)
+                      } catch {
+                        toast.error("친구 목록 로드 실패")
+                      }
+                    }}
+                  >
+                    <UserPlus className="h-4 w-4 mr-1" /> 친구 초대
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={async () => {
+                      const origin = typeof window !== 'undefined' ? window.location.origin : ''
+                      const link = `${origin}/invite?code=${server.inviteCode}`
+                      try {
+                        await navigator.clipboard.writeText(link)
+                        toast.success("초대 링크가 복사되었습니다")
+                      } catch {
+                        toast.error("초대 링크 복사 실패")
+                      }
+                    }}
+                  >
+                    링크 복사
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
         {/* 멤버 목록 */}
         <div className="space-y-3">
-          <h3 className="text-cyan-400 font-medium">멤버 목록</h3>
+          <h3 className="text-neon-cyan font-medium text-sm">멤버 목록</h3>
           <div className="space-y-2 max-h-48 overflow-y-auto overflow-x-hidden">
             {server.members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between px-3 py-2 bg-cyan-500/10 rounded-xl border border-cyan-500/20 hover:bg-cyan-500/20 transition-colors"
+                className="flex items-center justify-between px-3 py-2 bg-neon-cyan/5 rounded-xl border border-neon-cyan/20 hover:bg-neon-cyan/10 transition-colors"
               >
                 {/* 닉네임 왼쪽 */}
-                <span className="text-white text-sm truncate w-32">
+                <span className="text-foreground text-sm truncate min-w-0 flex-1 mr-2" title={member.nickname}>
                   {member.nickname}
                 </span>
 
                 {/* 왕관 및 액션 버튼 우측 */}
                 <div className="flex items-center space-x-2">
                   {member.id === server.ownerId && (
-                    <Crown className="h-4 w-4 text-yellow-400" />
+                    <Crown className="h-4 w-4 text-neon-yellow" />
                   )}
                   {server.admins.some((a) => a.id === member.id) &&
                     member.id !== server.ownerId && (
@@ -259,7 +260,7 @@ export function ServerOverview({
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="hover:bg-white/10"
+                        className="hover:bg-neon-cyan/20 text-neon-cyan"
                         title="친구 추가"
                         onClick={async () => {
                           try {
@@ -287,7 +288,7 @@ export function ServerOverview({
                         <Button
                           onClick={() => handleGrantAdmin(member)}
                           size="sm"
-                          className="glass-button text-white"
+                          variant="secondary"
                           disabled={isLoading}
                         >
                           임명
@@ -298,7 +299,6 @@ export function ServerOverview({
                           onClick={() => handleRevokeAdmin(member)}
                           size="sm"
                           variant="outline"
-                          className="glass border-white/30 text-white"
                           disabled={isLoading}
                         >
                           해임
@@ -311,7 +311,7 @@ export function ServerOverview({
                           onClick={() => { setKickTarget(member); setKickOpen(true) }}
                           size="sm"
                           variant="ghost"
-                          className="text-red-400 truncate hover:text-red-300 hover:bg-red-500/20"
+                          className="text-neon-red hover:text-neon-red hover:bg-neon-red/20"
                           disabled={isLoading}
                         >
                           강퇴
@@ -326,56 +326,58 @@ export function ServerOverview({
         </div>
 
         {/* 통계 및 설정 버튼 */}
-        <div className="space-y-2 p-4">
-          <div className={isMember ? "flex justify-center sm:justify-start" : undefined}>
-            <Button
-              variant="outline"
-              className="w-auto glass border-white/30 text-white hover:bg-black/10 hover:text-white"
-              disabled={checkingStats}
-              onClick={async () => {
-                setCheckingStats(true)
-                try {
-                  const entries = await timetableService.getTimetable(server.id)
-                  if (!entries || entries.length === 0) {
-                    setNoStatsOpen(true)
-                    return
-                  }
-                  router.push(`/stats/${server.id}`)
-                } catch {
-                  toast.error("통계 확인 실패", { description: "스케줄 정보를 확인할 수 없습니다." })
-                } finally {
-                  setCheckingStats(false)
+        <div className="space-y-3 pt-2">
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={checkingStats}
+            onClick={async () => {
+              setCheckingStats(true)
+              try {
+                const entries = await timetableService.getTimetable(server.id)
+                if (!entries || entries.length === 0) {
+                  setNoStatsOpen(true)
+                  return
                 }
-              }}
-            >
-              <BarChart3 className="mr-2 h-4 w-4 text-white" /> 통계 보기
-            </Button>
-          </div>
+                router.push(`/stats/${server.id}`)
+              } catch {
+                toast.error("통계 확인 실패", { description: "스케줄 정보를 확인할 수 없습니다." })
+              } finally {
+                setCheckingStats(false)
+              }
+            }}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" /> 통계 보기
+          </Button>
           {(isOwner || isAdmin) && (
             <Dialog open={showSettings} onOpenChange={setShowSettings}>
               <DialogTrigger asChild>
-                <Button  className="w-full glass border-white/30 text-white hover:bg-black/10 hover:text-white">
-                  <SettingsIcon className="mr-2 h-4 w-4 text-white" /> 서버 설정
+                <Button variant="secondary" className="w-full">
+                  <SettingsIcon className="mr-2 h-4 w-4" /> 서버 설정
                 </Button>
               </DialogTrigger>
-              <DialogContent className="glass border-white/20 max-w-md">
+              <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle className="text-white">서버 설정</DialogTitle>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2.5 rounded-xl bg-neon-cyan/20 shadow-[0_0_15px_rgba(5,242,219,0.2)]">
+                      <SettingsIcon className="w-5 h-5 text-neon-cyan" />
+                    </div>
+                    <DialogTitle className="text-neon-cyan drop-shadow-[0_0_10px_rgba(5,242,219,0.5)] font-display">서버 설정</DialogTitle>
+                  </div>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-1">
-                    <Label htmlFor="srv-name" className="text-white">
+                    <Label htmlFor="srv-name">
                       서버 이름
                     </Label>
                     <Input
                       id="srv-name"
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
-                      className="glass border-white/30 text-white"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="srv-reset" className="text-white">
+                    <Label htmlFor="srv-reset">
                       초기화 시간
                     </Label>
                     <Input
@@ -383,36 +385,30 @@ export function ServerOverview({
                       type="time"
                       value={newResetTime}
                       onChange={(e) => setNewResetTime(e.target.value)}
-                      className="glass border-white/30 text-white"
                     />
                   </div>
                 </div>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button
-                      variant="outline"
-                      className="glass border-white/30 hover:bg-black/10"
-                    >
+                    <Button variant="outline">
                       취소
                     </Button>
                   </DialogClose>
                   <Button
                     onClick={handleSaveSettings}
-                    className="glass-button text-white"
                     disabled={isLoading}
                   >
                     저장
                   </Button>
                 </DialogFooter>
                 {isOwner && (
-                  <div className="mt-4 border-t border-white/20 pt-4 space-y-2">
-                    <Label htmlFor="srv-delete-confirm" className="text-white">서버 이름을 입력하여 삭제를 확인하세요</Label>
+                  <div className="mt-4 border-t border-white/10 pt-4 space-y-2">
+                    <Label htmlFor="srv-delete-confirm" className="text-neon-red">서버 이름을 입력하여 삭제를 확인하세요</Label>
                     <Input
                       id="srv-delete-confirm"
                       value={serverNameConfirm}
                       onChange={(e) => setServerNameConfirm(e.target.value)}
                       placeholder={server.name}
-                      className="glass border-white/30 text-white"
                     />
                     <Button
                       variant="destructive"
@@ -420,7 +416,7 @@ export function ServerOverview({
                       onClick={() => setDeleteOpen(true)}
                       disabled={isLoading || serverNameConfirm !== server.name}
                     >
-                      서버 삭제
+                      <Trash2 className="mr-2 h-4 w-4" /> 서버 삭제
                     </Button>
                   </div>
                 )}
@@ -432,38 +428,47 @@ export function ServerOverview({
     </Card>
     {/* 스케줄 없음 안내 모달 */}
     <Dialog open={noStatsOpen} onOpenChange={setNoStatsOpen}>
-      <DialogContent className="glass border-white/20 max-w-sm">
+      <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle className="text-white">통계 데이터 없음</DialogTitle>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2.5 rounded-xl bg-neon-yellow/20 shadow-[0_0_15px_rgba(255,215,0,0.2)]">
+              <BarChart3 className="w-5 h-5 text-neon-yellow" />
+            </div>
+            <DialogTitle className="text-neon-yellow drop-shadow-[0_0_10px_rgba(255,215,0,0.5)] font-display">통계 데이터 없음</DialogTitle>
+          </div>
         </DialogHeader>
-        <div className="text-white/80 text-sm">아직 통계가 없습니다. 스케줄을 먼저 등록해주세요.</div>
+        <div className="text-foreground/80 text-sm py-2">아직 통계가 없습니다. 스케줄을 먼저 등록해주세요.</div>
         <div className="flex justify-end space-x-2 pt-4">
           <DialogClose asChild>
-            <Button variant="outline" className="glass border-white/30 text-white">닫기</Button>
+            <Button variant="outline">닫기</Button>
           </DialogClose>
         </div>
       </DialogContent>
     </Dialog>
     {/* 초대 모달 */}
     <Dialog open={inviteOpen} onOpenChange={setInviteOpen} key="invite">
-      <DialogContent className="glass border-white/20 max-w-md">
+      <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-white">친구 초대</DialogTitle>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2.5 rounded-xl bg-neon-green/20 shadow-[0_0_15px_rgba(0,255,136,0.2)]">
+              <UserPlus className="w-5 h-5 text-neon-green" />
+            </div>
+            <DialogTitle className="text-neon-green drop-shadow-[0_0_10px_rgba(0,255,136,0.5)] font-display">친구 초대</DialogTitle>
+          </div>
         </DialogHeader>
         <div className="space-y-2 max-h-72 overflow-y-auto">
           {friends.friends.filter((f) => !server.members.some((m) => m.id === f.id)).length === 0 && (
-            <div className="text-white/60 text-sm">초대 가능한 친구가 없습니다.</div>
+            <div className="text-muted-foreground text-sm p-3 rounded-xl bg-white/5 border border-white/10">초대 가능한 친구가 없습니다.</div>
           )}
           {friends.friends
             .filter((f) => !server.members.some((m) => m.id === f.id))
             .map((f) => (
-            <div key={f.id} className="flex items-center justify-between p-2 glass rounded-lg">
-              <div className="text-white text-sm">
-                {f.nickname} <span className="text-white/50">@{f.username}</span>
+            <div key={f.id} className="flex items-center justify-between p-3 bg-neon-green/5 border border-neon-green/20 rounded-xl hover:bg-neon-green/10 transition-colors">
+              <div className="text-foreground text-sm">
+                {f.nickname} <span className="text-muted-foreground">@{f.username}</span>
               </div>
               <Button
                 size="sm"
-                className="glass-button"
                 disabled={inviteLoading}
                 onClick={async () => {
                   setInviteLoading(true)
@@ -484,26 +489,31 @@ export function ServerOverview({
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline" className="glass border-white/30 text-white">닫기</Button>
+            <Button variant="outline">닫기</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
     {/* 강퇴 확인 다이얼로그 */}
     <ConfirmDialog open={kickOpen} onOpenChange={setKickOpen}>
-      <ConfirmContent className="glass border-white/20 max-w-sm">
+      <ConfirmContent className="max-w-sm">
         <ConfirmHeader>
-          <ConfirmTitle className="text-white">멤버 강퇴</ConfirmTitle>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2.5 rounded-xl bg-neon-red/20 shadow-[0_0_15px_rgba(255,51,102,0.2)]">
+              <Users className="w-5 h-5 text-neon-red" />
+            </div>
+            <ConfirmTitle className="text-neon-red drop-shadow-[0_0_10px_rgba(255,51,102,0.5)] font-display">멤버 강퇴</ConfirmTitle>
+          </div>
         </ConfirmHeader>
-        <div className="text-white/80 text-sm">
+        <div className="text-foreground/80 text-sm py-2">
           {kickTarget ? `${kickTarget.nickname} 을(를) 강퇴하시겠습니까?` : "대상을 선택해주세요."}
         </div>
         <ConfirmFooter>
           <ConfirmClose asChild>
-            <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
+            <Button variant="outline">취소</Button>
           </ConfirmClose>
           <Button
-            className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300"
+            variant="destructive"
             disabled={isLoading || !kickTarget}
             onClick={handleConfirmKick}
           >
@@ -514,19 +524,24 @@ export function ServerOverview({
     </ConfirmDialog>
     {/* 서버 삭제 확인 다이얼로그 */}
     <ConfirmDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-      <ConfirmContent className="glass border-white/20 max-w-sm">
+      <ConfirmContent className="max-w-sm">
         <ConfirmHeader>
-          <ConfirmTitle className="text-white">서버 삭제</ConfirmTitle>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2.5 rounded-xl bg-neon-red/20 shadow-[0_0_15px_rgba(255,51,102,0.2)]">
+              <Trash2 className="w-5 h-5 text-neon-red" />
+            </div>
+            <ConfirmTitle className="text-neon-red drop-shadow-[0_0_10px_rgba(255,51,102,0.5)] font-display">서버 삭제</ConfirmTitle>
+          </div>
         </ConfirmHeader>
-        <div className="text-white/80 text-sm">
+        <div className="text-foreground/80 text-sm py-2">
           정말 서버를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
         </div>
         <ConfirmFooter>
           <ConfirmClose asChild>
-            <Button variant="outline" className="glass border-white/30 text-white">취소</Button>
+            <Button variant="outline">취소</Button>
           </ConfirmClose>
           <Button
-            className="glass-button bg-red-500/20 hover:bg-red-500/30 text-red-300"
+            variant="destructive"
             disabled={isLoading || serverNameConfirm !== server.name}
             onClick={handleDeleteServer}
           >
@@ -535,7 +550,6 @@ export function ServerOverview({
         </ConfirmFooter>
       </ConfirmContent>
     </ConfirmDialog>
-    {/* 친구 추가 모달 제거 요청에 따라 삭제됨 */}
     </>
   )
 }

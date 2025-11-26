@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { gameService } from "@/lib/game-service"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Gamepad2 } from "lucide-react"
 import Image from "next/image"
 import {
   Dialog,
@@ -135,14 +135,17 @@ export function GameManagement({ serverId }: GameManagementProps) {
 
   if (isLoading) {
     return (
-      <Card className="card-cyber border-purple-500/30 h-full">
+      <Card>
         <CardHeader>
-          <CardTitle className="neon-text-purple flex items-center">
+          <CardTitle className="text-neon-magenta drop-shadow-[0_0_10px_rgba(217,4,142,0.5)] flex items-center">
             <Image src="/logo_round.png" alt="게임" width={20} height={20} className="mr-2 h-5 w-5" /> 게임 관리
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-muted-foreground">로딩 중...</div>
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <div className="w-5 h-5 border-2 border-neon-magenta border-t-transparent rounded-full animate-spin" />
+            로딩 중...
+          </div>
         </CardContent>
       </Card>
     )
@@ -150,17 +153,17 @@ export function GameManagement({ serverId }: GameManagementProps) {
 
   return (
     <>
-      <Card className="card-cyber border-purple-500/30 h-full flex flex-col">
+      <Card>
         <CardHeader>
-          <CardTitle className="neon-text-purple flex items-center">
+          <CardTitle className="text-neon-magenta drop-shadow-[0_0_10px_rgba(217,4,142,0.5)] flex items-center">
             <Image src="/logo_round.png" alt="게임" width={20} height={20} className="mr-2 h-5 w-5" /> 게임 관리
           </CardTitle>
-          <CardDescription className="text-white/70">
+          <CardDescription>
             기본 게임과 커스텀 게임을 관리하세요
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6 flex-grow">
-          <h3 className="text-purple-400 font-medium mb-3">커스텀 게임</h3>
+        <CardContent className="space-y-4">
+          <h3 className="text-neon-magenta font-medium text-sm mb-3">커스텀 게임</h3>
           <form
             onSubmit={handleAddCustomGame}
             className="flex gap-2 mb-3"
@@ -169,14 +172,12 @@ export function GameManagement({ serverId }: GameManagementProps) {
               value={newGameName}
               onChange={(e) => setNewGameName(e.target.value)}
               placeholder="게임 이름"
-              className="input-cyber text-sm"
               inputMode="text"
               style={{ fontSize: 16 }}
             />
             <Button
               type="submit"
-              size="sm"
-              className="btn-cyber-purple"
+              size="icon"
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -185,23 +186,28 @@ export function GameManagement({ serverId }: GameManagementProps) {
             {customGames.map((game) => (
               <div
                 key={game.id}
-                className="flex items-center justify-between p-2 bg-purple-500/10 rounded-xl border border-purple-500/20 hover:bg-purple-500/20 transition-colors"
+                className="flex items-center justify-between p-3 bg-neon-magenta/5 rounded-xl border border-neon-magenta/20 hover:bg-neon-magenta/10 transition-colors"
               >
-                <span className="text-white text-sm truncate w-40">
+                <span className="text-foreground text-sm truncate min-w-0 flex-1 mr-2" title={game.name}>
                   {game.name}
                 </span>
                 <Button
                   onClick={() =>
                     requestDeleteCustomGame(game.id, game.name)
                   }
-                  size="sm"
+                  size="icon"
                   variant="ghost"
-                  className="text-pink-400 truncate hover:text-pink-300 hover:bg-pink-500/20"
+                  className="text-neon-red hover:text-neon-red hover:bg-neon-red/20"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             ))}
+            {customGames.length === 0 && (
+              <div className="text-center py-4 text-muted-foreground text-sm">
+                커스텀 게임이 없습니다
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -211,30 +217,35 @@ export function GameManagement({ serverId }: GameManagementProps) {
         open={showDeleteModal}
         onOpenChange={setShowDeleteModal}
       >
-        <DialogContent className="card-cyber border-pink-500/30 max-w-md">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="neon-text-accent">
-              {deletingGameName} 삭제 확인
-            </DialogTitle>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2.5 rounded-xl bg-neon-red/20 shadow-[0_0_15px_rgba(255,51,102,0.2)]">
+                <Gamepad2 className="w-5 h-5 text-neon-red" />
+              </div>
+              <DialogTitle className="text-neon-red drop-shadow-[0_0_10px_rgba(255,51,102,0.5)] font-display">
+                {deletingGameName} 삭제 확인
+              </DialogTitle>
+            </div>
           </DialogHeader>
-          <div className="p-4 text-white">
-            <p>다음 사용자가 예약한 기록이 있습니다:</p>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-pink-400">
+          <div className="py-2 text-foreground/80">
+            <p className="text-sm">다음 사용자가 예약한 기록이 있습니다:</p>
+            <ul className="list-disc list-inside mt-2 space-y-1 text-neon-pink text-sm">
               {scheduledUsers.map((user) => (
                 <li key={user}>{user}</li>
               ))}
             </ul>
-            <p className="mt-4 text-white/80">정말로 삭제하시겠습니까?</p>
+            <p className="mt-4 text-foreground/80 text-sm">정말로 삭제하시겠습니까?</p>
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button className="btn-cyber-outline text-sm px-4 py-2">
+              <Button variant="outline">
                 취소
               </Button>
             </DialogClose>
             <Button
               onClick={confirmDelete}
-              className="btn-cyber-pink text-sm px-4 py-2"
+              variant="destructive"
             >
               예, 삭제합니다
             </Button>
