@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
 import { authService } from "@/lib/auth-service"
-import { Loader2 } from "lucide-react"
+import { Loader2, UserPlus } from "lucide-react"
 import Image from "next/image"
 import { DiscordIcon } from "@/components/icons/discord-icon"
 import { openOAuthInBrowser, isNative } from "@/lib/native"
@@ -32,40 +32,24 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // 아이디 유효성 검사
     if (username.length < 3 || username.length > 20) {
-      toast.error("아이디 길이 오류", {
-        description: "아이디는 3자 이상 20자 이하로 입력해주세요.",
-      })
+      toast.error("아이디 길이 오류", { description: "아이디는 3자 이상 20자 이하로 입력해주세요." })
       return
     }
     if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-      toast.error("아이디 형식 오류", {
-        description: "아이디는 영문, 숫자, 밑줄(_)만 사용할 수 있습니다.",
-      })
+      toast.error("아이디 형식 오류", { description: "아이디는 영문, 숫자, 밑줄(_)만 사용할 수 있습니다." })
       return
     }
-
-    // 사용자명 유효성 검사
     if (nickname.length < 2 || nickname.length > 30) {
-      toast.error("사용자명 길이 오류", {
-        description: "사용자명은 2자 이상 30자 이하로 입력해주세요.",
-      })
+      toast.error("사용자명 길이 오류", { description: "사용자명은 2자 이상 30자 이하로 입력해주세요." })
       return
     }
-
-    // 비밀번호 유효성 검사
     if (password.length < 8) {
-      toast.error("비밀번호 길이 오류", {
-        description: "비밀번호는 최소 8자 이상이어야 합니다.",
-      })
+      toast.error("비밀번호 길이 오류", { description: "비밀번호는 최소 8자 이상이어야 합니다." })
       return
     }
-
     if (password !== confirmPassword) {
-      toast.error("비밀번호 확인 오류", {
-        description: "비밀번호가 일치하지 않습니다.",
-      })
+      toast.error("비밀번호 확인 오류", { description: "비밀번호가 일치하지 않습니다." })
       return
     }
 
@@ -83,20 +67,9 @@ export default function SignupPage() {
         router.push("/auth/login")
       }
     } catch (error) {
-      toast.error("회원가입 실패", {
-        description: "다시 시도해주세요.",
-      })
+      toast.error("회원가입 실패", { description: "다시 시도해주세요." })
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const isNativeWebView = () => {
-    try {
-      const w = window as any
-      return !!(w?.Capacitor?.isNativePlatform?.() === true)
-    } catch {
-      return false
     }
   }
 
@@ -112,22 +85,16 @@ export default function SignupPage() {
   const handleDiscordSignup = async () => {
     setIsDiscordLoading(true)
     const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
-    
-    // 네이티브 앱인지 확인
     const isNativeApp = await isNative()
     const target = isNativeApp ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
-    
     const url = `${base}/oauth2/authorization/discord?target=${encodeURIComponent(target)}`
-    
+
     if (isNativeApp) {
-      // 네이티브 앱에서는 Capacitor Browser 플러그인 사용
       const opened = await openOAuthInBrowser(url)
       if (!opened) {
-        // 브라우저 플러그인이 없으면 일반 웹뷰로 열기
         window.location.href = url
       }
     } else {
-      // 웹에서는 일반 리다이렉트
       window.location.href = url
     }
   }
@@ -135,46 +102,58 @@ export default function SignupPage() {
   const handleKakaoSignup = async () => {
     setIsKakaoLoading(true)
     const base = process.env.NEXT_PUBLIC_API_URL!.replace(/\/api$/, "")
-    
-    // 네이티브 앱인지 확인
     const isNativeApp = await isNative()
     const target = isNativeApp ? "app" : (isIOSMobileWeb() ? "mobile-web" : "web")
-    
     const url = `${base}/oauth2/authorization/kakao?target=${encodeURIComponent(target)}`
-    
+
     if (isNativeApp) {
-      // 네이티브 앱에서는 Capacitor Browser 플러그인 사용
       const opened = await openOAuthInBrowser(url)
       if (!opened) {
-        // 브라우저 플러그인이 없으면 일반 웹뷰로 열기
         window.location.href = url
       }
     } else {
-      // 웹에서는 일반 리다이렉트
       window.location.href = url
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background grid-bg">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      {/* 배경 효과 */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(5,242,219,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(5,242,219,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-neon-magenta/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-neon-cyan/10 rounded-full blur-[150px]" />
+      </div>
+
       <motion.div
-        className="w-full max-w-md"
+        className="relative w-full max-w-md z-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
+        {/* 로고 영역 */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 glass rounded-2xl mb-4 overflow-hidden mx-auto animate-float">
-            <Image src="/logo_round.png" alt="GameSync" width={64} height={64} className="w-16 h-16" />
-          </div>
-          <h1 className="text-3xl font-bold neon-text-primary mb-2">GameSync</h1>
-          <p className="text-muted-foreground">게임 스케줄링 플랫폼에 가입하세요</p>
+          <Link href="/" className="inline-block group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-neon-magenta/30 rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition-opacity" />
+              <div className="relative w-20 h-20 rounded-2xl bg-cyber-dark/60 border border-neon-magenta/30 overflow-hidden mx-auto mb-4 backdrop-blur-sm">
+                <Image src="/logo_round.png" alt="GameSync" width={80} height={80} className="w-full h-full" />
+              </div>
+            </div>
+          </Link>
+          <h1 className="font-display font-bold text-3xl text-neon-cyan drop-shadow-[0_0_15px_rgba(5,242,219,0.5)] mb-2">
+            GameSync
+          </h1>
+          <p className="text-muted-foreground font-body">게임 스케줄링 플랫폼에 가입하세요</p>
         </div>
 
-        <Card className="card-cyber">
-          <CardHeader>
-            <CardTitle className="neon-text-primary text-xl">회원가입</CardTitle>
-            <CardDescription className="text-muted-foreground">새 계정을 만들어보세요</CardDescription>
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="flex items-center justify-center gap-2">
+              <UserPlus className="w-5 h-5" />
+              회원가입
+            </CardTitle>
+            <CardDescription>새 계정을 만들어보세요</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {!REVIEW_MODE && (
@@ -183,17 +162,17 @@ export default function SignupPage() {
                 <Button
                   onClick={handleDiscordSignup}
                   disabled={isDiscordLoading || isKakaoLoading || isLoading}
-                  className="w-full bg-none !bg-[#5865F2] hover:!bg-[#4752C4] text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#5865F2]/50"
+                  className="w-full !bg-[#5865F2] hover:!bg-[#4752C4] text-white border-none shadow-[0_0_15px_rgba(88,101,242,0.4)] hover:shadow-[0_0_25px_rgba(88,101,242,0.6)]"
                 >
                   {isDiscordLoading ? (
                     <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Discord 연결 중...</span>
+                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      Discord 연결 중...
                     </>
                   ) : (
                     <>
-                      <DiscordIcon className="w-5 h-5" />
-                      <span>Discord로 계속하기</span>
+                      <DiscordIcon className="w-5 h-5 mr-2" />
+                      Discord로 계속하기
                     </>
                   )}
                 </Button>
@@ -202,27 +181,25 @@ export default function SignupPage() {
                 <Button
                   onClick={handleKakaoSignup}
                   disabled={isKakaoLoading || isDiscordLoading || isLoading}
-                  className="w-full bg-none !bg-[#FEE500] hover:!bg-[#F7D400] text-black font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-[#FEE500]/50"
+                  className="w-full !bg-[#FEE500] hover:!bg-[#F7D400] !text-black border-none shadow-[0_0_15px_rgba(254,229,0,0.4)] hover:shadow-[0_0_25px_rgba(254,229,0,0.6)]"
                 >
                   {isKakaoLoading ? (
                     <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>카카오 연결 중...</span>
+                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      카카오 연결 중...
                     </>
                   ) : (
-                    <>
-                      <span>카카오로 계속하기</span>
-                    </>
+                    <>카카오로 계속하기</>
                   )}
                 </Button>
 
                 {/* 구분선 */}
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-white/20" />
+                    <span className="w-full border-t border-white/10" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-transparent px-2 text-muted-foreground">또는</span>
+                    <span className="px-3 text-muted-foreground bg-cyber-dark">또는</span>
                   </div>
                 </div>
               </>
@@ -231,9 +208,7 @@ export default function SignupPage() {
             {/* 일반 회원가입 폼 */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-muted-foreground">
-                  로그인 아이디 (3~20자, 영문,숫자)
-                </Label>
+                <Label htmlFor="username">로그인 아이디 (3~20자, 영문,숫자)</Label>
                 <Input
                   id="username"
                   type="text"
@@ -243,7 +218,6 @@ export default function SignupPage() {
                   maxLength={20}
                   pattern="^[a-zA-Z0-9_]+$"
                   title="3~20자 영문, 숫자, 밑줄(_)만 가능"
-                  className="input-cyber"
                   placeholder="로그인 아이디를 입력하세요"
                   required
                   disabled={isDiscordLoading || isKakaoLoading}
@@ -251,9 +225,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="nickname" className="text-muted-foreground">
-                  사용자명 (2~30자)
-                </Label>
+                <Label htmlFor="nickname">사용자명 (2~30자)</Label>
                 <Input
                   id="nickname"
                   type="text"
@@ -262,7 +234,6 @@ export default function SignupPage() {
                   minLength={2}
                   maxLength={30}
                   title="2~30자 사이로 입력해주세요"
-                  className="input-cyber"
                   placeholder="사용자명을 입력하세요"
                   required
                   disabled={isDiscordLoading || isKakaoLoading}
@@ -270,9 +241,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-muted-foreground">
-                  비밀번호 (최소 8자)
-                </Label>
+                <Label htmlFor="password">비밀번호 (최소 8자)</Label>
                 <Input
                   id="password"
                   type="password"
@@ -280,7 +249,6 @@ export default function SignupPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   minLength={8}
                   title="비밀번호는 최소 8자 이상이어야 합니다."
-                  className="input-cyber"
                   placeholder="비밀번호를 입력하세요"
                   required
                   disabled={isDiscordLoading || isKakaoLoading}
@@ -288,9 +256,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-muted-foreground">
-                  비밀번호 확인
-                </Label>
+                <Label htmlFor="confirmPassword">비밀번호 확인</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -298,7 +264,6 @@ export default function SignupPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   minLength={8}
                   title="비밀번호를 다시 입력하세요"
-                  className="input-cyber"
                   placeholder="비밀번호를 다시 입력하세요"
                   required
                   disabled={isDiscordLoading || isKakaoLoading}
@@ -307,7 +272,8 @@ export default function SignupPage() {
 
               <Button
                 type="submit"
-                className="w-full btn-cyber font-medium py-3"
+                variant="secondary"
+                className="w-full"
                 disabled={isLoading || isDiscordLoading || isKakaoLoading}
               >
                 {isLoading ? (
@@ -323,10 +289,10 @@ export default function SignupPage() {
 
             <div className="text-center">
               <p className="text-muted-foreground text-sm">
-                이미 계정이 있으신가요? {" "}
+                이미 계정이 있으신가요?{" "}
                 <Link
                   href="/auth/login"
-                  className="neon-text-accent hover:drop-shadow-[0_0_10px_rgba(255,0,100,0.8)] font-medium transition-all"
+                  className="text-neon-cyan hover:text-neon-cyan/80 hover:drop-shadow-[0_0_10px_rgba(5,242,219,0.6)] font-medium transition-all"
                 >
                   로그인
                 </Link>
