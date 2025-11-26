@@ -84,7 +84,7 @@ export function Navbar() {
               }
             } catch {}
           }}>
-            <Image src="/logo_round.png" alt="GameSync" width={24} height={24} className="h-6 w-6 animate-float" />
+            <Image src="/logo_round.png" alt="GameSync" width={24} height={24} className="h-6 w-6" />
             <span className="hidden sm:inline text-xs sm:text-sm md:text-base lg:text-lg font-bold neon-text-primary whitespace-nowrap">
               GameSync
             </span>
